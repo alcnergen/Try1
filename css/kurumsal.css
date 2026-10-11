@@ -1,0 +1,220 @@
+/* ==========================================================================
+   Vitrin Kurumsal (white-label) sayfası — styles.css üzerine eklenir.
+   --wl, --wl2, --wl-ink: seçilen markanın renkleri (kurumsal.js günceller).
+   ========================================================================== */
+
+.wl-page {
+  --wl: var(--accent);
+  --wl2: var(--accent-2);
+  --wl-ink: var(--accent-ink);
+}
+
+.logo-tag {
+  margin-left: 2px; padding: 3px 9px; border-radius: 999px;
+  font-family: var(--font-body); font-size: 0.68rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--muted); border: 1px solid var(--line-strong);
+}
+
+/* Sayfa vurguları da seçilen markayı izler */
+.wl-accent-text {
+  background: linear-gradient(135deg, var(--wl2), var(--wl));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  transition: filter 0.4s;
+}
+.wl-btn { background: linear-gradient(135deg, var(--wl2), var(--wl)); color: var(--wl-ink); box-shadow: 0 10px 30px -10px color-mix(in srgb, var(--wl) 70%, transparent), inset 0 1px 0 rgba(255, 255, 255, 0.3); }
+.wl-btn:hover { box-shadow: 0 14px 38px -10px color-mix(in srgb, var(--wl) 85%, transparent), inset 0 1px 0 rgba(255, 255, 255, 0.3); }
+.wl-dot { background: var(--wl); box-shadow: 0 0 0 4px color-mix(in srgb, var(--wl) 20%, transparent); transition: background-color 0.4s; }
+.wl-kicker { color: var(--wl2); }
+.wl-glow {
+  background:
+    radial-gradient(40% 50% at 50% 30%, color-mix(in srgb, var(--wl) 24%, transparent), transparent 70%),
+    radial-gradient(30% 35% at 80% 60%, color-mix(in srgb, var(--wl2) 10%, transparent), transparent 70%);
+  transition: background 0.5s;
+}
+.wl-title { max-width: 14ch; }
+
+.wl-sectors { margin-top: 32px; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.wl-sectors li {
+  padding: 7px 14px; border-radius: 999px; font-size: 0.85rem; color: var(--muted);
+  background: rgba(255, 255, 255, 0.03); border: 1px solid var(--line);
+}
+
+/* ---------- marka seçici ---------- */
+.wl-picker { position: relative; z-index: 1; margin-top: 72px; text-align: center; }
+.wl-picker-label { color: var(--muted); font-size: 0.92rem; margin-bottom: 14px; }
+.wl-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.wl-chip {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 10px 18px 10px 12px; border-radius: 999px; font-weight: 600; font-size: 0.92rem;
+  background: rgba(255, 255, 255, 0.04); border: 1px solid var(--line-strong); color: var(--muted);
+  transition: color 0.2s, border-color 0.2s, background-color 0.2s, box-shadow 0.25s, transform 0.2s var(--ease);
+}
+.wl-chip::before {
+  content: ""; width: 14px; height: 14px; border-radius: 50%; flex: none;
+  background: var(--c); box-shadow: 0 0 0 3px color-mix(in srgb, var(--c) 25%, transparent);
+}
+.wl-chip:hover { color: var(--text); transform: translateY(-1px); }
+.wl-chip.is-active {
+  color: var(--text);
+  border-color: color-mix(in srgb, var(--c) 70%, transparent);
+  background: color-mix(in srgb, var(--c) 14%, transparent);
+  box-shadow: 0 8px 28px -12px var(--c);
+}
+.wl-chip-custom { border-style: dashed; }
+
+.wl-custom[hidden] { display: none; }
+.wl-custom {
+  margin: 16px auto 0; display: inline-flex; flex-wrap: wrap; justify-content: center; gap: 12px;
+  padding: 12px 14px; border-radius: 18px; background: var(--surface); border: 1px solid var(--line-strong);
+}
+.wl-custom label { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; color: var(--muted); }
+.wl-custom input[type="text"], .wl-custom select {
+  height: 38px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line-strong);
+  background: var(--bg); color: var(--text); font: inherit; font-size: 0.9rem;
+}
+.wl-custom input[type="text"] { width: 160px; }
+.wl-custom input[type="color"] { width: 44px; height: 38px; padding: 3px; border-radius: 10px; border: 1px solid var(--line-strong); background: var(--bg); cursor: pointer; }
+
+/* ---------- tarayıcı çerçevesi ---------- */
+.wl-frame {
+  position: relative; z-index: 1; margin: 28px auto 0; max-width: 1100px;
+  border-radius: 22px; overflow: hidden;
+  border: 1px solid var(--line-strong);
+  box-shadow: 0 50px 120px -40px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(0, 0, 0, 0.4), 0 40px 120px -60px color-mix(in srgb, var(--wl) 55%, transparent);
+  transition: box-shadow 0.5s;
+}
+.wl-frame.is-switching .wl-app { animation: wl-flash 0.6s var(--ease); }
+@keyframes wl-flash { 0% { filter: saturate(0.6) brightness(1.15); } 100% { filter: none; } }
+.wl-chrome { display: flex; align-items: center; gap: 16px; height: 44px; padding: 0 16px; background: #1b1a20; border-bottom: 1px solid var(--line); }
+.wl-dots { display: flex; gap: 7px; }
+.wl-dots i { width: 11px; height: 11px; border-radius: 50%; background: #3a3840; }
+.wl-dots i:first-child { background: #ff5f57; }
+.wl-dots i:nth-child(2) { background: #febc2e; }
+.wl-dots i:nth-child(3) { background: #28c840; }
+.wl-url {
+  flex: 1; max-width: 420px; margin: 0 auto; display: flex; align-items: center; justify-content: center; gap: 7px;
+  height: 28px; padding: 0 14px; border-radius: 8px; background: #111015; color: var(--muted); font-size: 0.8rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace; white-space: nowrap; overflow: hidden;
+}
+.wl-url svg { width: 13px; height: 13px; flex: none; color: #4ade80; }
+.wl-caption { padding: 12px 16px; text-align: center; font-size: 0.8rem; color: var(--subtle); background: #121116; border-top: 1px solid var(--line); }
+
+/* ---------- markalı uygulama (önizleme) ---------- */
+.wl-app {
+  --b: #ff7a3d; --b2: #ffb35c; --b-ink: #1a0d05;
+  --p-bg: #0e0d12; --p-surface: #17161c; --p-surface-2: #1f1d25; --p-text: #f5f2ed; --p-muted: #a7a19a; --p-line: rgba(255, 255, 255, 0.08);
+  background: var(--p-bg); color: var(--p-text); text-align: left;
+  transition: background-color 0.45s, color 0.45s;
+}
+.wl-app[data-theme="light"] {
+  --p-bg: #f6f5f2; --p-surface: #ffffff; --p-surface-2: #f1efea; --p-text: #1a1814; --p-muted: #6f6a62; --p-line: rgba(20, 16, 10, 0.09);
+}
+.wl-app *, .wl-app *::before { transition: background-color 0.45s, color 0.45s, border-color 0.45s, box-shadow 0.45s; }
+
+.wl-top { display: flex; align-items: center; gap: 24px; height: 60px; padding: 0 24px; border-bottom: 1px solid var(--p-line); background: var(--p-surface); }
+.wl-brand { display: inline-flex; align-items: center; gap: 10px; white-space: nowrap; }
+.wl-brand strong { font-family: var(--font-display); font-size: 1.1rem; letter-spacing: -0.02em; }
+.wl-mark {
+  width: 30px; height: 30px; display: grid; place-items: center; flex: none;
+  font-family: var(--font-display); font-weight: 800; font-size: 0.95rem;
+  background: linear-gradient(135deg, var(--b2), var(--b)); color: var(--b-ink);
+  border-radius: 9px; transition: border-radius 0.4s var(--ease), clip-path 0.4s var(--ease), background 0.45s;
+}
+.wl-mark[data-shape="circle"] { border-radius: 50%; }
+.wl-mark[data-shape="square"] { border-radius: 4px; }
+.wl-mark[data-shape="arch"] { border-radius: 15px 15px 4px 4px; }
+.wl-mark[data-shape="hex"] { border-radius: 0; clip-path: polygon(25% 3%, 75% 3%, 100% 50%, 75% 97%, 25% 97%, 0 50%); }
+.wl-tabs { display: flex; gap: 4px; height: 100%; }
+.wl-tabs span { position: relative; display: flex; align-items: center; padding: 0 12px; font-size: 0.86rem; color: var(--p-muted); white-space: nowrap; }
+.wl-tabs .is-on { color: var(--p-text); font-weight: 600; }
+.wl-tabs .is-on::after { content: ""; position: absolute; left: 12px; right: 12px; bottom: -1px; height: 2px; border-radius: 2px; background: var(--b); }
+.wl-top-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.wl-pill { padding: 5px 11px; border-radius: 999px; font-size: 0.76rem; font-weight: 600; background: color-mix(in srgb, var(--b) 15%, transparent); color: var(--b); white-space: nowrap; }
+.wl-app[data-theme="dark"] .wl-pill { color: var(--b2); }
+.wl-avatar { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font-size: 0.72rem; font-weight: 700; background: linear-gradient(135deg, var(--b2), var(--b)); color: var(--b-ink); }
+
+.wl-body { padding: 28px 24px 18px; }
+.wl-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; }
+.wl-greet { font-family: var(--font-display); font-size: 1.6rem; font-weight: 700; letter-spacing: -0.03em; line-height: 1.15; }
+.wl-sub { margin-top: 4px; color: var(--p-muted); font-size: 0.86rem; }
+.wl-cta { flex: none; padding: 10px 16px; border-radius: 999px; font-size: 0.85rem; font-weight: 600; background: linear-gradient(135deg, var(--b2), var(--b)); color: var(--b-ink); box-shadow: 0 10px 24px -12px var(--b); }
+.wl-stats { margin-top: 22px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.wl-stats div { padding: 14px 16px; border-radius: 14px; background: var(--p-surface); border: 1px solid var(--p-line); }
+.wl-stats span { display: block; font-size: 0.74rem; color: var(--p-muted); }
+.wl-stats strong { display: block; margin-top: 6px; font-family: var(--font-display); font-size: 1.35rem; letter-spacing: -0.02em; }
+.wl-stats div:first-child { border-color: color-mix(in srgb, var(--b) 45%, transparent); background: color-mix(in srgb, var(--b) 8%, var(--p-surface)); }
+.wl-row-head { margin: 24px 0 12px; display: flex; justify-content: space-between; align-items: baseline; font-size: 0.92rem; }
+.wl-row-head span { font-size: 0.8rem; color: var(--b); }
+.wl-app[data-theme="dark"] .wl-row-head span { color: var(--b2); }
+.wl-cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.wl-card { display: grid; gap: 6px; padding: 8px 8px 12px; border-radius: 14px; background: var(--p-surface); border: 1px solid var(--p-line); }
+.wl-card img { width: 100%; aspect-ratio: 4 / 4.2; object-fit: cover; border-radius: 9px; }
+.wl-card-title { padding: 0 4px; font-size: 0.8rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wl-tag { justify-self: start; margin-left: 4px; padding: 2px 8px; border-radius: 999px; font-size: 0.7rem; font-weight: 600; background: color-mix(in srgb, var(--b) 15%, transparent); color: var(--b); }
+.wl-app[data-theme="dark"] .wl-tag { color: var(--b2); }
+.wl-powered { margin-top: 16px; text-align: right; font-size: 0.7rem; color: var(--p-muted); letter-spacing: 0.02em; }
+
+/* ---------- özellik ızgarası ---------- */
+.wl-features { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.wl-feature {
+  position: relative; padding: 32px; border-radius: var(--radius-lg); overflow: hidden;
+  background: linear-gradient(180deg, var(--surface), rgba(23, 22, 28, 0.5)); border: 1px solid var(--line);
+  transition: border-color 0.3s, transform 0.3s var(--ease);
+}
+.wl-feature:hover { border-color: color-mix(in srgb, var(--wl) 45%, transparent); transform: translateY(-3px); }
+.wl-ficon { width: 50px; height: 50px; border-radius: 14px; display: grid; place-items: center; color: var(--wl2); background: color-mix(in srgb, var(--wl) 15%, transparent); border: 1px solid color-mix(in srgb, var(--wl) 35%, transparent); }
+.wl-ficon svg { width: 26px; height: 26px; }
+.wl-feature h3 { margin-top: 22px; font-size: 1.4rem; }
+.wl-feature p { margin-top: 10px; color: var(--muted); }
+.wl-feature ul { margin-top: 18px; display: grid; gap: 9px; }
+.wl-feature li { position: relative; padding-left: 24px; font-size: 0.93rem; }
+.wl-feature li::before { content: ""; position: absolute; left: 2px; top: 0.5em; width: 12px; height: 7px; border-left: 2px solid var(--wl2); border-bottom: 2px solid var(--wl2); transform: rotate(-45deg); }
+.wl-code {
+  margin: 18px 0 0; padding: 16px 18px; border-radius: 14px; overflow-x: auto;
+  background: #0a090c; border: 1px solid var(--line); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.82rem; line-height: 1.7; color: var(--muted);
+}
+.c-k { color: var(--wl2); font-weight: 700; }
+.c-s { color: #9ecbff; }
+.c-v { color: #b5e8a4; }
+
+/* ---------- süreç ---------- */
+.wl-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; counter-reset: s; }
+.wl-steps li { padding: 28px; border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--line); }
+.wl-steps span { font-family: var(--font-display); font-size: 0.9rem; font-weight: 700; color: var(--wl2); }
+.wl-steps h3 { margin-top: 14px; font-size: 1.25rem; }
+.wl-steps p { margin-top: 8px; color: var(--muted); }
+
+/* ---------- kapanış ---------- */
+.wl-cta-box { border-color: color-mix(in srgb, var(--wl) 35%, transparent); }
+.wl-cta-glow { background: radial-gradient(50% 70% at 50% 0%, color-mix(in srgb, var(--wl) 32%, transparent), transparent 70%); }
+.wl-cta-note { margin-top: 18px !important; font-size: 0.86rem !important; color: var(--subtle) !important; }
+.wl-footer { margin-top: 0; padding-top: 0; border-top: 0; }
+.wl-footer a { color: var(--muted); }
+.wl-footer a:hover { color: var(--text); }
+
+/* ---------- responsive ---------- */
+@media (max-width: 900px) {
+  .wl-tabs { display: none; }
+  .wl-stats, .wl-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .wl-features, .wl-steps { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+  .wl-picker { margin-top: 48px; }
+  .wl-chip { padding: 8px 14px 8px 10px; font-size: 0.86rem; }
+  .wl-custom { display: flex; }
+  .wl-custom label { width: 100%; justify-content: space-between; }
+  .wl-custom input[type="text"] { width: 100%; max-width: 200px; }
+  .wl-frame { border-radius: 16px; }
+  .wl-chrome { height: 38px; gap: 10px; padding: 0 10px; }
+  .wl-dots i { width: 9px; height: 9px; }
+  .wl-top { height: 54px; padding: 0 14px; gap: 10px; }
+  .wl-brand strong { font-size: 0.98rem; }
+  .wl-pill { display: none; }
+  .wl-body { padding: 18px 14px 14px; }
+  .wl-head { flex-direction: column; align-items: flex-start; }
+  .wl-greet { font-size: 1.3rem; }
+  .wl-stats strong { font-size: 1.1rem; }
+  .wl-feature { padding: 26px 22px; }
+  .logo-tag { display: none; }
+}
+#onizleme { scroll-margin-top: calc(var(--header-h) + 16px); }

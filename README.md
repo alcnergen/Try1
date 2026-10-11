@@ -10,6 +10,7 @@ Bu depo üç katmandan oluşur:
 | Tanıtım sitesi | `/` | Statik tek sayfa (`index.html`, `css/`, `js/`, `img/`) |
 | Giriş | `/giris` | E-posta + şifre; demo hesabı ya da herhangi bir e-posta ile giriş |
 | Panel ve üretim aracı | `/panel` | Yalnızca oturum açıkken erişilir; araç panelin içinde açılır |
+| Kurumsal (white-label) | `/kurumsal` | Şirketlere özel tanıtım: marka seçiciyle anında markalanan panel önizlemesi |
 | 3B model | `/panel#model3d` | Görsel yükle → ~1 dakikalık üretim → döndürülebilir 3B görüntüleyici |
 
 ## Kurulum
@@ -84,6 +85,7 @@ Güvenlik: scrypt ile parola özeti, sunucu tarafında saklanan oturum jetonu (H
 
 ```
 index.html, css/, js/, img/, fonts/   Tanıtım sitesi (css/tokens.css site ve uygulama için ortak)
+kurumsal.html, css/kurumsal.css, js/kurumsal.js   White-label sayfası (örnek markalar hayalidir)
 server/index.js                       Express uygulaması, rotalar, demo verisi
 server/auth.js, db.js, jobs.js        Oturum, JSON veri deposu, iş kuyruğu
 server/pipeline/                      segment.js, process.js, backgrounds.js, color.js, listing.js

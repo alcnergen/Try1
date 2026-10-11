@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vitrin Kurumsal — Kendi markanla, kendi panelinle</title>
+  <meta name="description" content="E-ticaret ajansları, perakende zincirleri, pazaryerleri ve üreticiler için white-label yapay zeka ürün stüdyosu: kendi alan adınız, logonuz ve renklerinizle.">
+  <meta name="theme-color" content="#0c0b0f">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="canonical" href="https://vitrin.app/kurumsal">
+
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="tr_TR">
+  <meta property="og:site_name" content="Vitrin">
+  <meta property="og:title" content="Vitrin Kurumsal — Kendi markanla, kendi panelinle">
+  <meta property="og:description" content="Yapay zeka ürün stüdyosunu kendi markanızla müşterilerinize ve ekiplerinize sunun.">
+  <meta property="og:image" content="https://vitrin.app/img/og.jpg">
+
+  <link rel="preload" href="/fonts/bricolage-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="/css/kurumsal.css">
+  <script>document.documentElement.classList.add('js')</script>
+  <script src="/js/main.js" defer></script>
+  <script src="/js/kurumsal.js" defer></script>
+</head>
+<body class="wl-page">
+  <a class="skip-link" href="#icerik">İçeriğe geç</a>
+
+  <header class="site-header" data-header>
+    <div class="container header-inner">
+      <a class="logo" href="/" aria-label="Vitrin ana sayfa">
+        <svg class="logo-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <rect width="32" height="32" rx="9" fill="url(#lg)"/>
+          <path d="M9 10.5h14M10 10.5l1.4 12h9.2l1.4-12" fill="none" stroke="#1a0d05" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M16 14.5l1 2.2 2.2 1-2.2 1-1 2.2-1-2.2-2.2-1 2.2-1z" fill="#1a0d05"/>
+          <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb35c"/><stop offset="1" stop-color="#ff6a3d"/></linearGradient></defs>
+        </svg>
+        <span>vitrin</span>
+        <span class="logo-tag">Kurumsal</span>
+      </a>
+
+      <nav class="nav" id="ana-menu" aria-label="Ana menü" data-nav>
+        <ul>
+          <li><a href="#onizleme">Önizleme</a></li>
+          <li><a href="#ozellikler">Özellikler</a></li>
+          <li><a href="#iletisim">İletişim</a></li>
+          <li><a href="/">Satıcılar için</a></li>
+        </ul>
+        <a class="btn btn-primary nav-cta" href="#iletisim">Demo talep et</a>
+      </nav>
+
+      <div class="header-actions">
+        <a class="btn btn-ghost btn-sm" href="/giris">Giriş yap</a>
+        <button class="menu-toggle" type="button" aria-controls="ana-menu" aria-expanded="false" aria-label="Menüyü aç" data-menu-toggle>
+          <span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="icerik">
+    <!-- Hero -->
+    <section class="hero wl-hero">
+      <div class="hero-glow wl-glow" aria-hidden="true"></div>
+      <div class="container hero-inner">
+        <p class="eyebrow reveal"><span class="eyebrow-dot wl-dot"></span>White-label · Kurumsal</p>
+        <h1 class="hero-title wl-title reveal">Kendi markanla, <span class="wl-accent-text">kendi panelinle.</span></h1>
+        <p class="hero-sub reveal">E-ticaret ajansları, perakende zincirleri, pazaryeri operatörleri ve üreticiler için: Vitrin'in yapay zeka ürün stüdyosunu kendi alan adınızda, kendi logonuz ve renklerinizle müşterilerinize, satıcılarınıza ve ekiplerinize sunun. Altyapı bizden, marka sizden.</p>
+        <div class="hero-actions reveal">
+          <a class="btn btn-primary btn-lg wl-btn" href="#iletisim">
+            Demo talep et
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a class="btn btn-secondary btn-lg" href="#onizleme">Önizlemeyi dene</a>
+        </div>
+        <ul class="wl-sectors reveal" aria-label="Hedef sektörler">
+          <li>E-ticaret ajansları</li>
+          <li>Perakende zincirleri</li>
+          <li>Pazaryeri operatörleri</li>
+          <li>Üreticiler ve toptancılar</li>
+        </ul>
+      </div>
+
+      <!-- Marka seçici + panel önizlemesi -->
+      <div class="container" id="onizleme">
+        <div class="wl-picker reveal">
+          <p class="wl-picker-label" id="marka-secici">Bir marka seç, panel anında ona bürünsün:</p>
+          <div class="wl-chips" role="radiogroup" aria-labelledby="marka-secici" data-brand-chips>
+            <button type="button" class="wl-chip is-active" role="radio" aria-checked="true" data-brand="vitrin" style="--c:#ff7a3d">Vitrin</button>
+            <button type="button" class="wl-chip" role="radio" aria-checked="false" tabindex="-1" data-brand="pervaz" style="--c:#7c5cff">Pervaz Dijital</button>
+            <button type="button" class="wl-chip" role="radio" aria-checked="false" tabindex="-1" data-brand="mavera" style="--c:#0f9f74">Mavera Moda</button>
+            <button type="button" class="wl-chip" role="radio" aria-checked="false" tabindex="-1" data-brand="kozalak" style="--c:#2f7cf6">Kozalak Pazar</button>
+            <button type="button" class="wl-chip" role="radio" aria-checked="false" tabindex="-1" data-brand="tezgah" style="--c:#e8445a">Tezgâh Toptan</button>
+            <button type="button" class="wl-chip wl-chip-custom" role="radio" aria-checked="false" tabindex="-1" data-brand="custom" style="--c:#f5b700">+ Senin markan</button>
+          </div>
+          <form class="wl-custom" hidden data-custom-form>
+            <label>
+              <span>Marka adı</span>
+              <input type="text" maxlength="24" value="Markanız" data-custom-name>
+            </label>
+            <label class="wl-color">
+              <span>Ana renk</span>
+              <input type="color" value="#f5b700" data-custom-color>
+            </label>
+            <label class="wl-theme">
+              <span>Tema</span>
+              <select data-custom-theme>
+                <option value="dark">Koyu</option>
+                <option value="light">Açık</option>
+              </select>
+            </label>
+          </form>
+        </div>
+
+        <!-- Panel önizlemesi: data-b* alanlarını kurumsal.js seçilen markaya göre doldurur -->
+        <figure class="wl-frame reveal" aria-label="Markalı panel önizlemesi">
+          <div class="wl-chrome" aria-hidden="true">
+            <span class="wl-dots"><i></i><i></i><i></i></span>
+            <span class="wl-url"><svg viewBox="0 0 16 16"><path d="M5 7V5a3 3 0 0 1 6 0v2M4 7h8v6H4z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg><span data-b="domain">studyo.vitrin.app</span></span>
+          </div>
+
+          <div class="wl-app" data-wl-app data-theme="dark" style="--b:#ff7a3d;--b2:#ffb35c;--b-ink:#1a0d05">
+            <div class="wl-top">
+              <span class="wl-brand">
+                <span class="wl-mark" data-b="mark" data-shape="rounded">V</span>
+                <strong data-b="name">Vitrin</strong>
+              </span>
+              <span class="wl-tabs" data-b="tabs"><span class="is-on">Panel</span><span>Kütüphane</span><span>3B model</span></span>
+              <span class="wl-top-right">
+                <span class="wl-pill" data-b="pill">244 görsel hakkı</span>
+                <span class="wl-avatar" data-b="avatar">AD</span>
+              </span>
+            </div>
+
+            <div class="wl-body">
+              <div class="wl-head">
+                <div>
+                  <p class="wl-greet" data-b="greeting">Merhaba, Ayşe</p>
+                  <p class="wl-sub" data-b="sub">Demir Butik · Profesyonel plan</p>
+                </div>
+                <span class="wl-cta" data-b="cta">+ Yeni görsel</span>
+              </div>
+
+              <div class="wl-stats" data-b="stats">
+                <div><span>Bu ay üretilen</span><strong>128</strong></div>
+                <div><span>Kalan hak</span><strong>122</strong></div>
+                <div><span>Kazanılan zaman</span><strong>41 sa</strong></div>
+                <div><span>Ortalama süre</span><strong>5,4 sn</strong></div>
+              </div>
+
+              <div class="wl-row-head"><strong data-b="section">Son çalışmalar</strong><span data-b="sectionLink">Tümünü gör →</span></div>
+              <div class="wl-cards">
+                <div class="wl-card"><img src="/img/ornek-elbise.webp" alt="" width="800" height="1000" loading="lazy"><span class="wl-card-title" data-b="card0">Puantiyeli midi elbise</span><span class="wl-tag" data-b="tag0">Yaşam alanı</span></div>
+                <div class="wl-card"><img src="/img/ornek-canta.webp" alt="" width="800" height="1000" loading="lazy"><span class="wl-card-title" data-b="card1">Deri el çantası</span><span class="wl-tag" data-b="tag1">Koyu stüdyo</span></div>
+                <div class="wl-card"><img src="/img/ornek-kazak.webp" alt="" width="800" height="1000" loading="lazy"><span class="wl-card-title" data-b="card2">Örgü kazak</span><span class="wl-tag" data-b="tag2">Düz yatırma</span></div>
+                <div class="wl-card"><img src="/img/ornek-sneaker.webp" alt="" width="800" height="1000" loading="lazy"><span class="wl-card-title" data-b="card3">Beyaz deri sneaker</span><span class="wl-tag" data-b="tag3">Pastel</span></div>
+              </div>
+              <p class="wl-powered" data-b="powered">vitrin.app</p>
+            </div>
+          </div>
+          <figcaption class="wl-caption"><span data-b="sector">Varsayılan Vitrin paneli</span> · Örnek markalar ve veriler hayalidir.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- Özellikler -->
+    <section class="section" id="ozellikler">
+      <div class="container">
+        <header class="section-head reveal">
+          <p class="kicker wl-kicker">Neler sunuyoruz</p>
+          <h2>Sizin markanız, bizim altyapımız.</h2>
+          <p>Kendi ekibinizle yıllar sürecek bir yapay zeka stüdyosunu haftalar içinde, kendi adınızla yayına alın.</p>
+        </header>
+        <div class="wl-features">
+          <article class="wl-feature reveal">
+            <span class="wl-ficon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3.5 14 9l5.5.5-4.2 3.6 1.3 5.4L12 15.6l-4.6 2.9 1.3-5.4L4.5 9.5 10 9z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></span>
+            <h3>Kendi markanız</h3>
+            <p>Logonuz, renkleriniz, yazı tipiniz ve kendi alan adınız. Vitrin adı hiçbir ekranda, e-postada ya da indirilen dosyada görünmez.</p>
+            <ul>
+              <li>Özel alan adı ve SSL</li>
+              <li>Markalı e-posta ve bildirim şablonları</li>
+              <li>Açık ya da koyu tema, özel renk paleti</li>
+            </ul>
+          </article>
+          <article class="wl-feature reveal">
+            <span class="wl-ficon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="3.2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3.5 19c.8-3.2 3-5 5.5-5s4.7 1.8 5.5 5M15.5 5.6a3 3 0 0 1 0 5.8M17.5 14.3c1.6.6 2.6 2.2 3 4.7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>
+            <h3>Müşteri paneli</h3>
+            <p>Her müşterinize, mağazanıza ya da satıcınıza ayrı bir alt hesap açın. Kimin ne üreteceğini ve neyi onaylayacağını siz belirleyin.</p>
+            <ul>
+              <li>Alt hesaplar, roller ve izinler</li>
+              <li>Onay akışı ve yorumlar</li>
+              <li>Hesap bazında kota ve faturalama</li>
+            </ul>
+          </article>
+          <article class="wl-feature reveal">
+            <span class="wl-ficon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="13" y="4" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="4" y="13" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M16.5 13.5v6M13.5 16.5h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>
+            <h3>Kendi kataloğunuz</h3>
+            <p>Ürün kataloğunuzu içe aktarın; görseller ve ilan metinleri SKU'larınızla eşleşsin. Sahne, ışık ve metin dilini marka kurallarınıza göre sabitleyin.</p>
+            <ul>
+              <li>CSV / Excel ile toplu içe aktarma</li>
+              <li>Markaya özel stil ve metin şablonları</li>
+              <li>Varyant ve renk eşleştirme</li>
+            </ul>
+          </article>
+          <article class="wl-feature reveal">
+            <span class="wl-ficon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <h3>API ve entegrasyon</h3>
+            <p>Üretimi kendi sistemlerinizden tetikleyin, sonuçları webhook ile alın. Görseller ve metinler doğrudan mağaza altyapınıza aksın.</p>
+            <pre class="wl-code" aria-label="Örnek API çağrısı"><code><span class="c-k">POST</span> /v1/images
+{ <span class="c-s">"sku"</span>: <span class="c-v">"MV-2611-04"</span>,
+  <span class="c-s">"style"</span>: <span class="c-v">"studio"</span>,
+  <span class="c-s">"market"</span>: <span class="c-v">"trendyol"</span> }</code></pre>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Süreç -->
+    <section class="section section-alt wl-steps-section">
+      <div class="container">
+        <header class="section-head reveal">
+          <p class="kicker wl-kicker">Nasıl başlarız</p>
+          <h2>Görüşmeden yayına, üç adım.</h2>
+        </header>
+        <ol class="wl-steps">
+          <li class="reveal"><span>01</span><h3>Keşif görüşmesi</h3><p>Hacminizi, kullanıcı yapınızı ve marka kurallarınızı birlikte netleştiririz.</p></li>
+          <li class="reveal"><span>02</span><h3>Markalı kurulum</h3><p>Alan adı, tema, şablonlar ve hesaplar hazırlanır; ekibiniz deneme ortamında test eder.</p></li>
+          <li class="reveal"><span>03</span><h3>Yayın ve destek</h3><p>Paneliniz kendi adresinizde yayına girer; size özel bir hesap yöneticisi süreç boyunca yanınızdadır.</p></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- Kapanış CTA -->
+    <section class="cta-section" id="iletisim">
+      <div class="container">
+        <div class="cta wl-cta-box reveal">
+          <div class="cta-glow wl-cta-glow" aria-hidden="true"></div>
+          <h2>Markanızın stüdyosunu birlikte kuralım.</h2>
+          <p>30 dakikalık bir görüşmede ihtiyacınızı dinleyelim, kendi logonuz ve renklerinizle hazırlanmış bir demo paneli gösterelim.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary btn-lg wl-btn" href="mailto:kurumsal@vitrin.app?subject=Vitrin%20Kurumsal%20demo%20talebi">
+              Demo talep et
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+            <a class="btn btn-secondary btn-lg" href="mailto:kurumsal@vitrin.app?subject=Vitrin%20Kurumsal%20teklif">Teklif iste</a>
+          </div>
+          <p class="wl-cta-note">Genellikle aynı iş günü içinde dönüş yapıyoruz.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-bottom wl-footer">
+      <p>© <span data-year>2026</span> Vitrin. Tüm hakları saklıdır.</p>
+      <p><a href="/">Satıcılar için Vitrin</a> · <a href="/kvkk">KVKK</a> · <a href="/gizlilik">Gizlilik</a></p>
+    </div>
+  </footer>
+</body>
+</html>

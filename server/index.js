@@ -27,8 +27,9 @@ app.set('trust proxy', 1);
 // ---------------------------------------------------------------- güvenlik başlıkları
 const indexHtml = fs.readFileSync(path.join(config.root, 'index.html'), 'utf8');
 const panelHtml = fs.readFileSync(path.join(config.root, 'server', 'views', 'panel.html'), 'utf8');
+const kurumsalHtml = fs.readFileSync(path.join(config.root, 'kurumsal.html'), 'utf8');
 // Satır içi betikler (sayfa başı sınıfı, import map) CSP'ye özetleriyle izinli.
-const inlineScripts = [indexHtml, panelHtml]
+const inlineScripts = [indexHtml, panelHtml, kurumsalHtml]
   .flatMap((html) => [...html.matchAll(/<script(?: type="importmap")?>([\s\S]*?)<\/script>/g)])
   .map((m) => `'sha256-${crypto.createHash('sha256').update(m[1]).digest('base64')}'`);
 const CSP = [
@@ -91,6 +92,7 @@ app.use('/vendor/three/addons', express.static(path.join(threeDir, 'examples', '
 app.use('/vendor/three', express.static(path.join(threeDir, 'build'), staticOpts));
 app.get('/favicon.svg', (req, res) => res.sendFile(path.join(config.root, 'favicon.svg')));
 app.get('/', (req, res) => res.type('html').send(indexHtml));
+app.get('/kurumsal', (req, res) => res.type('html').send(kurumsalHtml));
 
 // ---------------------------------------------------------------- yardımcılar
 app.use('/api', express.json({ limit: '32kb' }));
