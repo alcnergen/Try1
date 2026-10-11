@@ -150,7 +150,7 @@
   }
 
   function setView(view, push = true) {
-    if (!['panel', 'kutuphane', 'plan'].includes(view)) view = 'panel';
+    if (!['panel', 'kutuphane', 'model3d', 'plan'].includes(view)) view = 'panel';
     state.view = view;
     $$('[data-view]').forEach((v) => { v.hidden = v.dataset.view !== view; });
     $$('.app-tabs [data-view-link]').forEach((a) => {
@@ -158,8 +158,23 @@
       else a.removeAttribute('aria-current');
     });
     if (push && location.hash !== `#${view}`) history.pushState(null, '', `#${view}`);
-    document.title = `${{ panel: 'Panel', kutuphane: 'Kütüphane', plan: 'Plan ve kullanım' }[view]} — Vitrin`;
+    document.title = `${{ panel: 'Panel', kutuphane: 'Kütüphane', model3d: '3B model', plan: 'Plan ve kullanım' }[view]} — Vitrin`;
     window.scrollTo(0, 0);
+    if (view === 'model3d') ensureModel3d();
+    window.dispatchEvent(new CustomEvent('vitrin:view', { detail: { view } }));
+  }
+
+  // 3B bölümü (ve three.js) yalnızca ilk açıldığında yüklenir.
+  let model3dLoading = null;
+  function ensureModel3d() {
+    if (model3dLoading || !state.me) return;
+    model3dLoading = import('/app/model3d.js')
+      .then((m) => m.init({ api, toast, samples: state.me.options.samples }))
+      .catch((err) => {
+        console.error(err);
+        model3dLoading = null;
+        toast('3B bölümü yüklenemedi.', 'error');
+      });
   }
 
   document.addEventListener('click', (e) => {
@@ -690,6 +705,7 @@
   refresh()
     .then(() => {
       studio.renderOptions();
+      if (state.view === 'model3d') ensureModel3d();
       followPending();
     })
     .catch((err) => toast(err.message, 'error'));

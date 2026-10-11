@@ -26,7 +26,10 @@ app.set('trust proxy', 1);
 
 // ---------------------------------------------------------------- güvenlik başlıkları
 const indexHtml = fs.readFileSync(path.join(config.root, 'index.html'), 'utf8');
-const inlineScripts = [...indexHtml.matchAll(/<script>([\s\S]*?)<\/script>/g)]
+const panelHtml = fs.readFileSync(path.join(config.root, 'server', 'views', 'panel.html'), 'utf8');
+// Satır içi betikler (sayfa başı sınıfı, import map) CSP'ye özetleriyle izinli.
+const inlineScripts = [indexHtml, panelHtml]
+  .flatMap((html) => [...html.matchAll(/<script(?: type="importmap")?>([\s\S]*?)<\/script>/g)])
   .map((m) => `'sha256-${crypto.createHash('sha256').update(m[1]).digest('base64')}'`);
 const CSP = [
   "default-src 'self'",
@@ -82,6 +85,10 @@ app.use('/app', express.static(path.join(config.root, 'app'), staticOpts));
 for (const dir of ['css', 'js', 'img', 'fonts']) {
   app.use(`/${dir}`, express.static(path.join(config.root, dir), staticOpts));
 }
+// three.js modülleri (3B görüntüleyici için), import map ile /vendor/three altından yüklenir.
+const threeDir = path.join(config.root, 'node_modules', 'three');
+app.use('/vendor/three/addons', express.static(path.join(threeDir, 'examples', 'jsm'), staticOpts));
+app.use('/vendor/three', express.static(path.join(threeDir, 'build'), staticOpts));
 app.get('/favicon.svg', (req, res) => res.sendFile(path.join(config.root, 'favicon.svg')));
 app.get('/', (req, res) => res.type('html').send(indexHtml));
 
@@ -95,7 +102,8 @@ function monthStart() {
 
 function statsFor(user) {
   const start = monthStart();
-  const done = db.jobs.filter((j) => j.userId === user.id && j.status === 'done');
+  const imageJobs = db.jobs.filter((j) => j.userId === user.id && j.kind !== '3d');
+  const done = imageJobs.filter((j) => j.status === 'done');
   const thisMonth = done.filter((j) => j.finishedAt >= start).length;
   const works = db.works.filter((w) => w.userId === user.id);
   const recent = done.slice(-20);
@@ -107,7 +115,8 @@ function statsFor(user) {
     savedWorks: works.length,
     minutesSaved: works.length * 25,
     avgSeconds: Math.round(avgMs / 100) / 10,
-    pendingJobs: db.jobs.filter((j) => j.userId === user.id && (j.status === 'queued' || j.status === 'running')).length,
+    pendingJobs: imageJobs.filter((j) => j.status === 'queued' || j.status === 'running').length,
+    models3d: db.jobs.filter((j) => j.userId === user.id && j.kind === '3d' && j.status === 'done').length,
   };
 }
 
@@ -193,6 +202,10 @@ function guardQuota(user, res) {
     res.status(402).json({ error: 'Bu ayki görsel hakkın doldu. Planını yükselterek devam edebilirsin.' });
     return false;
   }
+  return guardCapacity(user, res);
+}
+
+function guardCapacity(user, res) {
   const active = db.jobs.filter((j) => j.userId === user.id && (j.status === 'queued' || j.status === 'running')).length;
   if (active >= 3) {
     res.status(429).json({ error: 'Aynı anda en fazla 3 üretim çalıştırabilirsin. Birinin bitmesini bekle.' });
@@ -213,7 +226,7 @@ async function storeInput(user, buffer, ext) {
   return rel;
 }
 
-app.post('/api/jobs', requireUser, (req, res, next) => {
+const handleUpload = (req, res, next) => {
   upload.single('image')(req, res, (err) => {
     if (err) {
       const msg = err.code === 'LIMIT_FILE_SIZE' ? 'Fotoğraf en fazla 15 MB olabilir.' : 'Fotoğraf yüklenemedi.';
@@ -221,16 +234,47 @@ app.post('/api/jobs', requireUser, (req, res, next) => {
     }
     next();
   });
-}, asyncRoute(async (req, res) => {
-  const user = req.user;
+};
+
+function readBody(req) {
   let body = req.body || {};
   if (typeof body.options === 'string') {
     try { body = { ...body, ...JSON.parse(body.options) }; } catch { /* yok say */ }
   }
+  return body;
+}
+
+/** Yüklenen dosyayı ya da seçilen örneği doğrulayıp kullanıcı klasörüne yazar. Hata varsa yanıtı gönderir ve null döner. */
+async function readInputFile(req, res, body, user) {
+  if (body.sample) {
+    const sample = SAMPLES.find((s) => s.id === body.sample);
+    if (!sample) { res.status(400).json({ error: 'Örnek fotoğraf bulunamadı.' }); return null; }
+    const buf = await fsp.readFile(path.join(config.root, 'app', 'samples', `${sample.id}.jpg`));
+    return storeInput(user, buf, 'jpg');
+  }
+  if (!req.file) {
+    res.status(400).json({ error: 'Bir fotoğraf yükle ya da örnek fotoğraflardan birini seç.' });
+    return null;
+  }
+  let meta;
+  try {
+    meta = await sharp(req.file.buffer).metadata();
+  } catch {
+    res.status(400).json({ error: 'Bu dosya okunamadı. JPG, PNG ya da WEBP formatında bir fotoğraf yükle.' });
+    return null;
+  }
+  if (!ACCEPTED.has(meta.format)) { res.status(400).json({ error: 'Desteklenmeyen format. JPG, PNG ya da WEBP yükle.' }); return null; }
+  if (Math.min(meta.width, meta.height) < 300) { res.status(400).json({ error: 'Fotoğraf çok küçük; en az 300 piksel genişlik/yükseklik gerekli.' }); return null; }
+  return storeInput(user, req.file.buffer, meta.format === 'jpeg' ? 'jpg' : meta.format);
+}
+
+app.post('/api/jobs', requireUser, handleUpload, asyncRoute(async (req, res) => {
+  const user = req.user;
+  const body = readBody(req);
 
   // Yeniden üret: önceki işin girdisini ve seçeneklerini kullan, yeni bir varyant iste.
   if (body.fromJobId) {
-    const parent = db.jobs.find((j) => j.id === body.fromJobId && j.userId === user.id);
+    const parent = db.jobs.find((j) => j.id === body.fromJobId && j.userId === user.id && j.kind !== '3d');
     if (!parent) return res.status(404).json({ error: 'Kaynak üretim bulunamadı.' });
     if (!guardQuota(user, res)) return;
     const siblings = db.jobs.filter((j) => j.inputFile === parent.inputFile).length;
@@ -241,28 +285,20 @@ app.post('/api/jobs', requireUser, (req, res, next) => {
 
   const options = parseOptions(body);
   if (!guardQuota(user, res)) return;
-
-  let inputFile;
-  if (body.sample) {
-    const sample = SAMPLES.find((s) => s.id === body.sample);
-    if (!sample) return res.status(400).json({ error: 'Örnek fotoğraf bulunamadı.' });
-    const buf = await fsp.readFile(path.join(config.root, 'app', 'samples', `${sample.id}.jpg`));
-    inputFile = await storeInput(user, buf, 'jpg');
-  } else if (req.file) {
-    let meta;
-    try {
-      meta = await sharp(req.file.buffer).metadata();
-    } catch {
-      return res.status(400).json({ error: 'Bu dosya okunamadı. JPG, PNG ya da WEBP formatında bir fotoğraf yükle.' });
-    }
-    if (!ACCEPTED.has(meta.format)) return res.status(400).json({ error: 'Desteklenmeyen format. JPG, PNG ya da WEBP yükle.' });
-    if (Math.min(meta.width, meta.height) < 300) return res.status(400).json({ error: 'Fotoğraf çok küçük; en az 300 piksel genişlik/yükseklik gerekli.' });
-    inputFile = await storeInput(user, req.file.buffer, meta.format === 'jpeg' ? 'jpg' : meta.format);
-  } else {
-    return res.status(400).json({ error: 'Bir fotoğraf yükle ya da örnek fotoğraflardan birini seç.' });
-  }
-
+  const inputFile = await readInputFile(req, res, body, user);
+  if (!inputFile) return;
   const job = createJob({ userId: user.id, inputFile, options });
+  res.status(202).json({ job: publicJob(job) });
+}));
+
+// Görselden 3B model. Görsel hakkından düşmez; yaklaşık bir dakika sürer.
+app.post('/api/3d/jobs', requireUser, handleUpload, asyncRoute(async (req, res) => {
+  const user = req.user;
+  const body = readBody(req);
+  if (!guardCapacity(user, res)) return;
+  const inputFile = await readInputFile(req, res, body, user);
+  if (!inputFile) return;
+  const job = createJob({ userId: user.id, inputFile, kind: '3d' });
   res.status(202).json({ job: publicJob(job) });
 }));
 
@@ -276,6 +312,7 @@ app.get('/api/jobs/:id', requireUser, (req, res) => {
 app.post('/api/jobs/:id/save', requireUser, (req, res) => {
   const job = db.jobs.find((j) => j.id === req.params.id && j.userId === req.user.id);
   if (!job) return res.status(404).json({ error: 'Üretim bulunamadı.' });
+  if (job.kind === '3d') return res.status(400).json({ error: '3B modeller kütüphaneye kaydedilmez; GLB olarak indirebilirsin.' });
   if (job.status !== 'done') return res.status(409).json({ error: 'Üretim henüz tamamlanmadı.' });
   let work = db.works.find((w) => w.jobId === job.id);
   if (!work) {
@@ -311,7 +348,7 @@ app.delete('/api/works/:id', requireUser, asyncRoute(async (req, res) => {
 }));
 
 // Kullanıcıya ait üretim dosyaları (yalnızca sahibi görebilir).
-const FILES = new Set(['result.jpg', 'before.jpg', 'thumb.webp', 'cutout.png', 'input']);
+const FILES = new Set(['result.jpg', 'before.jpg', 'thumb.webp', 'cutout.png', 'model.glb', 'input']);
 app.get('/files/:jobId/:name', (req, res) => {
   const user = userFromRequest(req);
   if (!user) return res.status(401).end();
@@ -321,6 +358,7 @@ app.get('/files/:jobId/:name', (req, res) => {
     ? path.join(userDir(user.id), job.inputFile)
     : path.join(jobDir(job), req.params.name);
   res.setHeader('Cache-Control', 'private, max-age=86400');
+  if (req.params.name === 'model.glb') res.type('model/gltf-binary');
   if (req.query.download) {
     const ext = path.extname(file) || '.jpg';
     res.attachment(`vitrin-${job.id.slice(4, 12)}${req.params.name === 'cutout.png' ? '-seffaf' : ''}${ext}`);

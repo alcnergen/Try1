@@ -11,6 +11,7 @@
   <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/css/tokens.css">
   <link rel="stylesheet" href="/app/app.css">
+  <script type="importmap">{ "imports": { "three": "/vendor/three/three.module.min.js", "three/addons/": "/vendor/three/addons/" } }</script>
   <script src="/app/panel.js" defer></script>
 </head>
 <body class="app-page">
@@ -30,6 +31,7 @@
       <nav class="app-tabs" aria-label="Panel bölümleri" data-tabs>
         <a href="#panel" data-view-link="panel">Panel</a>
         <a href="#kutuphane" data-view-link="kutuphane">Kütüphane</a>
+        <a href="#model3d" data-view-link="model3d">3B model <span class="new-dot">Yeni</span></a>
         <a href="#plan" data-view-link="plan">Plan ve kullanım</a>
       </nav>
 
@@ -106,6 +108,104 @@
         <div class="filter-chips" role="group" aria-label="Kanala göre filtrele" data-filters></div>
       </div>
       <ul class="works" data-works="all"></ul>
+    </section>
+
+    <!-- 3B model -->
+    <section class="view" data-view="model3d" aria-labelledby="m3d-title" hidden>
+      <div class="page-head">
+        <div>
+          <h1 id="m3d-title">3B model</h1>
+          <p class="page-sub">Ürün fotoğrafını döndürülebilir bir 3B modele çevir. Üretim yaklaşık 1 dakika sürer.</p>
+        </div>
+      </div>
+
+      <div class="m3d">
+        <!-- Sol: girdi -->
+        <div class="card m3d-input">
+          <div class="m3d-card-head">
+            <h2>Görsel</h2>
+            <span class="step-chip">1</span>
+          </div>
+          <label class="dropzone m3d-drop" data-m3d-drop>
+            <input type="file" accept="image/jpeg,image/png,image/webp,image/avif" class="sr-only" data-m3d-file>
+            <div class="dz-empty" data-m3d-empty>
+              <span class="dz-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M12 15V4m-4 4 4-4 4 4M5 15v3.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+              <strong>Görseli sürükle ya da seç</strong>
+              <span>JPG, PNG veya WEBP · en fazla 15 MB</span>
+            </div>
+            <img class="dz-preview" alt="Seçilen görselin önizlemesi" hidden data-m3d-preview>
+            <button type="button" class="dz-change" hidden data-m3d-change>Değiştir</button>
+          </label>
+          <p class="samples-label">Ya da örnek bir görselle dene:</p>
+          <div class="samples m3d-samples" role="radiogroup" aria-label="Örnek görseller" data-m3d-samples></div>
+          <ul class="m3d-tips">
+            <li>Tek bir nesne, kadrajın ortasında ve tamamen görünür olsun.</li>
+            <li>Sade bir arka plan ve eşit ışık en iyi sonucu verir.</li>
+          </ul>
+          <p class="form-error" role="alert" hidden data-m3d-error></p>
+          <button type="button" class="btn btn-primary btn-block btn-lg" data-m3d-generate>
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2 17 6v8l-7 4-7-4V6l7-4Zm0 0v8m7-4-7 4-7-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+            3B modele dönüştür
+          </button>
+        </div>
+
+        <!-- Sağ: çıktı -->
+        <div class="card m3d-output" data-m3d-output data-state="empty" aria-live="polite">
+          <div class="m3d-card-head">
+            <h2>3B model</h2>
+            <span class="demo-tag" hidden data-m3d-demo title="Görselden 3B üretim servisi henüz bağlı değil; sonuç olarak projedeki örnek model gösteriliyor.">Demo · örnek model</span>
+          </div>
+
+          <div class="m3d-stage m3d-empty" data-m3d-state="empty">
+            <svg class="m3d-cube" viewBox="0 0 120 120" aria-hidden="true">
+              <path d="M60 14 102 38v44L60 106 18 82V38L60 14Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+              <path d="M60 14v46m42-22L60 60 18 38m42 22v46" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 4"/>
+            </svg>
+            <strong>3B modelin burada görünecek</strong>
+            <span>Soldan bir görsel yükle ve "3B modele dönüştür"e bas.</span>
+          </div>
+
+          <div class="m3d-stage m3d-loading" data-m3d-state="loading" hidden>
+            <div class="m3d-orbit" aria-hidden="true">
+              <img alt="" data-m3d-loading-img>
+              <span class="orbit orbit-1"></span><span class="orbit orbit-2"></span>
+            </div>
+            <div class="m3d-progress-row">
+              <span class="loading-kicker"><span class="pulse-dot" aria-hidden="true"></span>Üretiliyor</span>
+              <span class="m3d-pct"><span data-m3d-pct>0</span>%</span>
+            </div>
+            <div class="progress m3d-bar" role="progressbar" aria-label="3B model üretimi" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-m3d-bar><span></span></div>
+            <p class="m3d-eta" data-m3d-eta>Hazırlanıyor…</p>
+            <ol class="stage-list" data-m3d-stages></ol>
+          </div>
+
+          <div class="m3d-stage m3d-done" data-m3d-state="done" hidden>
+            <div class="m3d-viewer" data-m3d-viewer>
+              <p class="m3d-hint">Sürükleyerek çevir · tekerlek ya da iki parmakla yakınlaştır</p>
+            </div>
+            <div class="m3d-toolbar" role="toolbar" aria-label="Görüntüleyici">
+              <button type="button" class="tool-btn" aria-pressed="true" data-m3d-rotate title="Otomatik döndür">
+                <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M15.5 8A6 6 0 1 0 16 12m-.5-4V4m0 4h-4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span>Otomatik dön</span>
+              </button>
+              <button type="button" class="tool-btn" data-m3d-zoom="in" aria-label="Yakınlaştır"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="9" cy="9" r="5.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m13.5 13.5 3 3M9 6.5v5M6.5 9h5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button>
+              <button type="button" class="tool-btn" data-m3d-zoom="out" aria-label="Uzaklaştır"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="9" cy="9" r="5.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m13.5 13.5 3 3M6.5 9h5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button>
+              <button type="button" class="tool-btn" data-m3d-reset aria-label="Görünümü sıfırla"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10a6 6 0 1 0 1.8-4.3M4 4v3.5h3.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+              <span class="toolbar-spacer"></span>
+              <span class="m3d-meta" data-m3d-meta></span>
+              <a class="btn btn-secondary" data-m3d-download download>GLB indir</a>
+            </div>
+          </div>
+
+          <div class="m3d-stage m3d-failed" data-m3d-state="error" hidden>
+            <span class="error-icon" aria-hidden="true">!</span>
+            <strong>3B model oluşturulamadı</strong>
+            <span data-m3d-error-text></span>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- Plan -->

@@ -4,6 +4,7 @@ import { db, save } from './db.js';
 import { config } from './config.js';
 import { newId } from './auth.js';
 import { runPipeline, PipelineError } from './pipeline/process.js';
+import { runModel3d, STAGES_3D, TOTAL_MS as MODEL3D_MS } from './pipeline/model3d.js';
 
 export const STAGES = [
   { key: 'queued', label: 'Sıraya alındı' },
@@ -15,6 +16,8 @@ export const STAGES = [
   { key: 'text', label: 'İlan metni yazılıyor' },
 ];
 const STAGE_INDEX = Object.fromEntries(STAGES.map((s, i) => [s.key, i]));
+const STAGES_3D_PUBLIC = STAGES_3D.map(({ key, label }) => ({ key, label }));
+const STAGE_INDEX_3D = Object.fromEntries(STAGES_3D.map((s, i) => [s.key, i]));
 
 const queue = [];
 let running = 0;
@@ -28,9 +31,14 @@ export function jobDir(job) {
   return path.join(userDir(job.userId), job.id);
 }
 
-export function createJob({ userId, inputFile, options, parentId = null }) {
+/**
+ * kind: 'image' (ürün görseli + ilan; CPU yoğun, sıraya alınır) ya da '3d' (görselden 3B model;
+ * çoğunlukla bekleme içerdiği için sıraya girmeden hemen başlar).
+ */
+export function createJob({ userId, inputFile, options = {}, parentId = null, kind = 'image' }) {
   const job = {
     id: newId('job'),
+    kind,
     userId,
     parentId,
     status: 'queued',
@@ -46,8 +54,12 @@ export function createJob({ userId, inputFile, options, parentId = null }) {
   };
   db.jobs.push(job);
   save();
-  queue.push(job.id);
-  pump();
+  if (kind === '3d') {
+    run(job);
+  } else {
+    queue.push(job.id);
+    pump();
+  }
   return job;
 }
 
@@ -83,18 +95,17 @@ async function run(job) {
   job.startedAt = new Date().toISOString();
   save();
   const t0 = Date.now();
+  const onStage = (stage) => {
+    job.stage = stage;
+    save();
+  };
+  const input = {
+    inputPath: path.join(userDir(job.userId), job.inputFile),
+    outDir: jobDir(job),
+    options: job.options,
+  };
   try {
-    const result = await runPipeline(
-      {
-        inputPath: path.join(userDir(job.userId), job.inputFile),
-        outDir: jobDir(job),
-        options: job.options,
-      },
-      (stage) => {
-        job.stage = stage;
-        save();
-      },
-    );
+    const result = job.kind === '3d' ? await runModel3d(input, onStage) : await runPipeline(input, onStage);
     job.result = result;
     job.status = 'done';
   } catch (err) {
@@ -123,7 +134,38 @@ export function recoverJobs() {
 
 const fileUrl = (job, name) => `/files/${job.id}/${name}?v=${encodeURIComponent(job.finishedAt || '')}`;
 
+function publicJob3d(job) {
+  const idx = STAGE_INDEX_3D[job.stage] ?? 0;
+  const out = {
+    id: job.id,
+    kind: '3d',
+    status: job.status,
+    stage: job.stage,
+    stageIndex: idx,
+    stages: STAGES_3D_PUBLIC,
+    createdAt: job.createdAt,
+    startedAt: job.startedAt,
+    durationMs: job.durationMs,
+    error: job.error,
+    inputUrl: `/files/${job.id}/input`,
+    expectedMs: MODEL3D_MS,
+  };
+  if (job.status === 'running' && job.startedAt) {
+    const elapsed = Date.now() - new Date(job.startedAt).getTime();
+    out.elapsedMs = elapsed;
+    out.progress = Math.min(0.99, elapsed / MODEL3D_MS);
+  }
+  // Nesne ayrıldıktan sonra kesilmiş görsel üretim sırasında da gösterilebilir.
+  if (idx > STAGE_INDEX_3D.segment || job.status === 'done') out.cutoutUrl = `/files/${job.id}/cutout.png`;
+  if (job.status === 'done') {
+    out.progress = 1;
+    out.result = { ...job.result, modelUrl: fileUrl(job, 'model.glb'), cutoutUrl: fileUrl(job, 'cutout.png') };
+  }
+  return out;
+}
+
 export function publicJob(job) {
+  if (job.kind === '3d') return publicJob3d(job);
   const out = {
     id: job.id,
     parentId: job.parentId,
