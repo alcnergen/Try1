@@ -2,3 +2,6 @@ tools/gorsel-uretici/svg/
 tools/gorsel-uretici/png/
 node_modules/
 .DS_Store
+models/
+data/
+.env

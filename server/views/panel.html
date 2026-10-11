@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Panel — Vitrin</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#0c0b0f">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="/fonts/bricolage-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/app/app.css">
+  <script src="/app/panel.js" defer></script>
+</head>
+<body class="app-page">
+  <!-- Üst bar -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="logo" href="/panel" aria-label="Vitrin panel">
+        <svg class="logo-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <rect width="32" height="32" rx="9" fill="url(#lg)"/>
+          <path d="M9 10.5h14M10 10.5l1.4 12h9.2l1.4-12" fill="none" stroke="#1a0d05" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M16 14.5l1 2.2 2.2 1-2.2 1-1 2.2-1-2.2-2.2-1 2.2-1z" fill="#1a0d05"/>
+          <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb35c"/><stop offset="1" stop-color="#ff6a3d"/></linearGradient></defs>
+        </svg>
+        <span>vitrin</span>
+      </a>
+
+      <nav class="app-tabs" aria-label="Panel bölümleri" data-tabs>
+        <a href="#panel" data-view-link="panel">Panel</a>
+        <a href="#kutuphane" data-view-link="kutuphane">Kütüphane</a>
+        <a href="#plan" data-view-link="plan">Plan ve kullanım</a>
+      </nav>
+
+      <div class="topbar-right">
+        <span class="quota-pill" title="Bu ay kalan görsel hakkı" data-quota-pill>
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2.5 11.8 8l5.7 2-5.7 2L10 17.5 8.2 12l-5.7-2 5.7-2z" fill="currentColor"/></svg>
+          <span data-quota-text>—</span>
+        </span>
+        <div class="account">
+          <button type="button" class="avatar-btn" aria-haspopup="menu" aria-expanded="false" aria-controls="hesap-menu" data-account-btn>
+            <span class="avatar" data-avatar>·</span>
+            <span class="sr-only">Hesap menüsü</span>
+          </button>
+          <div class="menu" id="hesap-menu" role="menu" hidden data-account-menu>
+            <div class="menu-head">
+              <strong data-user-name></strong>
+              <span data-user-email></span>
+            </div>
+            <a role="menuitem" href="#plan" data-view-link="plan">Plan ve kullanım</a>
+            <a role="menuitem" href="/">Tanıtım sitesi</a>
+            <button role="menuitem" type="button" class="menu-danger" data-logout>Çıkış yap</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="app-main" id="icerik">
+    <!-- Panel -->
+    <section class="view" data-view="panel" aria-labelledby="panel-title">
+      <div class="page-head">
+        <div>
+          <h1 id="panel-title" data-greeting>Merhaba</h1>
+          <p class="page-sub" data-store-line>&nbsp;</p>
+        </div>
+        <button type="button" class="btn btn-primary" data-open-studio>
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4v12M4 10h12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Yeni görsel
+        </button>
+      </div>
+
+      <div class="stats" data-stats>
+        <article class="stat"><p class="stat-label">Bu ay üretilen</p><p class="stat-value skeleton">&nbsp;</p><p class="stat-sub">&nbsp;</p></article>
+        <article class="stat"><p class="stat-label">Kalan görsel hakkı</p><p class="stat-value skeleton">&nbsp;</p><p class="stat-sub">&nbsp;</p></article>
+        <article class="stat"><p class="stat-label">Kazanılan zaman</p><p class="stat-value skeleton">&nbsp;</p><p class="stat-sub">&nbsp;</p></article>
+        <article class="stat"><p class="stat-label">Ortalama üretim süresi</p><p class="stat-value skeleton">&nbsp;</p><p class="stat-sub">&nbsp;</p></article>
+      </div>
+
+      <div class="section-row">
+        <h2>Son çalışmalar</h2>
+        <a class="link-muted" href="#kutuphane" data-view-link="kutuphane">Tümünü gör →</a>
+      </div>
+      <ul class="works" data-works="recent" aria-live="polite"></ul>
+    </section>
+
+    <!-- Kütüphane -->
+    <section class="view" data-view="kutuphane" aria-labelledby="lib-title" hidden>
+      <div class="page-head">
+        <div>
+          <h1 id="lib-title">Kütüphane</h1>
+          <p class="page-sub" data-lib-count>&nbsp;</p>
+        </div>
+        <button type="button" class="btn btn-primary" data-open-studio>
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4v12M4 10h12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Yeni görsel
+        </button>
+      </div>
+      <div class="lib-tools">
+        <label class="search">
+          <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="9" cy="9" r="5.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m13.5 13.5 3 3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+          <span class="sr-only">Çalışmalarda ara</span>
+          <input type="search" placeholder="Başlıkta ara…" data-search>
+        </label>
+        <div class="filter-chips" role="group" aria-label="Kanala göre filtrele" data-filters></div>
+      </div>
+      <ul class="works" data-works="all"></ul>
+    </section>
+
+    <!-- Plan -->
+    <section class="view" data-view="plan" aria-labelledby="plan-title" hidden>
+      <div class="page-head">
+        <div>
+          <h1 id="plan-title">Plan ve kullanım</h1>
+          <p class="page-sub">Görsel hakkın her ayın 1'inde yenilenir.</p>
+        </div>
+      </div>
+      <div class="plan-grid">
+        <article class="card usage-card">
+          <p class="card-kicker">Profesyonel plan</p>
+          <p class="usage-big"><span data-usage-used>0</span><span class="usage-of"> / <span data-usage-quota>250</span> görsel</span></p>
+          <div class="meter" role="progressbar" aria-label="Aylık kullanım" aria-valuemin="0" aria-valuemax="250" aria-valuenow="0" data-usage-meter><span></span></div>
+          <p class="card-note" data-usage-note>&nbsp;</p>
+          <ul class="checks">
+            <li>Tüm stiller ve 4 pazaryeri formatı</li>
+            <li>Şeffaf PNG ve JPG indirme</li>
+            <li>Pazaryerine göre başlık, açıklama ve özellikler</li>
+            <li>Yeniden üretim ve varyasyonlar</li>
+          </ul>
+        </article>
+        <article class="card">
+          <p class="card-kicker">Üretim motoru</p>
+          <dl class="engine" data-engine>
+            <div><dt>Ürün ayırma</dt><dd>—</dd></div>
+            <div><dt>İlan metni</dt><dd>—</dd></div>
+            <div><dt>Ortalama süre</dt><dd>—</dd></div>
+          </dl>
+          <p class="card-note">Fotoğrafların yalnızca senin hesabında saklanır ve model eğitimi için kullanılmaz.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <!-- Üretim aracı -->
+  <dialog class="studio" aria-labelledby="studio-title" data-studio>
+    <div class="studio-shell">
+      <header class="studio-head">
+        <h2 id="studio-title" class="sr-only">Yeni görsel</h2>
+        <ol class="steps-bar" aria-label="Adımlar">
+          <li data-step-ind="input"><span>1</span>Fotoğraf</li>
+          <li data-step-ind="options"><span>2</span>Seçenekler</li>
+          <li data-step-ind="result"><span>3</span>Sonuç</li>
+        </ol>
+        <button type="button" class="icon-btn" aria-label="Kapat" data-studio-close>
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </header>
+
+      <!-- 1. Girdi -->
+      <section class="step" data-step="input">
+        <div class="step-grid">
+          <div>
+            <label class="dropzone" data-dropzone>
+              <input type="file" accept="image/jpeg,image/png,image/webp,image/avif" class="sr-only" data-file>
+              <div class="dz-empty" data-dz-empty>
+                <span class="dz-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><path d="M12 15V4m-4 4 4-4 4 4M5 15v3.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+                <strong>Ürün fotoğrafını sürükle ya da seç</strong>
+                <span>JPG, PNG veya WEBP · en fazla 15 MB · telefonla çekilmiş olması yeterli</span>
+              </div>
+              <img class="dz-preview" alt="Seçilen fotoğrafın önizlemesi" hidden data-dz-preview>
+              <button type="button" class="dz-change" hidden data-dz-change>Değiştir</button>
+            </label>
+            <p class="samples-label">Fotoğrafın yanında değil mi? Örnek bir fotoğrafla dene:</p>
+            <div class="samples" role="radiogroup" aria-label="Örnek fotoğraflar" data-samples></div>
+          </div>
+          <div class="form-col">
+            <div class="field">
+              <label for="productName">Ürün adı</label>
+              <input id="productName" type="text" maxlength="120" placeholder="ör. Kadın keten gömlek uzun kol" data-product-name>
+            </div>
+            <div class="field">
+              <label for="category">Kategori</label>
+              <select id="category" data-category></select>
+            </div>
+            <div class="field">
+              <label for="details">Detaylar <span class="optional">isteğe bağlı</span></label>
+              <textarea id="details" rows="4" maxlength="500" placeholder="Materyal, kalıp, beden aralığı… ör. %100 keten, regular fit, S-M-L-XL" data-details></textarea>
+              <p class="hint">Yazdığın bilgiler ilan metnine işlenir; olmayan bir özelliği uydurmayız.</p>
+            </div>
+          </div>
+        </div>
+        <footer class="step-foot">
+          <p class="form-error" role="alert" hidden data-input-error></p>
+          <button type="button" class="btn btn-primary" data-to-options>Devam et
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </footer>
+      </section>
+
+      <!-- 2. Seçenekler -->
+      <section class="step" data-step="options" hidden>
+        <div class="options">
+          <fieldset>
+            <legend>Görsel stili</legend>
+            <div class="style-grid" data-style-options></div>
+          </fieldset>
+          <fieldset>
+            <legend>Satış kanalı ve ölçü</legend>
+            <div class="market-grid" data-market-options></div>
+          </fieldset>
+          <label class="switch">
+            <input type="checkbox" checked data-lightfix>
+            <span class="switch-track" aria-hidden="true"></span>
+            <span><strong>Işık ve renk düzeltme</strong><small>Sarı ampul ve flaş etkisini dengeler, pozlamayı ayarlar.</small></span>
+          </label>
+        </div>
+        <footer class="step-foot">
+          <button type="button" class="btn btn-ghost" data-back-input>← Geri</button>
+          <p class="cost-note" data-cost-note>1 görsel hakkı kullanılır</p>
+          <button type="button" class="btn btn-primary" data-generate>
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2.5 11.8 8l5.7 2-5.7 2L10 17.5 8.2 12l-5.7-2 5.7-2z" fill="currentColor"/></svg>
+            Üret
+          </button>
+        </footer>
+      </section>
+
+      <!-- 3a. Üretiliyor -->
+      <section class="step" data-step="loading" hidden aria-live="polite">
+        <div class="loading">
+          <div class="loading-visual">
+            <img alt="" data-loading-img>
+            <div class="scan" aria-hidden="true"></div>
+            <div class="loading-ring" aria-hidden="true"><span></span></div>
+          </div>
+          <div class="loading-info">
+            <p class="loading-kicker"><span class="pulse-dot" aria-hidden="true"></span><span data-loading-title>Üretiliyor</span></p>
+            <p class="loading-time"><span data-elapsed>0,0</span> sn</p>
+            <div class="progress" aria-hidden="true"><span data-progress></span></div>
+            <ol class="stage-list" data-stage-list></ol>
+            <p class="hint">Bu pencereyi kapatsan da üretim arka planda devam eder.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3b. Sonuç -->
+      <section class="step" data-step="result" hidden>
+        <div class="result">
+          <div class="result-media">
+            <div class="compare" data-compare style="--pos:50%">
+              <img class="compare-after-img" alt="Üretilen ürün görseli" data-after>
+              <div class="compare-before"><img alt="" data-before></div>
+              <span class="compare-tag compare-tag-before">Önce</span>
+              <span class="compare-tag compare-tag-after">Sonra</span>
+              <div class="compare-handle" aria-hidden="true"><span><svg viewBox="0 0 24 24"><path d="M9 6 3 12l6 6M15 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+              <input class="compare-range" type="range" min="0" max="100" value="50" aria-label="Önce ve sonra görselini karşılaştır" data-compare-range>
+            </div>
+            <div class="result-meta" data-result-meta></div>
+          </div>
+
+          <div class="result-side">
+            <div class="listing-card">
+              <div class="listing-top">
+                <p class="listing-kicker" data-listing-kicker>İlan</p>
+                <span class="source-badge" data-source-badge></span>
+              </div>
+              <div class="field">
+                <div class="field-row">
+                  <label for="resultTitle">Başlık</label>
+                  <span class="count" data-title-count></span>
+                </div>
+                <div class="copy-wrap">
+                  <textarea id="resultTitle" rows="2" data-result-title></textarea>
+                  <button type="button" class="copy-btn" data-copy="title" aria-label="Başlığı kopyala">Kopyala</button>
+                </div>
+              </div>
+              <div class="field">
+                <div class="field-row">
+                  <span class="label">Açıklama</span>
+                  <button type="button" class="copy-btn" data-copy="bullets">Kopyala</button>
+                </div>
+                <ul class="bullets" data-result-bullets></ul>
+              </div>
+              <dl class="attrs" data-result-attrs></dl>
+              <div class="keywords" data-result-keywords></div>
+            </div>
+          </div>
+        </div>
+        <footer class="step-foot result-foot">
+          <div class="foot-left">
+            <button type="button" class="btn btn-ghost" data-regenerate>
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M15.5 8A6 6 0 1 0 16 12m-.5-4V4m0 4h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Yeniden üret
+            </button>
+            <button type="button" class="btn btn-ghost" data-change-options>Seçenekleri değiştir</button>
+          </div>
+          <div class="foot-right">
+            <a class="btn btn-ghost" data-download-png download>Şeffaf PNG</a>
+            <a class="btn btn-secondary" data-download-jpg download>İndir</a>
+            <button type="button" class="btn btn-primary" data-save>Kaydet</button>
+            <button type="button" class="btn btn-ghost btn-danger" hidden data-delete>Kütüphaneden kaldır</button>
+          </div>
+        </footer>
+      </section>
+
+      <!-- 3c. Hata -->
+      <section class="step" data-step="error" hidden>
+        <div class="error-state">
+          <span class="error-icon" aria-hidden="true">!</span>
+          <h3>Üretim tamamlanamadı</h3>
+          <p data-error-text></p>
+          <div class="error-actions">
+            <button type="button" class="btn btn-ghost" data-back-input>Başka fotoğraf seç</button>
+            <button type="button" class="btn btn-primary" data-retry>Tekrar dene</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </dialog>
+
+  <div class="toasts" aria-live="polite" data-toasts></div>
+</body>
+</html>
