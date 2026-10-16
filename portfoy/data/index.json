@@ -1,0 +1,132 @@
+{
+ "guncelleme": "2026-10-16T18:58:33.789Z",
+ "seriler": {
+  "YFBL1": {
+   "ad": "YFBL1",
+   "tur": "fon",
+   "kaynak": null,
+   "ilk": null,
+   "son": null,
+   "deger": null,
+   "adet": 0,
+   "hata": "Kaynak bulunamadı"
+  },
+  "YFBL7": {
+   "ad": "YFBL7",
+   "tur": "fon",
+   "kaynak": null,
+   "ilk": null,
+   "son": null,
+   "deger": null,
+   "adet": 0,
+   "hata": "Kaynak bulunamadı"
+  },
+  "TGT": {
+   "ad": "TGT",
+   "tur": "fon",
+   "kaynak": null,
+   "ilk": null,
+   "son": null,
+   "deger": null,
+   "adet": 0,
+   "hata": "Kaynak bulunamadı"
+  },
+  "USDTRY": {
+   "ad": "USDTRY",
+   "tur": "kiyas",
+   "kaynak": "tcmb",
+   "ilk": "2026-10-16",
+   "son": "2026-10-16",
+   "deger": 49.4463,
+   "adet": 1
+  },
+  "EURTRY": {
+   "ad": "EURTRY",
+   "tur": "kiyas",
+   "kaynak": "tcmb",
+   "ilk": "2026-10-16",
+   "son": "2026-10-16",
+   "deger": 55.618,
+   "adet": 1
+  },
+  "JPYTRY": {
+   "ad": "JPYTRY",
+   "tur": "kiyas",
+   "kaynak": "tcmb",
+   "ilk": "2026-10-16",
+   "son": "2026-10-16",
+   "deger": 0.313773,
+   "adet": 1
+  },
+  "GOLD": {
+   "ad": "Altın (ons, $)",
+   "tur": "kiyas",
+   "kaynak": null,
+   "ilk": null,
+   "son": null,
+   "deger": null,
+   "adet": 0,
+   "hata": "429 Too Many Requests"
+  },
+  "XU100": {
+   "ad": "BIST 100",
+   "tur": "kiyas",
+   "kaynak": null,
+   "ilk": null,
+   "son": null,
+   "deger": null,
+   "adet": 0,
+   "hata": "429 Too Many Requests"
+  },
+  "SPX": {
+   "ad": "S&P 500",
+   "tur": "kiyas",
+   "kaynak": null,
+   "ilk": null,
+   "son": null,
+   "deger": null,
+   "adet": 0,
+   "hata": "429 Too Many Requests"
+  },
+  "NDX": {
+   "ad": "Nasdaq 100",
+   "tur": "kiyas",
+   "kaynak": null,
+   "ilk": null,
+   "son": null,
+   "deger": null,
+   "adet": 0,
+   "hata": "429 Too Many Requests"
+  },
+  "DAX": {
+   "ad": "DAX",
+   "tur": "kiyas",
+   "kaynak": null,
+   "ilk": null,
+   "son": null,
+   "deger": null,
+   "adet": 0,
+   "hata": "429 Too Many Requests"
+  },
+  "N225": {
+   "ad": "Nikkei 225",
+   "tur": "kiyas",
+   "kaynak": null,
+   "ilk": null,
+   "son": null,
+   "deger": null,
+   "adet": 0,
+   "hata": "429 Too Many Requests"
+  },
+  "MSCIW": {
+   "ad": "MSCI Dünya (URTH)",
+   "tur": "kiyas",
+   "kaynak": null,
+   "ilk": null,
+   "son": null,
+   "deger": null,
+   "adet": 0,
+   "hata": "429 Too Many Requests"
+  }
+ }
+}
