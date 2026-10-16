@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Portföyüm</title>
+  <meta name="theme-color" content="#f6f5f1" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#141413" media="(prefers-color-scheme: dark)">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Portföyüm">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <header class="top">
+    <div>
+      <h1>Portföyüm</h1>
+      <div id="status" class="muted small">Yükleniyor…</div>
+    </div>
+    <div class="row gap">
+      <button id="reload" class="icon" aria-label="Verileri yenile">↻</button>
+      <button id="settings" class="icon" aria-label="Ayarlar">⚙︎</button>
+    </div>
+  </header>
+  <main id="view"></main>
+  <nav class="tabbar" aria-label="Sekmeler">
+    <button data-tab="ozet"><span aria-hidden="true">◉</span>Özet</button>
+    <button data-tab="fonlar"><span aria-hidden="true">☰</span>Fonlar</button>
+    <button data-tab="kiyas"><span aria-hidden="true">⇅</span>Kıyas</button>
+    <button data-tab="senaryo"><span aria-hidden="true">✦</span>Senaryo</button>
+    <button data-tab="diger"><span aria-hidden="true">⌂</span>Diğer</button>
+  </nav>
+  <script type="module">
+    import { init } from './js/app.js';
+    init();
+  </script>
+</body>
+</html>

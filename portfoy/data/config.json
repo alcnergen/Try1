@@ -1,0 +1,17 @@
+{
+  "aciklama": "GitHub Actions bu listeyi her gün okur ve fiyat geçmişini data/series altına yazar. Yeni bir fon aldığınızda kodunu 'fonlar' listesine ekleyin.",
+  "fonlar": ["YFBL1", "YFBL7", "TGT"],
+  "gecmisYil": 10,
+  "kiyaslar": [
+    { "id": "USDTRY", "yahoo": "USDTRY=X", "ad": "Dolar/TL" },
+    { "id": "EURTRY", "yahoo": "EURTRY=X", "ad": "Euro/TL" },
+    { "id": "JPYTRY", "yahoo": "JPYTRY=X", "ad": "Yen/TL" },
+    { "id": "GOLD", "yahoo": "GC=F", "ad": "Altın (ons, $)" },
+    { "id": "XU100", "yahoo": "XU100.IS", "ad": "BIST 100" },
+    { "id": "SPX", "yahoo": "^GSPC", "ad": "S&P 500" },
+    { "id": "NDX", "yahoo": "^NDX", "ad": "Nasdaq 100" },
+    { "id": "DAX", "yahoo": "^GDAXI", "ad": "DAX" },
+    { "id": "N225", "yahoo": "^N225", "ad": "Nikkei 225" },
+    { "id": "MSCIW", "yahoo": "URTH", "ad": "MSCI Dünya (URTH)" }
+  ]
+}
