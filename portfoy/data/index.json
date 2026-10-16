@@ -1,5 +1,5 @@
 {
- "guncelleme": "2026-10-16T18:58:33.789Z",
+ "guncelleme": "2026-10-16T22:13:19.271Z",
  "seriler": {
   "YFBL1": {
    "ad": "YFBL1",
@@ -38,7 +38,8 @@
    "ilk": "2026-10-16",
    "son": "2026-10-16",
    "deger": 49.4463,
-   "adet": 1
+   "adet": 1,
+   "hata": "429 Too Many Requests"
   },
   "EURTRY": {
    "ad": "EURTRY",
@@ -47,7 +48,8 @@
    "ilk": "2026-10-16",
    "son": "2026-10-16",
    "deger": 55.618,
-   "adet": 1
+   "adet": 1,
+   "hata": "429 Too Many Requests"
   },
   "JPYTRY": {
    "ad": "JPYTRY",
@@ -56,7 +58,8 @@
    "ilk": "2026-10-16",
    "son": "2026-10-16",
    "deger": 0.313773,
-   "adet": 1
+   "adet": 1,
+   "hata": "429 Too Many Requests"
   },
   "GOLD": {
    "ad": "Altın (ons, $)",
