@@ -1,0 +1,51 @@
+name: Portföy verisi ve yayın
+
+# Her gün piyasa verisini çeker, data/ altına kaydeder ve portfoy/ klasörünü GitHub Pages'e yayınlar.
+on:
+  schedule:
+    - cron: '35 15 * * 1-5'   # 18:35 TR: borsa kapanışı
+    - cron: '50 19 * * 1-5'   # 22:50 TR: TEFAS fon fiyatları
+    - cron: '20 5 * * *'      # 08:20 TR: gece eksik kalanlar
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths: ['portfoy/**', '.github/workflows/portfoy.yml']
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: portfoy
+  cancel-in-progress: false
+
+jobs:
+  veri:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Fiyatları çek
+        if: github.event_name != 'push'
+        run: node portfoy/scripts/veri-cek.mjs
+      - name: Değişiklikleri kaydet
+        if: github.event_name != 'push'
+        run: |
+          git config user.name "portfoy-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add portfoy/data
+          if git diff --cached --quiet; then echo "Yeni veri yok"; exit 0; fi
+          git commit -m "Portföy verisi: $(date -u +%Y-%m-%d)"
+          for i in 1 2 3; do git pull --rebase origin master && git push origin HEAD:master && break; sleep 5; done
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: portfoy
+      - id: deployment
+        uses: actions/deploy-pages@v4
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
