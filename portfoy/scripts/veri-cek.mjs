@@ -153,15 +153,17 @@ async function saveSeries(s) {
 }
 
 // ---------- Ana akış ----------
-async function updateFund(code) {
+// Bankaların kendi kodu TEFAS kodundan farklı olabilir (ör. Yapı Kredi YFBL1 = TEFAS YLB)
+async function updateFund(code, tefasCode = code) {
   const prev = await loadSeries(code);
-  const full = !prev?.points?.length || prev.source !== 'tefas';
+  const source = `tefas:${tefasCode}`;
+  const full = !prev?.points?.length || prev.source !== source;
   try {
-    const rows = await tefas(code, full ? 60 : 1);
-    if (!rows.length) throw new Error('TEFAS\'ta bu kodla fon bulunamadı');
-    const s = { id: code, ad: rows[rows.length - 1].name || code, tur: 'fon', pb: 'TRY', source: 'tefas', points: mergePoints(full ? [] : prev.points, rows.map((r) => [r.date, r.price])) };
+    const rows = await tefas(tefasCode, full ? 60 : 1);
+    if (!rows.length) throw new Error(`TEFAS'ta ${tefasCode} koduyla fon bulunamadı`);
+    const s = { id: code, ad: rows[rows.length - 1].name || code, tur: 'fon', pb: 'TRY', source, points: mergePoints(full ? [] : prev.points, rows.map((r) => [r.date, r.price])) };
     await saveSeries(s);
-    log(`${code}: TEFAS ${rows.length} satır, son ${rows[rows.length - 1].date} ${rows[rows.length - 1].price}`);
+    log(`${code}${tefasCode !== code ? ` (${tefasCode})` : ''}: TEFAS ${rows.length} satır, son ${rows[rows.length - 1].date} ${rows[rows.length - 1].price}`);
     return s;
   } catch (e) {
     log(`${code}: ${e.message}`);
@@ -203,7 +205,11 @@ async function main() {
     const last = s.points?.[s.points.length - 1];
     index.seriler[s.id] = { ad: s.ad, tur: s.tur, kaynak: s.source || null, ilk: s.points?.[0]?.[0] || null, son: last?.[0] || null, deger: last?.[1] ?? null, adet: s.points?.length || 0, ...(s.hata ? { hata: s.hata } : {}) };
   };
-  for (const code of cfg.fonlar || []) { put(await updateFund(code.toUpperCase().trim())); await sleep(500); }
+  for (const f of cfg.fonlar || []) {
+    const code = (typeof f === 'string' ? f : f.kod).toUpperCase().trim();
+    put(await updateFund(code, (typeof f === 'string' ? code : f.tefas || code).toUpperCase().trim()));
+    await sleep(500);
+  }
   for (const b of cfg.kiyaslar || []) put(await updateBench(b, cfg.gecmisYil || 10));
   await writeFile(path.join(DATA, 'index.json'), JSON.stringify(index, null, 1));
   const errs = Object.entries(index.seriler).filter(([, v]) => v.hata);
