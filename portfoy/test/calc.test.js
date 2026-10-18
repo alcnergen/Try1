@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { valueAt, positionAt, fundState, portfolioHistory, replicate, periodReturn, projectScenario, monthsToTarget, combine, cpiDaily } from '../js/calc.js';
 import { addToConfig, isTracked, repoInfo } from '../js/track.js';
+import { depositSeries } from '../js/data.js';
 import { parseTefas, parseTvMessage, tvDate, parseCanli, mergePoints, pickTvSymbol, assetEntry } from '../scripts/veri-cek.mjs';
 
 const close = (a, b, eps = 1e-6) => assert.ok(Math.abs(a - b) < eps, `${a} ≈ ${b}`);
@@ -118,4 +119,17 @@ test('otomatik takip: kod doğru listeye bir kez eklenir', () => {
   assert.deepEqual(cfg.hisseler, ['AAPL']);
   assert.deepEqual(cfg.fonlar.at(-1), 'IPB');
   assert.deepEqual(repoInfo({ hostname: 'alcnergen.github.io', pathname: '/Try1/' }), { owner: 'alcnergen', repo: 'Try1' });
+});
+
+test('mevduat: TCMB faizi stopaj sonrası günlük işler, değişen faizi izler', () => {
+  const end = '2026-10-18';
+  const rates = [['2000-01-01', 36.5]];
+  const d = depositSeries(rates, { auto: true, tax: 0.2 }, end);
+  assert.equal(d.auto, true);
+  close(d.net, 0.292);
+  const p = d.points;
+  close(p[p.length - 1][1] / p[p.length - 2][1], 1 + 0.292 / 365);
+  const m = depositSeries([], { auto: true, manualRate: 0.4 }, end);
+  assert.equal(m.auto, false);
+  close(m.points[1][1] / m.points[0][1], 1 + 0.4 / 365);
 });
