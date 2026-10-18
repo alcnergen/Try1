@@ -1,5 +1,5 @@
 {
- "guncelleme": "2026-10-18T19:19:17.528Z",
+ "guncelleme": "2026-10-18T19:21:41.232Z",
  "seriler": {
   "TGT": {
    "ad": "GARANTİ PORTFÖY KISA VADELİ BORÇLANMA ARAÇLARI FONU",
@@ -48,7 +48,7 @@
    "kaynak": "tv:FX_IDC:EURTRY",
    "ilk": "2010-01-04",
    "son": "2026-10-19",
-   "deger": 55.5156,
+   "deger": 55.5171,
    "adet": 4381
   },
   "JPYTRY": {
@@ -58,7 +58,7 @@
    "kaynak": "tv:FX_IDC:JPYTRY",
    "ilk": "2009-12-31",
    "son": "2026-10-19",
-   "deger": 0.313428,
+   "deger": 0.313418,
    "adet": 4381
   },
   "GOLD": {
