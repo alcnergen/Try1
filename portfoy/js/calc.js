@@ -120,7 +120,9 @@ export function replicate(funds, benchPts, date) {
   const flows = funds.flatMap((f) => (f.txs || []).map((t) => ({ ...t }))).sort((a, b) => a.date.localeCompare(b.date));
   for (const t of flows) {
     if (t.date > date) break;
-    const p = valueAtOrFirst(benchPts, t.date);
+    // Kıyas verisi işlem gününü kapsamalı (en fazla 7 gün sonra başlıyorsa ilk değer kabul edilir)
+    let p = valueAt(benchPts, t.date);
+    if (p == null && benchPts?.length && daysBetween(t.date, benchPts[0][0]) <= 7) p = benchPts[0][1];
     if (!p) return null;
     const amt = t.qty * t.price + (t.type === 'sell' ? -(Number(t.fee) || 0) : Number(t.fee) || 0);
     units += t.type === 'sell' ? -amt / p : amt / p;

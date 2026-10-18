@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { valueAt, positionAt, fundState, portfolioHistory, replicate, periodReturn, projectScenario, monthsToTarget, combine } from '../js/calc.js';
-import { parseTefas, parseYahoo, mergePoints } from '../scripts/veri-cek.mjs';
+import { parseTefas, parseTvMessage, tvDate, parseCanli, mergePoints } from '../scripts/veri-cek.mjs';
 
 const close = (a, b, eps = 1e-6) => assert.ok(Math.abs(a - b) < eps, `${a} ≈ ${b}`);
 
@@ -60,10 +60,25 @@ test('senaryo projeksiyonu', () => {
   assert.equal(monthsToTarget({ start: 1000, annual: 1, target: 2000 }), 12);
 });
 
-test('TEFAS ve Yahoo yanıtlarını ayrıştırma', () => {
-  const t = parseTefas({ data: [{ TARIH: '1760302800000', FONKODU: 'ABC', FONUNVAN: 'X Fonu', FIYAT: 0.5 }, { TARIH: '1760389200000', FONKODU: 'ABC', FIYAT: 0 }] });
-  assert.deepEqual(t, [{ date: '2025-10-13', code: 'ABC', name: 'X Fonu', price: 0.5 }]);
-  const y = parseYahoo({ chart: { result: [{ meta: { gmtoffset: 10800 }, timestamp: [1760331600, 1760418000], indicators: { quote: [{ close: [41.5, null] }] } }] } });
-  assert.deepEqual(y.points, [['2025-10-13', 41.5]]);
+test('TEFAS, TradingView ve canlidoviz yanıtlarını ayrıştırma', () => {
+  const t = parseTefas({ errorCode: null, errorMessage: null, resultList: [
+    { fonKodu: 'ABC', fonUnvan: 'X Fonu', tarih: '2026-10-16', fiyat: 0.5 },
+    { fonKodu: 'ABC', fonUnvan: 'X Fonu', tarih: '2026-10-17', fiyat: '0,75' },
+    { fonKodu: 'ABC', tarih: '2026-10-18', fiyat: 0 },
+  ] });
+  assert.deepEqual(t.map((r) => [r.date, r.price]), [['2026-10-16', 0.5], ['2026-10-17', 0.75]]);
+  assert.throws(() => parseTefas({ errorMessage: 'Sistem Hatası!!' }));
+
+  // ABD endeksi 13:30Z, döviz 21:00Z (ertesi gün), Japonya 00:00Z
+  assert.equal(tvDate(Date.parse('2026-10-16T13:30:00Z') / 1000), '2026-10-16');
+  assert.equal(tvDate(Date.parse('2026-10-15T21:00:00Z') / 1000), '2026-10-16');
+  assert.equal(tvDate(Date.parse('2026-10-16T00:00:00Z') / 1000), '2026-10-16');
+  const bars = [];
+  const msg = '~m~5~m~~h~12~m~80~m~{"m":"timescale_update","p":["cs",{"$prices":{"s":[{"i":0,"v":[1792157400,1,2,0.5,7659.44,0]}]}}]}';
+  const ev = parseTvMessage(msg, (t, v) => bars.push([t, v]));
+  assert.deepEqual(bars, [[1792157400, 7659.44]]);
+  assert.equal(ev[0].heartbeat, '~h~12');
+
+  assert.deepEqual(parseCanli({ 1790553600: '49.0102|49.1733|48.9702|48.9824' }), [['2026-09-28', 48.9824]]);
   assert.deepEqual(mergePoints([['a', 1], ['b', 2]], [['b', 3], ['c', 4]]), [['a', 1], ['b', 3], ['c', 4]]);
 });
