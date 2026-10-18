@@ -1,135 +1,122 @@
 {
- "guncelleme": "2026-10-18T09:41:00.186Z",
+ "guncelleme": "2026-10-18T12:56:25.680Z",
  "seriler": {
-  "YFBL1": {
-   "ad": "YFBL1",
+  "TGT": {
+   "ad": "GARANTİ PORTFÖY KISA VADELİ BORÇLANMA ARAÇLARI FONU",
    "tur": "fon",
-   "kaynak": null,
-   "ilk": null,
-   "son": null,
-   "deger": null,
-   "adet": 0,
-   "hata": "Kaynak bulunamadı"
+   "kaynak": "tefas:TGT",
+   "ilk": "2021-10-18",
+   "son": "2026-10-16",
+   "deger": 0.126462,
+   "adet": 1258
+  },
+  "YFBL1": {
+   "ad": "YAPI KREDİ PORTFÖY PARA PİYASASI FONU",
+   "tur": "fon",
+   "kaynak": "tefas:YLB",
+   "ilk": "2021-10-18",
+   "son": "2026-10-16",
+   "deger": 1.921351,
+   "adet": 1258
   },
   "YFBL7": {
-   "ad": "YFBL7",
+   "ad": "YAPI KREDİ PORTFÖY İKİNCİ PARA PİYASASI (TL) FONU",
    "tur": "fon",
-   "kaynak": null,
-   "ilk": null,
-   "son": null,
-   "deger": null,
-   "adet": 0,
-   "hata": "Kaynak bulunamadı"
-  },
-  "TGT": {
-   "ad": "TGT",
-   "tur": "fon",
-   "kaynak": null,
-   "ilk": null,
-   "son": null,
-   "deger": null,
-   "adet": 0,
-   "hata": "Kaynak bulunamadı"
+   "kaynak": "tefas:YVD",
+   "ilk": "2022-07-04",
+   "son": "2026-10-16",
+   "deger": 4.662267,
+   "adet": 1078
   },
   "USDTRY": {
-   "ad": "USDTRY",
+   "ad": "Dolar/TL",
    "tur": "kiyas",
-   "kaynak": "tcmb",
-   "ilk": "2026-10-16",
+   "kaynak": "tv:FX_IDC:USDTRY",
+   "ilk": "2010-01-04",
    "son": "2026-10-16",
-   "deger": 49.4463,
-   "adet": 1,
-   "hata": "429 Too Many Requests"
+   "deger": 49.5091,
+   "adet": 4380
   },
   "EURTRY": {
-   "ad": "EURTRY",
+   "ad": "Euro/TL",
    "tur": "kiyas",
-   "kaynak": "tcmb",
-   "ilk": "2026-10-16",
+   "kaynak": "tv:FX_IDC:EURTRY",
+   "ilk": "2010-01-04",
    "son": "2026-10-16",
-   "deger": 55.618,
-   "adet": 1,
-   "hata": "429 Too Many Requests"
+   "deger": 55.6369,
+   "adet": 4380
   },
   "JPYTRY": {
-   "ad": "JPYTRY",
+   "ad": "Yen/TL",
    "tur": "kiyas",
-   "kaynak": "tcmb",
-   "ilk": "2026-10-16",
+   "kaynak": "tv:FX_IDC:JPYTRY",
+   "ilk": "2009-12-31",
    "son": "2026-10-16",
-   "deger": 0.313773,
-   "adet": 1,
-   "hata": "429 Too Many Requests"
+   "deger": 0.313267,
+   "adet": 4380
   },
   "GOLD": {
    "ad": "Altın (ons, $)",
    "tur": "kiyas",
-   "kaynak": null,
-   "ilk": null,
-   "son": null,
-   "deger": null,
-   "adet": 0,
-   "hata": "429 Too Many Requests"
+   "kaynak": "tv:TVC:GOLD",
+   "ilk": "2009-05-27",
+   "son": "2026-10-16",
+   "deger": 4165.175,
+   "adet": 4380
   },
   "XU100": {
    "ad": "BIST 100",
    "tur": "kiyas",
-   "kaynak": null,
-   "ilk": null,
-   "son": null,
-   "deger": null,
-   "adet": 0,
-   "hata": "429 Too Many Requests"
+   "kaynak": "tv:BIST:XU100",
+   "ilk": "2009-05-06",
+   "son": "2026-10-16",
+   "deger": 11721.72,
+   "adet": 4380
   },
   "SPX": {
    "ad": "S&P 500",
    "tur": "kiyas",
-   "kaynak": null,
-   "ilk": null,
-   "son": null,
-   "deger": null,
-   "adet": 0,
-   "hata": "429 Too Many Requests"
+   "kaynak": "tv:SP:SPX",
+   "ilk": "2016-07-01",
+   "son": "2026-10-16",
+   "deger": 7659.44,
+   "adet": 2588
   },
   "NDX": {
    "ad": "Nasdaq 100",
    "tur": "kiyas",
-   "kaynak": null,
-   "ilk": null,
-   "son": null,
-   "deger": null,
-   "adet": 0,
-   "hata": "429 Too Many Requests"
+   "kaynak": "tv:NASDAQ:NDX",
+   "ilk": "2009-05-20",
+   "son": "2026-10-16",
+   "deger": 29187.5487,
+   "adet": 4380
   },
   "DAX": {
    "ad": "DAX",
    "tur": "kiyas",
-   "kaynak": null,
-   "ilk": null,
-   "son": null,
-   "deger": null,
-   "adet": 0,
-   "hata": "429 Too Many Requests"
+   "kaynak": "tv:XETR:DAX",
+   "ilk": "2009-07-21",
+   "son": "2026-10-16",
+   "deger": 25622.61,
+   "adet": 4380
   },
   "N225": {
    "ad": "Nikkei 225",
    "tur": "kiyas",
-   "kaynak": null,
-   "ilk": null,
-   "son": null,
-   "deger": null,
-   "adet": 0,
-   "hata": "429 Too Many Requests"
+   "kaynak": "tv:TVC:NI225",
+   "ilk": "2008-11-12",
+   "son": "2026-10-16",
+   "deger": 65324.07,
+   "adet": 4380
   },
   "MSCIW": {
    "ad": "MSCI Dünya (URTH)",
    "tur": "kiyas",
-   "kaynak": null,
-   "ilk": null,
-   "son": null,
-   "deger": null,
-   "adet": 0,
-   "hata": "429 Too Many Requests"
+   "kaynak": "tv:AMEX:URTH",
+   "ilk": "2012-01-12",
+   "son": "2026-10-16",
+   "deger": 206.34,
+   "adet": 3515
   }
  }
 }
