@@ -1,10 +1,11 @@
 {
-  "aciklama": "GitHub Actions bu listeyi her gün okur ve fiyat geçmişini data/series altına yazar. Yeni bir TEFAS fonu aldığınızda kodunu 'fonlar' listesine ekleyin. Bankanın kodu TEFAS kodundan farklıysa { \"kod\": \"BANKA_KODU\", \"tefas\": \"TEFAS_KODU\" } yazın.",
+  "aciklama": "GitHub Actions bu listeyi her gün okur ve fiyat geçmişini data/series altına yazar. Yeni bir TEFAS fonu aldığınızda kodunu 'fonlar' listesine ekleyin. Bankanın kodu TEFAS kodundan farklıysa { \"kod\": \"BANKA_KODU\", \"tefas\": \"TEFAS_KODU\" } yazın. Hisseleri 'hisseler' listesine kodlarıyla ekleyin (ör. \"THYAO\", \"AAPL\"); kod belirsizse { \"kod\": \"AAPL\", \"tv\": \"NASDAQ:AAPL\" } yazın.",
   "fonlar": [
     "TGT",
     { "kod": "YFBL1", "tefas": "YLB", "not": "Yapı Kredi Portföy Para Piyasası Fonu" },
     { "kod": "YFBL7", "tefas": "YVD", "not": "Yapı Kredi Portföy İkinci Para Piyasası (TL) Fonu" }
   ],
+  "hisseler": [],
   "gecmisYil": 12,
   "kiyaslar": [
     { "id": "USDTRY", "ad": "Dolar/TL", "tv": "FX_IDC:USDTRY", "canli": 1 },
@@ -16,6 +17,7 @@
     { "id": "NDX", "ad": "Nasdaq 100", "tv": "NASDAQ:NDX" },
     { "id": "DAX", "ad": "DAX", "tv": "XETR:DAX" },
     { "id": "N225", "ad": "Nikkei 225", "tv": "TVC:NI225" },
-    { "id": "MSCIW", "ad": "MSCI Dünya (URTH)", "tv": "AMEX:URTH" }
+    { "id": "MSCIW", "ad": "MSCI Dünya (URTH)", "tv": "AMEX:URTH" },
+    { "id": "TUFE", "ad": "TÜFE (aylık endeks)", "tv": "ECONOMICS:TRCPI", "tf": "1M" }
   ]
 }

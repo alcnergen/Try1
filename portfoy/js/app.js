@@ -1,8 +1,9 @@
 import * as store from './store.js';
+import * as backup from './backup.js';
 import { loadMarket, loadOne, series, benchSeries, BENCHES } from './data.js';
 import {
   todayISO, addDays, daysBetween, valueAt, valueAtOrFirst, sortTx, fundState, portfolioHistory,
-  replicate, periodReturn, periodStart, annualize, dailyRate, projectScenario, monthsToTarget, combine,
+  replicate, periodReturn, periodStart, annualize, dailyRate, projectScenario, monthsToTarget, combine, cpiDaily,
 } from './calc.js';
 import { lineChart, legend } from './chart.js';
 
@@ -12,7 +13,7 @@ let M = { raw: {}, names: {}, index: null, errors: [] };
 let C = null; // hesaplanmış değerler
 let tab = location.hash.match(/^#(ozet|fonlar|kiyas|senaryo|diger)$/)?.[1] || 'ozet';
 const ui = { ozetRange: 'ALL', fundRange: '1Y', cmpRange: '1Y', cmpCcy: null, histAll: false, otherDate: null, otherCcy: 'TRY' };
-const persist = () => store.save(S);
+const persist = () => { store.save(S); backup.schedule(() => S, () => updateStatus()); };
 
 // ---------- Biçimlendirme ----------
 const nf = (d) => new Intl.NumberFormat('tr-TR', { minimumFractionDigits: d, maximumFractionDigits: d });
@@ -43,25 +44,52 @@ export function parseNum(s) {
   else if ((s.match(/\./g) || []).length > 1) s = s.replace(/\./g, '');
   return Number(s);
 }
-const COLORS = { PORT: 'var(--s1)', USD: 'var(--s2)', XU100: 'var(--s3)', ALTIN: 'var(--s4)', NDX: 'var(--s5)', DAX: 'var(--s6)', SPX: 'var(--s7)', EUR: 'var(--s8)', N225: 'var(--s9)', MSCIW: 'var(--s10)', MEVDUAT: 'var(--s11)', COST: 'var(--muted)' };
+const COLORS = { PORT: 'var(--s1)', USD: 'var(--s2)', XU100: 'var(--s3)', ALTIN: 'var(--s4)', NDX: 'var(--s5)', DAX: 'var(--s6)', SPX: 'var(--s7)', EUR: 'var(--s8)', N225: 'var(--s9)', MSCIW: 'var(--s10)', MEVDUAT: 'var(--s11)', TUFE: 'var(--s12)', COST: 'var(--muted)' };
 const FUND_COLORS = ['var(--s1)', 'var(--s7)', 'var(--s3)', 'var(--s5)', 'var(--s6)', 'var(--s8)'];
 const benchName = (id) => (id === 'MEVDUAT' ? `Mevduat (%${num(S.settings.deposit * 100, 0)} yıllık)` : BENCHES.find((b) => b.id === id)?.ad || id);
 const fundName = (code) => S.funds.find((f) => f.code === code)?.name || M.names[code] || code;
 
 // ---------- Hesaplama ----------
+// Varlığın para birimi ve türü (veri dosyasından; yoksa kullanıcının girdiği)
+const assetCcy = (code) => M.meta?.[code]?.pb || S.funds.find((f) => f.code === code)?.pb || 'TRY';
+const assetKind = (code) => M.meta?.[code]?.tur || 'fon';
+const CCY_SIGN = { TRY: '₺', USD: '$', EUR: '€', JPY: '¥', GBP: '£' };
+const fmtPrice = (v, code) => {
+  const ccy = assetCcy(code);
+  const d = assetKind(code) === 'hisse' ? 2 : ccy === 'TRY' ? 6 : 4;
+  return v == null ? '—' : (ccy === 'TRY' ? '' : CCY_SIGN[ccy] || ccy + ' ') + num(v, d);
+};
+const defaultTax = (code) => (assetKind(code) === 'hisse' ? 0 : S.settings.tax);
+
+// Hesaplamalar TL ile yapılır: yabancı para birimli hisselerin fiyatı ve işlemleri o günün kuruyla TL'ye çevrilir
+function toTRY(f, fx) {
+  const ccy = assetCcy(f.code);
+  const native = series(M, S.manual, f.code);
+  const base = { ...f, tax: f.tax ?? defaultTax(f.code), ccy, native };
+  const rate = fx[ccy];
+  if (ccy === 'TRY' || !rate?.length) return { ...base, pts: native };
+  const at = (d) => valueAtOrFirst(rate, d);
+  return {
+    ...base,
+    pts: combine(native, rate, (p, k) => p * k),
+    txs: (f.txs || []).map((t) => ({ ...t, price: t.price * at(t.date), fee: (Number(t.fee) || 0) * at(t.date) })),
+  };
+}
+
 function compute() {
   const today = todayISO();
-  const pmap = {};
-  for (const f of S.funds) pmap[f.code] = series(M, S.manual, f.code);
   const usd = series(M, S.manual, 'USDTRY');
+  const fx = { USD: usd, EUR: series(M, S.manual, 'EURTRY'), JPY: series(M, S.manual, 'JPYTRY') };
+  const funds = S.funds.map((f) => toTRY(f, fx));
+  const pmap = Object.fromEntries(funds.map((f) => [f.code, f.pts]));
   const benches = benchSeries(M, S.manual, S.settings.deposit);
-  const hist = portfolioHistory(S.funds, pmap, usd, { taxRate: S.settings.tax, end: today });
+  const hist = portfolioHistory(funds, pmap, usd, { taxRate: S.settings.tax, end: today });
   const last = hist[hist.length - 1] || null;
   // Bir önceki "fiyat günü" (bugünün satırı yalnızca son fiyatın tekrarıysa onu atla)
   let prev = null;
   if (last) for (let i = hist.length - 2; i >= 0; i--) if (Math.abs(hist[i].value - last.value) > 1e-6 || i === 0) { prev = hist[i]; break; }
-  const states = S.funds.map((f) => ({ f, s: fundState(f, pmap[f.code], today, S.settings.tax), pts: pmap[f.code] }));
-  C = { today, pmap, usd, benches, hist, last, prev, states, usdNow: valueAt(usd, today) };
+  const states = funds.map((f) => ({ f, s: fundState(f, pmap[f.code], today, S.settings.tax), pts: pmap[f.code] }));
+  C = { today, funds, pmap, usd, benches, hist, last, prev, states, usdNow: valueAt(usd, today), cpiEst: cpiDaily(series(M, S.manual, 'TUFE')).estimatedAfter };
 
   // Günlük kayıt: her açılışta bugünün özetini sakla
   if (last && last.value > 0) {
@@ -84,12 +112,25 @@ const main = () => $('#view');
 function render() {
   compute();
   document.querySelectorAll('.tabbar button').forEach((b) => b.classList.toggle('on', b.dataset.tab === tab));
-  const upd = M.index?.guncelleme ? new Date(M.index.guncelleme) : null;
-  $('#status').textContent = upd ? `Veri: ${upd.toLocaleDateString('tr-TR')} ${upd.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}` : 'Piyasa verisi bekleniyor';
+  updateStatus();
   const v = { ozet, fonlar, kiyas, senaryo, diger }[tab];
   main().innerHTML = '';
   v(main());
   main().scrollTop = 0;
+}
+
+const hhmm = (d) => d.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+function backupText() {
+  const c = backup.loadCfg();
+  if (!c) return 'Yedek kapalı';
+  if (c.error) return 'Yedek hatası ⚠︎';
+  if (!c.last) return 'Yedek bekliyor';
+  const d = new Date(c.last);
+  return `Yedek ✓ ${d.toDateString() === new Date().toDateString() ? hhmm(d) : d.toLocaleDateString('tr-TR')}`;
+}
+function updateStatus() {
+  const upd = M.index?.guncelleme ? new Date(M.index.guncelleme) : null;
+  $('#status').textContent = `${upd ? `Veri: ${upd.toLocaleDateString('tr-TR')} ${hhmm(upd)}` : 'Piyasa verisi bekleniyor'} · ${backupText()}`;
 }
 
 function setTab(t) { tab = t; history.replaceState(null, '', '#' + t); render(); window.scrollTo(0, 0); }
@@ -125,6 +166,19 @@ function ozet(root) {
   const dayPct = P && P.value ? L.value / P.value - 1 : null;
   const val = ccy === 'USD' ? L.valueUsd : L.value;
 
+  const bc = backup.loadCfg();
+  if (!bc || bc.error) {
+    root.append(h(`<section class="card notice ${bc ? 'err' : ''}">
+      <b>${bc ? 'Otomatik yedek alınamadı' : 'Verilerin yalnızca bu telefonda'}</b>
+      <p class="small">${bc ? esc(bc.error) : 'Telefon değişir ya da veri silinirse portföy kaybolur. Şifreli otomatik yedeği bir kez kur, gerisi kendiliğinden olur.'}</p>
+      <button class="btn small" id="bk">${bc ? 'Tekrar dene' : 'Otomatik yedeği kur'}</button></section>`));
+    root.querySelector('#bk').onclick = async () => {
+      if (!bc) return backupSetup();
+      const r = await backup.backupNow(S, { force: true });
+      if (r.error) alert(r.error);
+      render();
+    };
+  }
   root.append(h(`
   <section class="hero card">
     <div class="row between"><span class="label">Portföy değeri</span>
@@ -139,10 +193,17 @@ function ozet(root) {
       <div><span class="label">Maliyet</span><b>${money(L.cost, 'TRY')}</b><span class="muted">${days} gün</span></div>
       <div><span class="label">Günlük ort. (net)</span><b class="${cls(netPct)}">${pct(dailyRate(netPct, days), 4)}</b><span class="muted">USD: ${pct(dailyRate(usdPct, days), 4)}</span></div>
       <div><span class="label">Yıllık karşılığı (net)</span><b class="${cls(netPct)}">${pct(annualize(netPct, days), 1)}</b><span class="muted">USD kuru ${num(C.usdNow ?? L.usd, 4)}</span></div>
+      ${(() => {
+        const infVal = replicate(C.funds, C.benches.TUFE, C.today);
+        if (!infVal) return '';
+        const infl = infVal / L.cost - 1, real = (L.cost + L.net) / infVal - 1;
+        const est = C.cpiEst && C.cpiEst < C.today;
+        return `<div class="wide"><span class="label">Enflasyona göre gerçek getiri (net)</span><b class="${cls(real)}">${pct(real)}</b><span class="muted">Aynı dönemde enflasyon ${pct(infl)}${est ? ` · ${dTR(C.cpiEst).slice(3)} sonrası tahmini` : ''}. ${real >= 0 ? 'Paran alım gücü kazandı.' : 'Paran alım gücü kaybetti.'}</span></div>`;
+      })()}
     </div>
   </section>
   <section class="card"><div class="row between"><h2>Değer gelişimi</h2></div><div id="rng"></div><div id="ch1" class="chart"></div><div id="lg1"></div></section>
-  <section class="card"><h2>Fonlar</h2><div id="hold"></div></section>
+  <section class="card"><h2>Yatırımlar</h2><div id="hold"></div></section>
   <section class="card"><div class="row between"><h2>Günlük kayıt</h2><span class="muted small">Her gün otomatik</span></div><div id="hist"></div></section>
   `));
   root.querySelectorAll('[data-ccy]').forEach((b) => (b.onclick = () => { S.settings.ccy = b.dataset.ccy; persist(); render(); }));
@@ -159,8 +220,9 @@ function ozet(root) {
 
   // Fon kartları
   const hold = root.querySelector('#hold');
-  for (const { f, s, pts } of C.states) {
+  for (const { f, s } of C.states) {
     if (s.qty <= 0 && !s.realized) continue;
+    const pts = f.native;
     const p = pts[pts.length - 1], q = pts[pts.length - 2];
     const dch = p && q ? p[1] / q[1] - 1 : null;
     const stale = !p || daysBetween(p[0], C.today) > 4;
@@ -169,7 +231,7 @@ function ozet(root) {
       <div class="row between"><b class="code">${esc(f.code)}</b><span class="${cls(dch)}">${pct(dch)}</span></div>
       <div class="name">${esc(fundName(f.code))}</div>
       <div class="grid3">
-        <div><span class="label">Fiyat</span>${num(s.price, 6)}${stale ? ' <span class="warn" title="Fiyat güncel değil">⚠︎</span>' : ''}<span class="muted small">${p ? dTR(p[0]) : 'veri yok'}</span></div>
+        <div><span class="label">Fiyat</span>${fmtPrice(p?.[1], f.code)}${stale ? ' <span class="warn" title="Fiyat güncel değil">⚠︎</span>' : ''}<span class="muted small">${p ? dTR(p[0]) : 'veri yok'}</span></div>
         <div><span class="label">Değer</span>${money(s.value)}<span class="muted small">${num(s.qty, 0)} adet</span></div>
         <div><span class="label">Kâr (net)</span><span class="${cls(s.net)}">${signMoney(s.net)}</span><span class="${cls(gp)} small">${pct(gp)} brüt</span></div>
       </div></button>`);
@@ -199,31 +261,32 @@ function emptyState() {
     <h2>Portföyünü ekle</h2>
     <p>Fon kodunu (ör. TGT), alış tarihini, adedi ve birim maliyetini gir. Fiyatlar her gün otomatik çekilir; değerler gün gün kaydedilir.</p>
     <button class="btn" onclick="window.__app.addFund()">Fon ekle</button>
-    <button class="btn ghost" onclick="window.__app.importFile()">Yedekten içe aktar</button>
+    <button class="btn ghost" onclick="window.__app.backupRestore()">GitHub yedeğinden geri yükle</button>
+    <button class="btn ghost" onclick="window.__app.importFile()">Dosyadan içe aktar</button>
   </section>`;
 }
 
 // ---------- FONLAR ----------
 function fonlar(root) {
-  root.append(h(`<section class="card"><div class="row between"><h2>Fonlarım</h2><button class="btn small" id="add">+ Fon / işlem</button></div><div id="list"></div></section>`));
+  root.append(h(`<section class="card"><div class="row between"><h2>Yatırımlarım</h2><button class="btn small" id="add">+ Fon / hisse</button></div><div id="list"></div></section>`));
   root.querySelector('#add').onclick = () => addFund();
   const list = root.querySelector('#list');
-  if (!S.funds.length) list.innerHTML = '<p class="muted">Henüz fon yok.</p>';
+  if (!S.funds.length) list.innerHTML = '<p class="muted">Henüz yatırım yok.</p>';
   for (const { f, s, pts } of C.states) {
-    const last = pts[pts.length - 1];
+    const last = f.native[f.native.length - 1];
     const r1 = periodReturn(pts, periodStart('1Y', C.today), C.today);
     const ra = periodReturn(pts, periodStart('1A', C.today), C.today);
     list.append(h(`<button class="hold" data-code="${esc(f.code)}">
-      <div class="row between"><b class="code">${esc(f.code)}</b><span class="muted small">${last ? dTR(last[0]) : 'veri yok'}</span></div>
+      <div class="row between"><b class="code">${esc(f.code)} <span class="tag">${assetKind(f.code) === 'hisse' ? 'Hisse' : 'Fon'}${f.ccy !== 'TRY' ? ' · ' + f.ccy : ''}</span></b><span class="muted small">${last ? dTR(last[0]) : 'veri yok'}</span></div>
       <div class="name">${esc(fundName(f.code))}</div>
       <div class="grid3">
-        <div><span class="label">Fiyat</span>${num(s.price, 6)}</div>
+        <div><span class="label">Fiyat</span>${fmtPrice(last?.[1], f.code)}</div>
         <div><span class="label">1 ay</span><span class="${cls(ra)}">${pct(ra)}</span></div>
         <div><span class="label">1 yıl</span><span class="${cls(r1)}">${pct(r1)}</span></div>
       </div>
       <div class="grid3">
         <div><span class="label">Adet</span>${num(s.qty, 0)}</div>
-        <div><span class="label">Ort. maliyet</span>${num(s.avg, 6)}</div>
+        <div><span class="label">Ort. maliyet (₺)</span>${num(s.avg, assetKind(f.code) === 'hisse' ? 2 : 6)}</div>
         <div><span class="label">Net kâr</span><span class="${cls(s.net)}">${signMoney(s.net)}</span></div>
       </div></button>`));
   }
@@ -232,15 +295,17 @@ function fonlar(root) {
 
 function fundDetail(code) {
   const f = S.funds.find((x) => x.code === code);
+  const fc = C.funds.find((x) => x.code === code);
   const pts = C.pmap[code];
-  const s = fundState(f, pts, C.today, S.settings.tax);
-  const rate = f.tax ?? S.settings.tax;
+  const s = fundState(fc, pts, C.today, S.settings.tax);
+  const rate = fc.tax;
+  const nat = fc.native[fc.native.length - 1];
   const body = h(`
     <div class="name">${esc(fundName(code))}</div>
     <div class="kpis">
-      <div><span class="label">Fiyat</span><b>${num(s.price, 6)}</b><span class="muted small">${pts.length ? dTR(pts[pts.length - 1][0]) : 'veri yok'}</span></div>
+      <div><span class="label">Fiyat</span><b>${fmtPrice(nat?.[1], code)}</b><span class="muted small">${nat ? dTR(nat[0]) : 'veri yok'}${fc.ccy !== 'TRY' ? ` · ₺${num(s.price, 2)}` : ''}</span></div>
       <div><span class="label">Değer</span><b>${money(s.value)}</b><span class="muted small">${num(s.qty, 0)} adet</span></div>
-      <div><span class="label">Maliyet</span><b>${money(s.cost)}</b><span class="muted small">ort. ${num(s.avg, 6)}</span></div>
+      <div><span class="label">Maliyet</span><b>${money(s.cost)}</b><span class="muted small">ort. ₺${num(s.avg, assetKind(code) === 'hisse' ? 2 : 6)}</span></div>
       <div><span class="label">Brüt / Net kâr</span><b class="${cls(s.gross)}">${signMoney(s.gross)}</b><span class="${cls(s.net)} small">net ${signMoney(s.net)} · stopaj %${num(rate * 100, 1)}</span></div>
     </div>
     <div class="row gap wrap"><button class="btn small" data-a="tx">+ Alış/Satış</button><button class="btn small ghost" data-a="price">Fiyat gir</button><button class="btn small ghost" data-a="tax">Stopaj</button></div>
@@ -264,13 +329,13 @@ function fundDetail(code) {
   requestAnimationFrame(draw);
   dlg.querySelector('#fret').innerHTML = returnsTable([[code, pts], ...['USD', 'ALTIN', 'XU100', 'SPX'].map((id) => [benchName(id), C.benches[id]])], 'TRY');
   const txs = sortTx(f.txs || []).reverse();
-  dlg.querySelector('#ftx').innerHTML = txs.length ? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Tarih</th><th>İşlem</th><th>Adet</th><th>Fiyat</th><th>Tutar</th><th></th></tr></thead><tbody>${txs.map((t) => `<tr><td>${dTR(t.date)}</td><td>${t.type === 'sell' ? 'Satış' : 'Alış'}</td><td>${num(t.qty, 0)}</td><td>${num(t.price, 6)}</td><td>${num(t.qty * t.price)}</td><td><button class="link" data-del="${t.id}" aria-label="İşlemi sil">Sil</button></td></tr>`).join('')}</tbody></table></div>` : '<p class="muted">İşlem yok</p>';
+  dlg.querySelector('#ftx').innerHTML = txs.length ? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Tarih</th><th>İşlem</th><th>Adet</th><th>Fiyat</th><th>Tutar</th><th></th></tr></thead><tbody>${txs.map((t) => `<tr><td>${dTR(t.date)}</td><td>${t.type === 'sell' ? 'Satış' : 'Alış'}</td><td>${num(t.qty, 0)}</td><td>${fmtPrice(t.price, code)}</td><td>${(fc.ccy === 'TRY' ? '' : CCY_SIGN[fc.ccy] || '') + num(t.qty * t.price)}</td><td><button class="link" data-del="${t.id}" aria-label="İşlemi sil">Sil</button></td></tr>`).join('')}</tbody></table></div>` : '<p class="muted">İşlem yok</p>';
   dlg.querySelectorAll('[data-del]').forEach((b) => (b.onclick = () => {
     if (!confirm('Bu işlem silinsin mi?')) return;
     f.txs = f.txs.filter((t) => t.id !== b.dataset.del); persist(); dlg.close(); render(); fundDetail(code);
   }));
   dlg.querySelector('[data-a=tx]').onclick = () => { dlg.close(); addFund(code); };
-  dlg.querySelector('[data-a=price]').onclick = () => { dlg.close(); manualPrice(code); };
+  dlg.querySelector('[data-a=price]').onclick = () => { dlg.close(); manualPrice(code, `Birim fiyat (${fc.ccy === 'TRY' ? 'TL' : fc.ccy})`); };
   dlg.querySelector('[data-a=tax]').onclick = () => {
     const v = prompt('Bu fon için stopaj oranı (%). Hisse yoğun fonlarda 0 olabilir.', num(rate * 100, 1));
     if (v == null) return;
@@ -310,7 +375,7 @@ function kiyas(root) {
   const portRet = invested ? portVal / invested - 1 : null;
 
   const all = BENCHES.map((b) => {
-    const v = conv(replicate(S.funds, C.benches[b.id], C.today), C.today);
+    const v = conv(replicate(C.funds, C.benches[b.id], C.today), C.today);
     const pts = C.benches[b.id] || [];
     return { id: b.id, name: benchName(b.id), v, ret: v != null && invested ? v / invested - 1 : null, last: pts[pts.length - 1]?.[0] };
   });
@@ -350,7 +415,7 @@ function kiyas(root) {
           </div>`;
         }).join('')}
       </div>
-      <p class="muted small">Her alışın tutarı aynı gün o piyasaya yatırılmış gibi hesaplanır. Çubuktaki dikey çizgi senin getirin. Yabancı borsalar TL'ye çevrilmiş haliyle (kur etkisi dahil) karşılaştırılır.${net ? ' Portföyün stopaj sonrası, kıyaslar vergisiz alınmıştır.' : ''}</p>` : '<p>Kıyas verisi henüz yok. Veriler her gün otomatik çekilir; ilk çekimden sonra burada görünür.</p>'}
+      <p class="muted small">Her alışın tutarı aynı gün o piyasaya yatırılmış gibi hesaplanır. Çubuktaki dikey çizgi senin getirin. Yabancı borsalar TL'ye çevrilmiş haliyle (kur etkisi dahil) karşılaştırılır.${C.cpiEst && C.cpiEst < C.today ? ` Enflasyonun ${dTR(C.cpiEst).slice(3)} sonrası, son 3 ayın ortalamasıyla tahmin edilir.` : ''}${net ? ' Portföyün stopaj sonrası, kıyaslar vergisiz alınmıştır.' : ''}</p>` : '<p>Kıyas verisi henüz yok. Veriler her gün otomatik çekilir; ilk çekimden sonra burada görünür.</p>'}
       ${missing.length ? `<p class="muted small">Verisi olmayan: ${missing.map((r) => esc(r.name)).join(', ')}</p>` : ''}
     </section>
     <section class="card"><h2>Zaman içinde karşılaştırma</h2><p class="muted small">Grafikte en çok 3 kıyas gösterilir</p><div id="pick"></div><div id="ch2" class="chart"></div><div id="lg2"></div></section>
@@ -379,7 +444,7 @@ function kiyas(root) {
 
   const dates = C.hist.map((r) => r.date);
   const ser = [{ name: 'Portföyüm', color: COLORS.PORT, points: C.hist.map((r) => [r.date, conv(net ? r.cost + r.net : r.value, r.date)]) }];
-  for (const id of S.settings.compare) ser.push({ name: benchName(id), color: COLORS[id], points: dates.map((d) => [d, conv(replicate(S.funds, C.benches[id], d), d)]).filter((p) => p[1] != null) });
+  for (const id of S.settings.compare) ser.push({ name: benchName(id), color: COLORS[id], points: dates.map((d) => [d, conv(replicate(C.funds, C.benches[id], d), d)]).filter((p) => p[1] != null) });
   ser.push({ name: 'Yatırılan', color: COLORS.COST, dashed: true, points: C.hist.map((r) => [r.date, ccy === 'USD' ? r.costUsd : r.cost]) });
   requestAnimationFrame(() => lineChart(root.querySelector('#ch2'), ser, { fmtY: compact, fmtTip: (v) => money(v, ccy) }));
   root.querySelector('#lg2').innerHTML = legend(ser);
@@ -417,7 +482,8 @@ function scenarioDefaults() {
     perFund[f.code] = Math.round(Math.max(-0.5, Math.min(2, r)) * 1000) / 1000;
   }
   const u = C.usdNow || C.last?.usd || 0;
-  return { months: 12, monthly: 0, spread: 0.15, perFund, usdEnd: Math.round(u * 1.2 * 100) / 100, target: null };
+  const inf1y = periodReturn(C.benches.TUFE, periodStart('1Y', C.today), C.today);
+  return { months: 12, monthly: 0, spread: 0.15, perFund, usdEnd: Math.round(u * 1.2 * 100) / 100, target: null, inflation: inf1y != null ? Math.round(inf1y * 1000) / 1000 : 0.3 };
 }
 
 function senaryo(root) {
@@ -441,6 +507,7 @@ function senaryo(root) {
       <label>Aylık ek yatırım (₺)<input name="monthly" inputmode="decimal" value="${num(sc.monthly, 0)}"></label>
       <label>Senaryo aralığı (± yıllık %)<input name="spread" inputmode="decimal" value="${num(sc.spread * 100, 1)}"></label>
       <label>Dönem sonu USD/TL<input name="usdEnd" inputmode="decimal" value="${num(sc.usdEnd, 2)}"></label>
+      <label>Beklenen yıllık enflasyon (%)<input name="inflation" inputmode="decimal" value="${num(sc.inflation * 100, 1)}"></label>
       <label>Hedef değer (₺, isteğe bağlı)<input name="target" inputmode="decimal" value="${sc.target ? num(sc.target, 0) : ''}"></label>
       <fieldset><legend>Fon bazında beklenen yıllık getiri (%)</legend>
         ${C.states.map(({ f }) => `<label>${esc(f.code)}<input name="f_${esc(f.code)}" inputmode="decimal" value="${num((sc.perFund[f.code] ?? 0) * 100, 1)}"></label>`).join('')}
@@ -456,6 +523,8 @@ function senaryo(root) {
       <tr><td>Brüt kâr</td>${res.map((r) => `<td class="${cls(r.gross)}">${signMoney(r.gross, 'TRY', 0)}</td>`).join('')}</tr>
       <tr><td>Net kâr (stopaj)</td>${res.map((r) => `<td class="${cls(r.net)}">${signMoney(r.net, 'TRY', 0)}</td>`).join('')}</tr>
       <tr><td>Değer $ (kur ${num(sc.usdEnd, 2)})</td>${res.map((r) => `<td>${money(r.value / sc.usdEnd, 'USD', 0)}</td>`).join('')}</tr>
+      <tr><td>Bugünün parasıyla değer</td>${res.map((r) => `<td>${money(r.value / Math.pow(1 + sc.inflation, sc.months / 12), 'TRY', 0)}</td>`).join('')}</tr>
+      <tr><td>Enflasyona göre getiri</td>${res.map((r) => { const g = (L.value + sc.monthly * sc.months) ? (r.value / Math.pow(1 + sc.inflation, sc.months / 12)) / (L.value + sc.monthly * sc.months) - 1 : null; return `<td class="${cls(g)}">${pct(g, 1)}</td>`; }).join('')}</tr>
       <tr><td>Dolar bazında getiri</td>${res.map((r) => { const g = usdNowVal ? (r.value - sc.monthly * sc.months) / sc.usdEnd / usdNowVal - 1 : null; return `<td class="${cls(g)}">${pct(g, 1)}</td>`; }).join('')}</tr>
     </tbody></table></div>
     ${sc.target ? `<p>Baz senaryoda <b>${money(sc.target, 'TRY', 0)}</b> hedefine ${mt == null ? '50 yılda ulaşılamıyor' : mt === 0 ? 'zaten ulaşıldı' : `<b>${mt} ay</b> sonra (${dTR(addDays(C.today, Math.round(mt * 30.44)))}) ulaşılır`}.</p>` : ''}
@@ -475,6 +544,7 @@ function senaryo(root) {
       monthly: parseNum(fd.get('monthly')) || 0,
       spread: (parseNum(fd.get('spread')) || 0) / 100,
       usdEnd: parseNum(fd.get('usdEnd')) || sc.usdEnd,
+      inflation: Number.isFinite(parseNum(fd.get('inflation'))) ? parseNum(fd.get('inflation')) / 100 : sc.inflation,
       target: Number.isFinite(t) && t > 0 ? t : null,
       perFund,
     };
@@ -610,23 +680,28 @@ function sheet(title, content) {
 
 function addFund(code = '') {
   const body = h(`<form class="form" id="ff">
-    <label>Fon kodu<input name="code" required autocapitalize="characters" value="${esc(code)}" placeholder="ör. TGT" ${code ? 'readonly' : ''}></label>
+    <label>Fon ya da hisse kodu<input name="code" required autocapitalize="characters" value="${esc(code)}" placeholder="ör. TGT, THYAO, AAPL" ${code ? 'readonly' : ''}></label>
     <div class="seg full" role="group" aria-label="İşlem"><label><input type="radio" name="type" value="buy" checked> Alış</label><label><input type="radio" name="type" value="sell"> Satış</label></div>
     <label>Tarih<input name="date" type="date" required value="${C.today}" max="${C.today}"></label>
     <label>Adet (pay)<input name="qty" inputmode="decimal" required></label>
-    <label>Birim fiyat (₺)<input name="price" inputmode="decimal" required placeholder="ör. 0,124680"></label>
-    <label>Komisyon (₺, isteğe bağlı)<input name="fee" inputmode="decimal"></label>
+    <label>Para birimi<select name="pb"><option value="TRY">TL</option><option value="USD">ABD doları</option><option value="EUR">Euro</option></select></label>
+    <label><span id="plbl">Birim fiyat (TL)</span><input name="price" inputmode="decimal" required placeholder="ör. 0,124680"></label>
+    <label>Komisyon (aynı para biriminde, isteğe bağlı)<input name="fee" inputmode="decimal"></label>
     <p class="muted small" id="hint"></p>
     <button class="btn full" type="submit">Kaydet</button></form>`);
-  const dlg = sheet(code ? `${code} işlem` : 'Fon / işlem ekle', body);
+  const dlg = sheet(code ? `${code} işlem` : 'Fon / hisse ekle', body);
   const form = dlg.querySelector('#ff');
   const hint = dlg.querySelector('#hint');
   const fill = () => {
     const c = form.code.value.trim().toUpperCase();
-    const pts = C.pmap[c]?.length ? C.pmap[c] : M.raw[c];
+    const pts = series(M, S.manual, c);
+    const known = M.meta?.[c]?.pb || S.funds.find((x) => x.code === c)?.pb;
+    if (known) { form.pb.value = known; form.pb.disabled = true; } else form.pb.disabled = false;
+    dlg.querySelector('#plbl').textContent = `Birim fiyat (${form.pb.value === 'TRY' ? 'TL' : form.pb.value})`;
     const p = pts?.length ? valueAt(pts, form.date.value) ?? pts[pts.length - 1][1] : M.tefasSon?.[c]?.[1];
-    hint.textContent = p ? `${fundName(c)} — ${form.date.value ? dTR(form.date.value) : ''} fiyatı: ${num(p, 6)}` : c ? 'Bu kod için henüz veri yok; fiyatı elle gir. Otomatik takip için kodu config.json\'a ekle (Ayarlar).' : '';
-    if (p && !form.price.value) form.price.value = num(p, 6);
+    const d = assetKind(c) === 'hisse' ? 2 : form.pb.value === 'TRY' ? 6 : 4;
+    hint.textContent = p ? `${fundName(c)} — ${form.date.value ? dTR(form.date.value) : ''} fiyatı: ${num(p, d)}` : c ? 'Bu kod için henüz veri yok; fiyatı elle gir. Otomatik takip için kodu config.json\'daki "fonlar" ya da "hisseler" listesine ekle (Ayarlar).' : '';
+    if (p && !form.price.value) form.price.value = num(p, d);
   };
   let timer;
   form.code.oninput = () => {
@@ -634,6 +709,7 @@ function addFund(code = '') {
     timer = setTimeout(async () => { const c = form.code.value.trim().toUpperCase(); if (c.length >= 3) await loadOne(M, c); fill(); }, 300);
   };
   form.date.onchange = () => { form.price.value = ''; fill(); };
+  form.pb.onchange = fill;
   if (code) fill(); else form.code.oninput();
   form.onsubmit = (e) => {
     e.preventDefault();
@@ -642,6 +718,7 @@ function addFund(code = '') {
     if (!c || !(qty > 0) || !(price > 0)) return alert('Kod, adet ve fiyat gerekli');
     let f = S.funds.find((x) => x.code === c);
     if (!f) { f = { code: c, txs: [] }; S.funds.push(f); }
+    if (!M.meta?.[c]?.pb && form.pb.value !== 'TRY') f.pb = form.pb.value;
     f.txs.push({ id: store.uid(), date: form.date.value, type: form.type.value, qty, price, fee });
     persist(); dlg.close(); render();
     if (!M.raw[c]?.length) refresh();
@@ -672,7 +749,15 @@ function settings() {
   const idx = M.index?.seriler || {};
   const repoEdit = 'https://github.com/alcnergen/Try1/edit/master/portfoy/data/config.json';
   const runUrl = 'https://github.com/alcnergen/Try1/actions/workflows/portfoy.yml';
-  const body = h(`<form class="form" id="st">
+  const body = h(`<div class="bk-top">
+    <h3 style="margin-top:0">Otomatik yedek</h3>
+    ${(() => {
+      const c = backup.loadCfg();
+      if (!c) return `<p class="small">Kapalı. Verilerin yalnızca bu cihazda.</p><div class="row gap wrap"><button class="btn small" type="button" id="bkset">Otomatik yedeği kur</button><button class="btn small ghost" type="button" id="bkres">GitHub yedeğinden geri yükle</button></div>`;
+      return `<p class="small">${c.error ? `<span class="warn">⚠︎ ${esc(c.error)}</span>` : `Açık. Son yedek: ${c.last ? new Date(c.last).toLocaleString('tr-TR') : '—'}`}<br><span class="muted">Her değişiklikten birkaç saniye sonra şifrelenip GitHub'daki gizli Gist'ine yazılır. Eski sürümler Gist geçmişinde saklanır.</span></p>
+        <div class="row gap wrap"><button class="btn small" type="button" id="bknow">Şimdi yedekle</button>${c.gistId ? `<a class="btn small ghost" href="https://gist.github.com/${esc(c.gistId)}/revisions" target="_blank" rel="noopener">Yedek geçmişi</a>` : ''}<button class="btn small ghost" type="button" id="bkres">Geri yükle</button><button class="btn small ghost danger" type="button" id="bkoff">Kapat</button></div>`;
+    })()}
+    </div><form class="form" id="st">
     <label>Varsayılan stopaj (%)<input name="tax" inputmode="decimal" value="${num(S.settings.tax * 100, 1)}"></label>
     <label>Mevduat kıyası: yıllık net faiz (%)<input name="deposit" inputmode="decimal" value="${num(S.settings.deposit * 100, 1)}"></label>
     <button class="btn" type="submit">Kaydet</button></form>
@@ -683,9 +768,8 @@ function settings() {
       return `<tr><td>${esc(id)}${idx[id]?.hata ? ' <span class="warn" title="' + esc(idx[id].hata) + '">⚠︎</span>' : ''}</td><td>${l ? dTR(l[0]) : '—'}</td><td>${l ? num(l[1], 4) : '—'}</td><td><button type="button" class="link" data-m="${esc(id)}">Elle gir</button></td></tr>`;
     }).join('')}</tbody></table></div>
     <p class="muted small">Fiyatlar GitHub Actions ile her iş günü akşam ve sabah çekilir. Yeni bir fon kodunu otomatik takibe almak için <a href="${repoEdit}" target="_blank" rel="noopener">config.json</a> dosyasındaki "fonlar" listesine ekle. Hemen güncellemek için <a href="${runUrl}" target="_blank" rel="noopener">Actions → Run workflow</a>.</p>
-    <h3>Yedek</h3>
-    <p class="muted small">Portföy bilgilerin yalnızca bu cihazda saklanır. Düzenli olarak yedek al.</p>
-    <div class="row gap wrap"><button class="btn small" type="button" id="exp">Yedeği indir</button><button class="btn small ghost" type="button" id="imp">Yedekten yükle</button><button class="btn small ghost" type="button" id="lnk">Aktarım bağlantısı oluştur</button><button class="btn small ghost" type="button" id="paste">Bağlantıyı yapıştır</button></div>
+    <h3>Elle yedek</h3>
+    <div class="row gap wrap"><button class="btn small ghost" type="button" id="exp">Yedeği indir</button><button class="btn small ghost" type="button" id="imp">Yedekten yükle</button><button class="btn small ghost" type="button" id="lnk">Aktarım bağlantısı oluştur</button><button class="btn small ghost" type="button" id="paste">Bağlantıyı yapıştır</button></div>
     <h3>Ana ekrana ekleme</h3>
     <p class="muted small">iPhone: Safari'de Paylaş → Ana Ekrana Ekle. Android: Chrome menüsü → Ana ekrana ekle / Uygulamayı yükle.</p>
     <button class="btn ghost danger small" type="button" id="reset">Tüm verileri sil</button>`);
@@ -700,6 +784,19 @@ function settings() {
   };
   dlg.querySelectorAll('[data-m]').forEach((b) => (b.onclick = () => { dlg.close(); manualPrice(b.dataset.m, ['USDTRY', 'EURTRY'].includes(b.dataset.m) ? 'Kur' : b.dataset.m === 'GOLD' ? 'Ons altın ($)' : undefined); }));
   dlg.querySelector('#exp').onclick = exportFile;
+  const on = (id, fn) => { const el = dlg.querySelector(id); if (el) el.onclick = fn; };
+  on('#bkset', () => { dlg.close(); backupSetup(); });
+  on('#bkres', () => { dlg.close(); backupRestore(); });
+  on('#bknow', async (e) => {
+    e.target.disabled = true; e.target.textContent = 'Yedekleniyor…';
+    const r = await backup.backupNow(S, { force: true });
+    dlg.close(); updateStatus(); settings();
+    if (r.error) alert(r.error);
+  });
+  on('#bkoff', () => {
+    if (!confirm('Otomatik yedek bu cihazda kapatılsın mı? GitHub\'daki mevcut yedek silinmez.')) return;
+    backup.disable(); dlg.close(); render();
+  });
   dlg.querySelector('#imp').onclick = () => { dlg.close(); importFile(); };
   dlg.querySelector('#lnk').onclick = async () => {
     const { snapshots, ...rest } = S;
@@ -716,6 +813,62 @@ function settings() {
   dlg.querySelector('#reset').onclick = () => {
     if (!confirm('Bu cihazdaki tüm portföy verisi silinsin mi? Önce yedek almanı öneririm.')) return;
     S = structuredClone(store.DEFAULT); persist(); dlg.close(); render();
+  };
+}
+
+const TOKEN_URL = 'https://github.com/settings/tokens/new?scopes=gist&description=Portf%C3%B6y%C3%BCm%20yedek';
+function backupSetup() {
+  const body = h(`<form class="form" id="bf">
+    <p class="small">Verilerin telefonda senin parolanla <b>şifrelenir</b> ve GitHub hesabındaki <b>gizli</b> bir Gist'e yazılır. GitHub ve başkaları içeriği okuyamaz.</p>
+    <ol class="small steps">
+      <li><a href="${TOKEN_URL}" target="_blank" rel="noopener">Bu bağlantıyla</a> GitHub'da bir anahtar oluştur: yalnızca <b>gist</b> kutusu işaretli olsun, "Expiration" için <b>No expiration</b> seç, en altta <b>Generate token</b>'a bas.</li>
+      <li>Çıkan <code>ghp_…</code> ile başlayan anahtarı kopyalayıp aşağı yapıştır.</li>
+      <li>Bir yedek parolası belirle. <b>Unutma:</b> parola olmadan yedek açılamaz; kimse kurtaramaz.</li>
+    </ol>
+    <label>GitHub anahtarı<input name="token" required autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="ghp_…"></label>
+    <label>Yedek parolası (en az 8 karakter)<input name="pass" type="password" required minlength="8" autocomplete="new-password"></label>
+    <label>Parola tekrar<input name="pass2" type="password" required minlength="8" autocomplete="new-password"></label>
+    <p class="small" id="bmsg" role="status"></p>
+    <button class="btn full" type="submit">Kur ve ilk yedeği al</button></form>`);
+  const dlg = sheet('Otomatik yedek', body);
+  const form = dlg.querySelector('#bf'), msg = dlg.querySelector('#bmsg');
+  form.onsubmit = async (e) => {
+    e.preventDefault();
+    if (form.pass.value !== form.pass2.value) { msg.textContent = 'Parolalar aynı değil'; return; }
+    const btn = form.querySelector('button[type=submit]');
+    btn.disabled = true; msg.textContent = 'Anahtar doğrulanıyor ve yedekleniyor…';
+    try {
+      const r = await backup.setup({ token: form.token.value.trim(), pass: form.pass.value }, S,
+        async () => confirm('Bu GitHub hesabında farklı parolayla alınmış eski bir Portföyüm yedeği var. Bu cihazdaki verilerle üzerine yazılsın mı? (Eski sürüm Gist geçmişinde kalır.)'));
+      if (r.error) throw new Error(r.error);
+      dlg.close(); render();
+      alert('Otomatik yedek kuruldu. Bundan sonra her değişiklik şifrelenip yedeklenecek.');
+    } catch (err) { msg.textContent = '⚠︎ ' + err.message; btn.disabled = false; }
+  };
+}
+
+function backupRestore() {
+  const c = backup.loadCfg();
+  const body = h(`<form class="form" id="rf">
+    <p class="small">GitHub'daki şifreli yedeğin bu cihaza indirilir. Bu cihazdaki mevcut veriler yedektekilerle değiştirilir.</p>
+    <label>GitHub anahtarı<input name="token" required autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="ghp_…" value="${esc(c?.token || '')}"></label>
+    <label>Yedek parolası<input name="pass" type="password" required autocomplete="current-password"></label>
+    <p class="small" id="rmsg" role="status"></p>
+    <button class="btn full" type="submit">Geri yükle</button></form>`);
+  const dlg = sheet('Yedekten geri yükle', body);
+  const form = dlg.querySelector('#rf'), msg = dlg.querySelector('#rmsg');
+  form.onsubmit = async (e) => {
+    e.preventDefault();
+    const btn = form.querySelector('button[type=submit]');
+    btn.disabled = true; msg.textContent = 'Yedek aranıyor…';
+    try {
+      const r = await backup.restore({ token: form.token.value.trim(), pass: form.pass.value });
+      const n = r.state.funds?.length || 0;
+      if ((S.funds.length || S.others.assets.length) && !confirm(`${new Date(r.tarih).toLocaleString('tr-TR')} tarihli yedek (${n} yatırım) yüklensin mi? Bu cihazdaki veri değiştirilecek.`)) { btn.disabled = false; msg.textContent = ''; return; }
+      S = store.normalize(r.state); store.save(S);
+      dlg.close(); await refresh();
+      alert('Yedek yüklendi; otomatik yedek bu cihazda da açık.');
+    } catch (err) { msg.textContent = '⚠︎ ' + err.message; btn.disabled = false; }
   };
 }
 
@@ -764,7 +917,7 @@ function importFromHash() {
   tab = 'ozet';
 }
 
-window.__app = { addFund, importFile };
+window.__app = { addFund, importFile, backupRestore };
 
 export async function init() {
   importFromHash();

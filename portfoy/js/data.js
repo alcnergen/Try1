@@ -1,5 +1,5 @@
 // Piyasa verisini (GitHub Actions'ın kaydettiği JSON'lar) yükler ve kıyas serilerini türetir.
-import { combine, mergePoints, addDays, todayISO } from './calc.js';
+import { combine, mergePoints, addDays, todayISO, cpiDaily } from './calc.js';
 
 const OZ = 31.1034768;
 
@@ -14,6 +14,7 @@ export const BENCHES = [
   { id: 'DAX', ad: 'DAX', renk: 6, need: ['DAX', 'EURTRY'], tl: (s) => combine(s.DAX, s.EURTRY, (a, b) => a * b) },
   { id: 'N225', ad: 'Nikkei 225', renk: 9, need: ['N225', 'JPYTRY'], tl: (s) => combine(s.N225, s.JPYTRY, (a, b) => a * b) },
   { id: 'MSCIW', ad: 'MSCI Dünya', renk: 10, need: ['MSCIW', 'USDTRY'], tl: (s) => combine(s.MSCIW, s.USDTRY, (a, b) => a * b) },
+  { id: 'TUFE', ad: 'Enflasyon (TÜFE)', renk: 12, need: ['TUFE'], tl: (s) => cpiDaily(s.TUFE).points },
   { id: 'MEVDUAT', ad: 'Mevduat', renk: 11, need: [], tl: null },
 ];
 
@@ -24,14 +25,15 @@ async function getJSON(url) {
 }
 
 export async function loadMarket(fundCodes) {
-  const market = { index: null, raw: {}, names: {}, errors: [], tefasSon: null };
+  const market = { index: null, raw: {}, names: {}, meta: {}, errors: [], tefasSon: null };
   try { market.index = await getJSON('data/index.json'); } catch (e) { market.errors.push('Veri dizini yok (Actions henüz çalışmamış olabilir)'); }
-  const ids = new Set([...fundCodes, 'USDTRY', 'EURTRY', 'JPYTRY', 'GOLD', 'XU100', 'SPX', 'NDX', 'DAX', 'N225', 'MSCIW']);
+  const ids = new Set([...fundCodes, 'USDTRY', 'EURTRY', 'JPYTRY', 'GOLD', 'XU100', 'SPX', 'NDX', 'DAX', 'N225', 'MSCIW', 'TUFE']);
   await Promise.all([...ids].map(async (id) => {
     try {
       const s = await getJSON(`data/series/${encodeURIComponent(id)}.json`);
       market.raw[id] = s.points || [];
       market.names[id] = s.ad;
+      market.meta[id] = { pb: s.pb || 'TRY', tur: s.tur };
     } catch { market.raw[id] = []; }
   }));
   const missing = fundCodes.filter((c) => !market.raw[c]?.length);
@@ -52,7 +54,7 @@ export async function loadOne(market, code) {
   if (market.raw[code]?.length) return true;
   try {
     const s = await getJSON(`data/series/${encodeURIComponent(code)}.json`);
-    market.raw[code] = s.points || []; market.names[code] = s.ad;
+    market.raw[code] = s.points || []; market.names[code] = s.ad; market.meta[code] = { pb: s.pb || 'TRY', tur: s.tur };
   } catch {
     try {
       market.tefasSon ||= await getJSON('data/tefas-son.json');
@@ -71,7 +73,7 @@ export function series(market, manual, id) {
 
 export function benchSeries(market, manual, depositRate) {
   const s = {};
-  for (const id of ['USDTRY', 'EURTRY', 'JPYTRY', 'GOLD', 'XU100', 'SPX', 'NDX', 'DAX', 'N225', 'MSCIW']) s[id] = series(market, manual, id);
+  for (const id of ['USDTRY', 'EURTRY', 'JPYTRY', 'GOLD', 'XU100', 'SPX', 'NDX', 'DAX', 'N225', 'MSCIW', 'TUFE']) s[id] = series(market, manual, id);
   const out = {};
   for (const b of BENCHES) {
     if (b.id === 'MEVDUAT') continue;

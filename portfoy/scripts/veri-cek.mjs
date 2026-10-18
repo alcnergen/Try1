@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Günlük piyasa verisi toplayıcı. GitHub Actions'ta çalışır, bağımlılığı yoktur (Node 22+).
 // - Fon fiyatları: TEFAS'ın 2026'daki yeni JSON API'si (/api/funds/fonFiyatBilgiGetir)
+// - Hisseler (BIST ve yabancı): TradingView; para birimi seriye yazılır, uygulama TL'ye çevirir
 // - Kıyaslar (döviz, altın, endeksler): TradingView günlük mumları; döviz için canlidoviz, BIST 100 için İş Yatırım yedek
 //   (Yahoo ve Stooq GitHub sunucularını engellediği için kullanılmıyor)
 // Çıktı: data/series/<ID>.json, data/index.json
@@ -77,37 +78,56 @@ export function parseTvMessage(raw, onBar) {
   return events;
 }
 
-function tvHistory(symbol, bars, timeoutMs = 25000) {
+function tvHistory(symbol, bars, timeoutMs = 25000, tf = '1D') {
   return new Promise((resolve, reject) => {
     const ws = new WebSocket('wss://data.tradingview.com/socket.io/websocket?type=chart', { headers: { Origin: 'https://www.tradingview.com', 'User-Agent': UA } });
     const cs = 'cs_' + Math.random().toString(36).slice(2, 14);
     const out = new Map();
-    let err = null, finished = false;
+    let err = null, finished = false, info = {};
     const done = () => {
       if (finished) return;
       finished = true;
       clearTimeout(timer);
       try { ws.close(); } catch { /* kapalı */ }
       if (!out.size) reject(new Error(err || 'veri yok'));
-      else resolve([...out.entries()].sort((a, b) => a[0] - b[0]).map(([t, v]) => [tvDate(t), v]));
+      else {
+        const pts = [...out.entries()].sort((a, b) => a[0] - b[0]).map(([t, v]) => [tvDate(t), v]);
+        pts.info = info; // sembol bilgisi: para birimi, ad, tür
+        resolve(pts);
+      }
     };
     const timer = setTimeout(() => { err ||= 'zaman aşımı'; done(); }, timeoutMs);
     ws.onopen = () => {
       ws.send(tvPacket({ m: 'set_auth_token', p: ['unauthorized_user_token'] }));
       ws.send(tvPacket({ m: 'chart_create_session', p: [cs, ''] }));
       ws.send(tvPacket({ m: 'resolve_symbol', p: [cs, 'ser_1', '=' + JSON.stringify({ symbol, adjustment: 'splits', session: 'regular' })] }));
-      ws.send(tvPacket({ m: 'create_series', p: [cs, '$prices', 's1', 'ser_1', '1D', bars, ''] }));
+      ws.send(tvPacket({ m: 'create_series', p: [cs, '$prices', 's1', 'ser_1', tf, bars, ''] }));
     };
     ws.onerror = (e) => { err = 'bağlantı hatası ' + (e?.message || ''); done(); };
     ws.onclose = () => done();
     ws.onmessage = (ev) => {
       for (const e of parseTvMessage(ev.data, (t, v) => out.set(t, v))) {
         if (e.heartbeat) ws.send(`~m~${e.heartbeat.length}~m~${e.heartbeat}`);
+        else if (e.m === 'symbol_resolved' && e.p?.[2]) info = { pb: e.p[2].currency_code, ad: e.p[2].description, tip: e.p[2].type, borsa: e.p[2].exchange };
         else if (e.m === 'series_completed') done();
         else if (e.m === 'symbol_error' || e.m === 'critical_error') { err = JSON.stringify(e.p); done(); }
       }
     };
   });
+}
+
+// TradingView sembol araması: "AAPL" → "NASDAQ:AAPL"
+export function pickTvSymbol(json, code) {
+  const list = (json?.symbols || json || []).filter((x) => ['stock', 'fund', 'dr', 'index'].includes(x.type));
+  const exact = list.filter((x) => String(x.symbol).replace(/<\/?em>/g, '').toUpperCase() === code);
+  const best = exact.find((x) => x.exchange === 'BIST') || exact.find((x) => ['NASDAQ', 'NYSE', 'AMEX', 'NYSE ARCA', 'XETR'].includes(x.exchange)) || exact[0];
+  return best ? `${best.prefix || best.exchange}:${String(best.symbol).replace(/<\/?em>/g, '')}` : null;
+}
+async function tvSearch(code) {
+  const res = await fetchRetry(`https://symbol-search.tradingview.com/symbol_search/v3/?text=${encodeURIComponent(code)}&hl=0&exchange=&lang=tr&search_type=undefined&domain=production`, {
+    headers: { Origin: 'https://www.tradingview.com', Referer: 'https://www.tradingview.com/' },
+  });
+  return pickTvSymbol(await res.json(), code);
 }
 
 // ---------- canlidoviz (döviz yedeği, TL karşılığı) ----------
@@ -153,31 +173,77 @@ async function saveSeries(s) {
 }
 
 // ---------- Ana akış ----------
-// Bankaların kendi kodu TEFAS kodundan farklı olabilir (ör. Yapı Kredi YFBL1 = TEFAS YLB)
-async function updateFund(code, tefasCode = code) {
-  const prev = await loadSeries(code);
+// Yatırım kalemi: TEFAS fonu ya da hisse (BIST/yabancı).
+// Bankanın kodu TEFAS kodundan farklı olabilir (ör. Yapı Kredi YFBL1 = TEFAS YLB).
+// Kaynak bulunduktan sonra seriye yazılır; sonraki çalıştırmalar aynı kaynaktan devam eder.
+export function assetEntry(f, tip) {
+  const base = typeof f === 'string' ? { kod: f } : { ...f };
+  return { ...base, kod: String(base.kod).toUpperCase().trim(), ...(base.tefas ? { tefas: String(base.tefas).toUpperCase().trim() } : {}), ...(tip ? { tip } : {}) };
+}
+
+async function fromTefas(code, tefasCode, prev) {
   const source = `tefas:${tefasCode}`;
   const full = !prev?.points?.length || prev.source !== source;
-  try {
-    const rows = await tefas(tefasCode, full ? 60 : 1);
-    if (!rows.length) throw new Error(`TEFAS'ta ${tefasCode} koduyla fon bulunamadı`);
-    const s = { id: code, ad: rows[rows.length - 1].name || code, tur: 'fon', pb: 'TRY', source, points: mergePoints(full ? [] : prev.points, rows.map((r) => [r.date, r.price])) };
-    await saveSeries(s);
-    log(`${code}${tefasCode !== code ? ` (${tefasCode})` : ''}: TEFAS ${rows.length} satır, son ${rows[rows.length - 1].date} ${rows[rows.length - 1].price}`);
-    return s;
-  } catch (e) {
-    log(`${code}: ${e.message}`);
-    return prev ? { ...prev, hata: e.message } : { id: code, ad: code, tur: 'fon', points: [], hata: e.message };
+  const rows = await tefas(tefasCode, full ? 60 : 1);
+  if (!rows.length) throw new Error(`TEFAS'ta ${tefasCode} yok`);
+  return { id: code, ad: rows[rows.length - 1].name || code, tur: 'fon', pb: 'TRY', source, points: mergePoints(full ? [] : prev.points, rows.map((r) => [r.date, r.price])) };
+}
+
+async function fromTv(code, sym, prev, years) {
+  const source = `tv:${sym}`;
+  const full = !prev?.points?.length || prev.source !== source;
+  const pts = await tvHistory(sym, full ? Math.round(years * 365) : 40);
+  const i = pts.info || {};
+  const tur = i.tip === 'fund' ? 'fon' : 'hisse';
+  return { id: code, ad: i.ad || prev?.ad || code, tur, pb: i.pb || prev?.pb || 'TRY', borsa: i.borsa || sym.split(':')[0], source, points: mergePoints(full ? [] : prev.points, pts) };
+}
+
+async function updateAsset(entry, years) {
+  const { kod } = entry;
+  const prev = await loadSeries(kod);
+  const tries = [];
+  const known = prev?.source;
+  if (entry.tv) tries.push(['tv', entry.tv]);
+  else if (entry.tefas) tries.push(['tefas', entry.tefas]);
+  else if (known?.startsWith('tefas:')) tries.push(['tefas', known.slice(6)]);
+  else if (known?.startsWith('tv:')) tries.push(['tv', known.slice(3)]);
+  else if (entry.tip === 'hisse') tries.push(['tv', `BIST:${kod}`], ['ara', kod]); // hisseler TEFAS'ta aranmaz (ör. SAP bir fon kodu da)
+  else {
+    // Bilinmeyen kod: 3 harfli kodlar çoğunlukla TEFAS fonudur, 4-5 harfliler BIST hissesi
+    if (kod.length === 3) tries.push(['tefas', kod], ['tv', `BIST:${kod}`]);
+    else tries.push(['tv', `BIST:${kod}`], ['tefas', kod]);
+    tries.push(['ara', kod]);
   }
+  const errs = [];
+  for (const [kind, arg] of tries) {
+    try {
+      let s;
+      if (kind === 'tefas') s = await fromTefas(kod, arg, prev);
+      else if (kind === 'tv') s = await fromTv(kod, arg, prev, years);
+      else {
+        const sym = await tvSearch(arg);
+        if (!sym) throw new Error('TradingView aramasında bulunamadı');
+        s = await fromTv(kod, sym, prev, years);
+      }
+      await saveSeries(s);
+      const last = s.points[s.points.length - 1];
+      log(`${kod}: ${s.source} (${s.tur}, ${s.pb}) ${s.points.length} satır, son ${last[0]} ${last[1]}`);
+      return s;
+    } catch (e) { errs.push(`${kind}:${arg} → ${e.message}`); }
+  }
+  const hata = errs.join(' | ');
+  log(`${kod}: bulunamadı — ${hata}`);
+  return prev ? { ...prev, hata } : { id: kod, ad: kod, tur: 'fon', points: [], hata };
 }
 
 async function updateBench(b, years) {
   const prev = await loadSeries(b.id);
   const fresh = !prev?.points?.length || !String(prev.source || '').startsWith('tv:');
-  const bars = fresh ? Math.round(years * 365) : 40;
+  const monthly = b.tf === '1M'; // ekonomik veriler (TÜFE) aylık
+  const bars = monthly ? (fresh ? Math.round(years * 12) + 12 : 6) : fresh ? Math.round(years * 365) : 40;
   const from = new Date(Date.now() - (fresh ? years * 365 : 40) * 864e5);
   const attempts = [];
-  if (b.tv) attempts.push([`tv:${b.tv}`, () => tvHistory(b.tv, bars)]);
+  if (b.tv) attempts.push([`tv:${b.tv}`, () => tvHistory(b.tv, bars, 25000, b.tf || '1D')]);
   if (b.canli) attempts.push([`canlidoviz:${b.canli}`, () => canlidoviz(b.canli, from, b.bolen || 1)]);
   if (b.isyatirim) attempts.push([`isyatirim:${b.isyatirim}`, () => isyatirim(b.isyatirim, from)]);
   const errs = [];
@@ -203,11 +269,11 @@ async function main() {
   const index = { guncelleme: new Date().toISOString(), seriler: {} };
   const put = (s) => {
     const last = s.points?.[s.points.length - 1];
-    index.seriler[s.id] = { ad: s.ad, tur: s.tur, kaynak: s.source || null, ilk: s.points?.[0]?.[0] || null, son: last?.[0] || null, deger: last?.[1] ?? null, adet: s.points?.length || 0, ...(s.hata ? { hata: s.hata } : {}) };
+    index.seriler[s.id] = { ad: s.ad, tur: s.tur, pb: s.pb || 'TRY', kaynak: s.source || null, ilk: s.points?.[0]?.[0] || null, son: last?.[0] || null, deger: last?.[1] ?? null, adet: s.points?.length || 0, ...(s.hata ? { hata: s.hata } : {}) };
   };
-  for (const f of cfg.fonlar || []) {
-    const code = (typeof f === 'string' ? f : f.kod).toUpperCase().trim();
-    put(await updateFund(code, (typeof f === 'string' ? code : f.tefas || code).toUpperCase().trim()));
+  const assets = [...(cfg.fonlar || []).map((f) => assetEntry(f)), ...(cfg.hisseler || []).map((f) => assetEntry(f, 'hisse'))];
+  for (const a of assets) {
+    put(await updateAsset(a, cfg.gecmisYil || 10));
     await sleep(500);
   }
   for (const b of cfg.kiyaslar || []) put(await updateBench(b, cfg.gecmisYil || 10));

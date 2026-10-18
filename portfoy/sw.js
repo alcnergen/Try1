@@ -1,6 +1,6 @@
 // Uygulama dosyaları önbellekten (çevrimdışı açılır); veri dosyaları önce ağdan, olmazsa önbellekten.
-const VER = 'portfoy-v2';
-const SHELL = ['./', 'index.html', 'app.css', 'js/app.js', 'js/calc.js', 'js/data.js', 'js/store.js', 'js/chart.js', 'manifest.webmanifest', 'icons/icon.svg', 'icons/icon-180.png'];
+const VER = 'portfoy-v3';
+const SHELL = ['./', 'index.html', 'app.css', 'js/app.js', 'js/calc.js', 'js/data.js', 'js/store.js', 'js/chart.js', 'js/backup.js', 'manifest.webmanifest', 'icons/icon.svg', 'icons/icon-180.png'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(VER).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));
