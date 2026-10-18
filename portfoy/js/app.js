@@ -300,33 +300,64 @@ function returnsTable(rows, ccy) {
 function kiyas(root) {
   if (!C.last) return root.append(h(emptyState()));
   const ccy = ui.cmpCcy || S.settings.ccy;
+  const net = ui.cmpNet ?? true;
   const L = C.last;
   const start = startDate();
+  const days = daysBetween(start, C.today);
   const conv = (v, d) => (ccy === 'USD' ? (v == null ? null : v / valueAtOrFirst(C.usd, d)) : v);
-  const portVal = conv(L.value, C.today);
-  const portNetVal = conv(L.cost + L.net, C.today);
+  const portVal = conv(net ? L.cost + L.net : L.value, C.today);
   const invested = ccy === 'USD' ? L.costUsd : L.cost;
+  const portRet = invested ? portVal / invested - 1 : null;
 
-  const rows = BENCHES.map((b) => {
-    const v = replicate(S.funds, C.benches[b.id], C.today);
-    return { id: b.id, name: benchName(b.id), v: conv(v, C.today) };
-  }).filter((r) => r.v != null).sort((a, b) => b.v - a.v);
+  const all = BENCHES.map((b) => {
+    const v = conv(replicate(S.funds, C.benches[b.id], C.today), C.today);
+    const pts = C.benches[b.id] || [];
+    return { id: b.id, name: benchName(b.id), v, ret: v != null && invested ? v / invested - 1 : null, last: pts[pts.length - 1]?.[0] };
+  });
+  const rows = all.filter((r) => r.ret != null).sort((a, b) => b.ret - a.ret);
+  const missing = all.filter((r) => r.ret == null);
+  const beat = rows.filter((r) => portRet >= r.ret).length;
+  const maxAbs = Math.max(Math.abs(portRet || 0), ...rows.map((r) => Math.abs(r.ret)), 0.0001);
+  const bar = (r) => {
+    const w = (Math.abs(r) / maxAbs) * 50;
+    return `<span class="bar"><span class="${r >= 0 ? 'pos' : 'neg'}" style="width:${w.toFixed(1)}%;${r >= 0 ? 'left:50%' : `left:${(50 - w).toFixed(1)}%`}"></span><span class="mark" style="left:${(50 + (portRet / maxAbs) * 50).toFixed(1)}%"></span></span>`;
+  };
 
   root.append(h(`
     <section class="card">
-      <div class="row between"><h2>Aynı parayla ne olurdu?</h2>
-      <div class="seg" role="group" aria-label="Para birimi"><button data-c="TRY" class="${ccy === 'TRY' ? 'on' : ''}">₺</button><button data-c="USD" class="${ccy === 'USD' ? 'on' : ''}">$</button></div></div>
-      <p class="muted small">Her alış/satışın tutarı, aynı gün aşağıdaki varlıklara yatırılmış gibi hesaplanır (${dTR(start)}'den bugüne).</p>
-      <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Varlık</th><th>Bugünkü değer</th><th>Kâr</th><th>Getiri</th><th>Portföye göre</th></tr></thead><tbody>
-        <tr class="me"><td><span class="sw" style="background:${COLORS.PORT}"></span>Portföyüm (brüt)</td><td>${money(portVal, ccy)}</td><td class="${cls(portVal - invested)}">${signMoney(portVal - invested, ccy)}</td><td class="${cls(portVal - invested)}">${pct(portVal / invested - 1)}</td><td>—</td></tr>
-        <tr class="me"><td>Portföyüm (net)</td><td>${money(portNetVal, ccy)}</td><td class="${cls(portNetVal - invested)}">${signMoney(portNetVal - invested, ccy)}</td><td class="${cls(portNetVal - invested)}">${pct(portNetVal / invested - 1)}</td><td>—</td></tr>
-        ${rows.map((r) => `<tr><td><span class="sw" style="background:${COLORS[r.id]}"></span>${esc(r.name)}</td><td>${money(r.v, ccy)}</td><td class="${cls(r.v - invested)}">${signMoney(r.v - invested, ccy)}</td><td class="${cls(r.v - invested)}">${pct(r.v / invested - 1)}</td><td class="${cls(portVal - r.v)}">${portVal >= r.v ? 'Önde ' : 'Geride '}${money(Math.abs(portVal - r.v), ccy, 0)}</td></tr>`).join('')}
-      </tbody></table></div>
+      <div class="row between wrap"><h2>${dTR(start)}'den beri</h2>
+        <div class="row gap">
+          <div class="seg" role="group" aria-label="Kâr türü"><button data-n="1" class="${net ? 'on' : ''}">Net</button><button data-n="0" class="${net ? '' : 'on'}">Brüt</button></div>
+          <div class="seg" role="group" aria-label="Para birimi"><button data-c="TRY" class="${ccy === 'TRY' ? 'on' : ''}">₺</button><button data-c="USD" class="${ccy === 'USD' ? 'on' : ''}">$</button></div>
+        </div></div>
+      <div class="verdict">
+        <div><span class="label">Portföyün (${net ? 'stopaj sonrası' : 'brüt'}, ${ccy === 'USD' ? 'dolar' : 'TL'} bazında)</span>
+          <div class="big ${cls(portRet)}">${pct(portRet)}</div>
+          <div class="sub ${cls(portVal - invested)}">${signMoney(portVal - invested, ccy, 0)} · ${days} gün</div></div>
+        ${rows.length ? `<div class="score"><b>${beat}/${rows.length}</b><span>piyasayı<br>geçiyorsun</span></div>` : ''}
+      </div>
+      ${rows.length ? `<div class="karne" role="table" aria-label="Piyasalara göre karşılaştırma">
+        <div class="k-row k-head" role="row"><span>Piyasa</span><span>Getirisi</span><span>Sen</span></div>
+        ${rows.map((r) => {
+          const d = portRet - r.ret;
+          const ahead = d >= 0;
+          const tl = portVal - r.v;
+          return `<div class="k-row" role="row">
+            <span class="k-name"><span class="sw" style="background:${COLORS[r.id]}"></span>${esc(r.name)}</span>
+            <span class="${cls(r.ret)}">${pct(r.ret)}</span>
+            <span class="k-res ${ahead ? 'up' : 'down'}"><b>${ahead ? '✓ Önde' : '✗ Geride'}</b><small>${num(Math.abs(d) * 100, 2)} puan · ${money(Math.abs(tl), ccy, 0)}</small></span>
+            ${bar(r.ret)}
+          </div>`;
+        }).join('')}
+      </div>
+      <p class="muted small">Her alışın tutarı aynı gün o piyasaya yatırılmış gibi hesaplanır. Çubuktaki dikey çizgi senin getirin. Yabancı borsalar TL'ye çevrilmiş haliyle (kur etkisi dahil) karşılaştırılır.${net ? ' Portföyün stopaj sonrası, kıyaslar vergisiz alınmıştır.' : ''}</p>` : '<p>Kıyas verisi henüz yok. Veriler her gün otomatik çekilir; ilk çekimden sonra burada görünür.</p>'}
+      ${missing.length ? `<p class="muted small">Verisi olmayan: ${missing.map((r) => esc(r.name)).join(', ')}</p>` : ''}
     </section>
-    <section class="card"><h2>Zaman içinde karşılaştırma</h2><p class="muted small">En çok 3 kıyas seç</p><div id="pick"></div><div id="ch2" class="chart"></div><div id="lg2"></div></section>
+    <section class="card"><h2>Zaman içinde karşılaştırma</h2><p class="muted small">Grafikte en çok 3 kıyas gösterilir</p><div id="pick"></div><div id="ch2" class="chart"></div><div id="lg2"></div></section>
     <section class="card"><div class="row between"><h2>Tüm zamanlar: dönemsel getiriler</h2></div><div id="per"></div></section>
     <section class="card"><h2>Uzun vadeli seyir (100'e endeksli)</h2><div id="rng3"></div><div id="ch3" class="chart"></div><div id="lg3"></div></section>`));
 
+  root.querySelectorAll('[data-n]').forEach((b) => (b.onclick = () => { ui.cmpNet = b.dataset.n === '1'; render(); }));
   root.querySelectorAll('[data-c]').forEach((b) => (b.onclick = () => { ui.cmpCcy = b.dataset.c; render(); }));
   // Kıyas seçimi
   const pick = root.querySelector('#pick');
@@ -347,7 +378,7 @@ function kiyas(root) {
   pick.appendChild(wrap);
 
   const dates = C.hist.map((r) => r.date);
-  const ser = [{ name: 'Portföyüm', color: COLORS.PORT, points: C.hist.map((r) => [r.date, conv(r.value, r.date)]) }];
+  const ser = [{ name: 'Portföyüm', color: COLORS.PORT, points: C.hist.map((r) => [r.date, conv(net ? r.cost + r.net : r.value, r.date)]) }];
   for (const id of S.settings.compare) ser.push({ name: benchName(id), color: COLORS[id], points: dates.map((d) => [d, conv(replicate(S.funds, C.benches[id], d), d)]).filter((p) => p[1] != null) });
   ser.push({ name: 'Yatırılan', color: COLORS.COST, dashed: true, points: C.hist.map((r) => [r.date, ccy === 'USD' ? r.costUsd : r.cost]) });
   requestAnimationFrame(() => lineChart(root.querySelector('#ch2'), ser, { fmtY: compact, fmtTip: (v) => money(v, ccy) }));

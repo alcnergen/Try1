@@ -1,8 +1,9 @@
 #!/usr/bin/env node
-// Günlük piyasa verisi toplayıcı. GitHub Actions'ta çalışır, bağımlılığı yoktur (Node 20+).
-// - Fon fiyatları: TEFAS (YAT/EMK/BYF), bulunamazsa Yahoo Finance (KOD.IS)
-// - Kıyaslar (döviz, altın, endeksler): Yahoo Finance; Dolar/Euro için TCMB yedek
-// Çıktı: data/series/<ID>.json, data/index.json, data/tefas-son.json
+// Günlük piyasa verisi toplayıcı. GitHub Actions'ta çalışır, bağımlılığı yoktur (Node 22+).
+// - Fon fiyatları: TEFAS'ın 2026'daki yeni JSON API'si (/api/funds/fonFiyatBilgiGetir)
+// - Kıyaslar (döviz, altın, endeksler): TradingView günlük mumları; döviz için canlidoviz, BIST 100 için İş Yatırım yedek
+//   (Yahoo ve Stooq GitHub sunucularını engellediği için kullanılmıyor)
+// Çıktı: data/series/<ID>.json, data/index.json
 // Kişisel portföy bilgisi (adet, maliyet) burada YOKTUR; yalnızca herkese açık fiyatlar yazılır.
 
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
@@ -13,129 +14,125 @@ import { fileURLToPath } from 'node:url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DATA = path.join(ROOT, 'data');
 const SERIES = path.join(DATA, 'series');
-const UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36';
+const UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36';
 
 export const iso = (d) => d.toISOString().slice(0, 10);
-const trDate = (d) => `${String(d.getUTCDate()).padStart(2, '0')}.${String(d.getUTCMonth() + 1).padStart(2, '0')}.${d.getUTCFullYear()}`;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const log = (...a) => console.log('[veri]', ...a);
+const num = (v) => (typeof v === 'number' ? v : Number(String(v ?? '').replace(',', '.')));
 
 async function fetchRetry(url, opts = {}, tries = 3) {
   let last;
   for (let i = 0; i < tries; i++) {
     try {
-      const res = await fetch(url, { ...opts, signal: AbortSignal.timeout(30000) });
+      const res = await fetch(url, { ...opts, headers: { 'User-Agent': UA, ...(opts.headers || {}) }, signal: AbortSignal.timeout(30000) });
       if (res.ok) return res;
       last = new Error(`${res.status} ${res.statusText}`);
-      if (res.status === 404) break;
+      if (res.status === 404 || res.status === 403) break;
+      await sleep(res.status === 429 ? 30000 : 1500 * (i + 1)); // TEFAS 429 engeli ~45 sn sürer
+      continue;
     } catch (e) { last = e; }
     await sleep(1500 * (i + 1));
   }
   throw last;
 }
 
-// ---------- TEFAS ----------
-let tefasCookie = '';
-async function tefasSession() {
-  if (tefasCookie) return;
-  try {
-    const res = await fetchRetry('https://www.tefas.gov.tr/TarihselVeriler.aspx', { headers: { 'User-Agent': UA } }, 2);
-    const set = res.headers.getSetCookie?.() || [];
-    tefasCookie = set.map((c) => c.split(';')[0]).join('; ');
-  } catch (e) { log('TEFAS oturum alınamadı:', e.message); }
-}
-
+// ---------- TEFAS (yeni API) ----------
+// periyod yalnızca şu değerleri kabul eder: 1, 3, 6, 12, 36, 60 (ay). En fazla 5 yıl.
 export function parseTefas(json) {
-  const rows = json?.data || [];
-  return rows
-    .filter((r) => r.FIYAT != null && Number(r.FIYAT) > 0)
-    .map((r) => ({
-      // TARIH Türkiye gece yarısının epoch ms değeri; +3 saat ile UTC gününe sabitlenir
-      date: iso(new Date(Number(r.TARIH) + 3 * 3600e3)),
-      code: r.FONKODU,
-      name: r.FONUNVAN,
-      price: Number(r.FIYAT),
-    }));
+  if (json?.errorMessage) throw new Error(`TEFAS: ${json.errorMessage}`);
+  return (json?.resultList || [])
+    .filter((r) => r.tarih && num(r.fiyat) > 0)
+    .map((r) => ({ date: String(r.tarih).slice(0, 10), code: r.fonKodu, name: r.fonUnvan, price: num(r.fiyat) }));
 }
 
-async function tefasQuery({ fontip, fonkod = '', from, to }) {
-  await tefasSession();
-  const body = new URLSearchParams({
-    fontip, sfontur: '', fonkod, fongrup: '', bastarih: trDate(from), bittarih: trDate(to), fonturkod: '', fonunvantip: '',
-  });
-  const res = await fetchRetry('https://www.tefas.gov.tr/api/DB/BindHistoryInfo', {
+async function tefas(code, periyod) {
+  const res = await fetchRetry('https://www.tefas.gov.tr/api/funds/fonFiyatBilgiGetir', {
     method: 'POST',
-    headers: {
-      'User-Agent': UA,
-      'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-      'X-Requested-With': 'XMLHttpRequest',
-      Origin: 'https://www.tefas.gov.tr',
-      Referer: 'https://www.tefas.gov.tr/TarihselVeriler.aspx',
-      ...(tefasCookie ? { Cookie: tefasCookie } : {}),
-    },
-    body,
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify({ fonKodu: code, dil: 'TR', periyod }),
   });
-  const text = await res.text();
-  if (!text.trim().startsWith('{')) throw new Error('TEFAS JSON dönmedi');
-  return parseTefas(JSON.parse(text));
+  return parseTefas(await res.json());
 }
 
-// TEFAS bir sorguda ~3 ay veriyor; geriye doğru pencerelerle iner, veri bitince durur.
-async function tefasHistory(code, fontip, from, to) {
-  const out = [];
-  let end = new Date(to);
-  let empty = 0;
-  while (end >= from) {
-    const start = new Date(Math.max(from.getTime(), end.getTime() - 88 * 864e5));
-    const rows = await tefasQuery({ fontip, fonkod: code, from: start, to: end });
-    if (rows.length === 0) { if (++empty >= 2) break; } else empty = 0;
-    out.push(...rows.filter((r) => r.code === code));
-    end = new Date(start.getTime() - 864e5);
-    await sleep(400);
+// ---------- TradingView (WebSocket, günlük mumlar) ----------
+const tvPacket = (o) => { const s = JSON.stringify(o); return `~m~${s.length}~m~${s}`; };
+
+// Mum zamanı borsanın gece yarısı/açılışıdır; 18:00 UTC sonrası bir sonraki güne aittir (ör. USDTRY 21:00Z)
+export const tvDate = (sec) => {
+  const d = new Date(sec * 1000);
+  return iso(d.getUTCHours() >= 18 ? new Date(d.getTime() + 864e5) : d);
+};
+
+export function parseTvMessage(raw, onBar) {
+  const events = [];
+  for (const part of String(raw).split(/~m~\d+~m~/)) {
+    if (!part) continue;
+    if (part.startsWith('~h~')) { events.push({ heartbeat: part }); continue; }
+    let p;
+    try { p = JSON.parse(part); } catch { continue; }
+    if (p.m === 'timescale_update') for (const c of p.p?.[1]?.$prices?.s || []) if (c.v?.length >= 5) onBar(c.v[0], c.v[4]);
+    events.push({ m: p.m, p: p.p });
   }
-  return out;
+  return events;
 }
 
-// ---------- Yahoo ----------
-export function parseYahoo(json) {
-  const r = json?.chart?.result?.[0];
-  if (!r || !r.timestamp) return { points: [], meta: r?.meta || {} };
-  const off = (r.meta?.gmtoffset || 0) * 1000;
-  const close = r.indicators?.quote?.[0]?.close || [];
-  const adj = r.indicators?.adjclose?.[0]?.adjclose;
-  const map = new Map();
-  r.timestamp.forEach((t, i) => {
-    const v = close[i] ?? adj?.[i];
-    if (v != null && Number.isFinite(v) && v > 0) map.set(iso(new Date(t * 1000 + off)), v);
+function tvHistory(symbol, bars, timeoutMs = 25000) {
+  return new Promise((resolve, reject) => {
+    const ws = new WebSocket('wss://data.tradingview.com/socket.io/websocket?type=chart', { headers: { Origin: 'https://www.tradingview.com', 'User-Agent': UA } });
+    const cs = 'cs_' + Math.random().toString(36).slice(2, 14);
+    const out = new Map();
+    let err = null, finished = false;
+    const done = () => {
+      if (finished) return;
+      finished = true;
+      clearTimeout(timer);
+      try { ws.close(); } catch { /* kapalı */ }
+      if (!out.size) reject(new Error(err || 'veri yok'));
+      else resolve([...out.entries()].sort((a, b) => a[0] - b[0]).map(([t, v]) => [tvDate(t), v]));
+    };
+    const timer = setTimeout(() => { err ||= 'zaman aşımı'; done(); }, timeoutMs);
+    ws.onopen = () => {
+      ws.send(tvPacket({ m: 'set_auth_token', p: ['unauthorized_user_token'] }));
+      ws.send(tvPacket({ m: 'chart_create_session', p: [cs, ''] }));
+      ws.send(tvPacket({ m: 'resolve_symbol', p: [cs, 'ser_1', '=' + JSON.stringify({ symbol, adjustment: 'splits', session: 'regular' })] }));
+      ws.send(tvPacket({ m: 'create_series', p: [cs, '$prices', 's1', 'ser_1', '1D', bars, ''] }));
+    };
+    ws.onerror = (e) => { err = 'bağlantı hatası ' + (e?.message || ''); done(); };
+    ws.onclose = () => done();
+    ws.onmessage = (ev) => {
+      for (const e of parseTvMessage(ev.data, (t, v) => out.set(t, v))) {
+        if (e.heartbeat) ws.send(`~m~${e.heartbeat.length}~m~${e.heartbeat}`);
+        else if (e.m === 'series_completed') done();
+        else if (e.m === 'symbol_error' || e.m === 'critical_error') { err = JSON.stringify(e.p); done(); }
+      }
+    };
   });
-  return { points: [...map.entries()].sort((a, b) => a[0].localeCompare(b[0])), meta: r.meta || {} };
 }
 
-async function yahoo(symbol, from) {
-  const p1 = Math.floor(from.getTime() / 1000);
-  const p2 = Math.floor(Date.now() / 1000) + 86400;
-  const q = `/v8/finance/chart/${encodeURIComponent(symbol)}?period1=${p1}&period2=${p2}&interval=1d&includePrePost=false`;
-  let lastErr;
-  for (const host of ['https://query1.finance.yahoo.com', 'https://query2.finance.yahoo.com']) {
-    try {
-      const res = await fetchRetry(host + q, { headers: { 'User-Agent': UA, Accept: 'application/json' } }, 2);
-      return parseYahoo(await res.json());
-    } catch (e) { lastErr = e; }
-  }
-  throw lastErr;
+// ---------- canlidoviz (döviz yedeği, TL karşılığı) ----------
+export function parseCanli(json, divisor = 1) {
+  return Object.entries(json || {})
+    .map(([ts, s]) => [iso(new Date((Number(ts) + 3 * 3600) * 1000)), Number(String(s).split('|')[3]) / divisor])
+    .filter(([, v]) => Number.isFinite(v) && v > 0)
+    .sort((a, b) => a[0].localeCompare(b[0]));
+}
+async function canlidoviz(id, from, divisor = 1) {
+  const f = (d) => d.toISOString().slice(0, 19);
+  const res = await fetchRetry(`https://a.canlidoviz.com/items/history?period=DAILY&itemDataId=${id}&startDate=${f(from)}&endDate=${f(new Date())}`, {
+    headers: { Accept: '*/*', Origin: 'https://canlidoviz.com', Referer: 'https://canlidoviz.com/' },
+  });
+  return parseCanli(await res.json(), divisor);
 }
 
-// ---------- TCMB (yalnızca son gün, döviz yedeği) ----------
-async function tcmbToday() {
-  const res = await fetchRetry('https://www.tcmb.gov.tr/kurlar/today.xml', { headers: { 'User-Agent': UA } }, 2);
-  const xml = await res.text();
-  const date = (xml.match(/Date="(\d{2})\/(\d{2})\/(\d{4})"/) || []).slice(1);
-  const pick = (code) => {
-    const m = xml.match(new RegExp(`CurrencyCode="${code}"[\\s\\S]*?<ForexSelling>([\\d.]+)</ForexSelling>`));
-    return m ? Number(m[1]) : null;
-  };
-  if (date.length !== 3) return null;
-  return { date: `${date[2]}-${date[0]}-${date[1]}`, USD: pick('USD'), EUR: pick('EUR'), JPY: pick('JPY') };
+// ---------- İş Yatırım (BIST endeks yedeği) ----------
+async function isyatirim(endeks, from) {
+  const f = (d) => iso(d).replace(/-/g, '') + '000000';
+  const res = await fetchRetry(`https://www.isyatirim.com.tr/_Layouts/15/IsYatirim.Website/Common/ChartData.aspx/IndexHistoricalAll?endeks=${endeks}&period=1440&from=${f(from)}&to=${f(new Date())}`, {
+    headers: { Referer: 'https://www.isyatirim.com.tr/tr-tr/analiz/Sayfalar/default.aspx' },
+  });
+  const j = await res.json();
+  return (j?.data || []).map(([t, v]) => [iso(new Date(t + 3 * 3600e3)), Number(v)]).filter(([, v]) => v > 0);
 }
 
 // ---------- Depolama ----------
@@ -156,103 +153,61 @@ async function saveSeries(s) {
 }
 
 // ---------- Ana akış ----------
-async function updateFund(code, years, today) {
+async function updateFund(code) {
   const prev = await loadSeries(code);
-  const fullFrom = new Date(today.getTime() - years * 365 * 864e5);
-  const incFrom = new Date(today.getTime() - 20 * 864e5);
-  const tryOrder = prev?.source?.startsWith('tefas:') ? [prev.source.slice(6)] : ['YAT', 'EMK', 'BYF'];
-  const needFull = !prev || !prev.points?.length;
-
-  for (const fontip of tryOrder) {
-    try {
-      const rows = needFull
-        ? await tefasHistory(code, fontip, fullFrom, today)
-        : await tefasQuery({ fontip, fonkod: code, from: incFrom, to: today }).then((r) => r.filter((x) => x.code === code));
-      if (rows.length) {
-        const pts = rows.map((r) => [r.date, r.price]);
-        const s = { id: code, ad: rows[rows.length - 1].name || prev?.ad || code, tur: 'fon', pb: 'TRY', source: `tefas:${fontip}`, points: mergePoints(prev?.points, pts) };
-        await saveSeries(s);
-        log(`${code}: TEFAS ${fontip}, ${rows.length} satır`);
-        return s;
-      }
-    } catch (e) { log(`${code}: TEFAS ${fontip} hata: ${e.message}`); }
-  }
-  // Borsada işlem gören fonlar / sertifikalar için Yahoo yedeği
+  const full = !prev?.points?.length || prev.source !== 'tefas';
   try {
-    const { points, meta } = await yahoo(`${code}.IS`, needFull ? fullFrom : incFrom);
-    if (points.length) {
-      const s = { id: code, ad: meta.longName || meta.shortName || prev?.ad || code, tur: 'fon', pb: 'TRY', source: 'yahoo', points: mergePoints(prev?.points, points) };
-      await saveSeries(s);
-      log(`${code}: Yahoo ${points.length} satır`);
-      return s;
-    }
-  } catch (e) { log(`${code}: Yahoo hata: ${e.message}`); }
-  log(`${code}: veri bulunamadı`);
-  return prev ? { ...prev, hata: 'Bu çalıştırmada yeni veri alınamadı' } : { id: code, ad: code, tur: 'fon', points: [], hata: 'Kaynak bulunamadı' };
-}
-
-async function updateBench(b, years, today) {
-  const prev = await loadSeries(b.id);
-  const from = prev?.points?.length ? new Date(today.getTime() - 20 * 864e5) : new Date(today.getTime() - years * 365 * 864e5);
-  try {
-    const { points } = await yahoo(b.yahoo, from);
-    if (!points.length) throw new Error('boş');
-    const s = { id: b.id, ad: b.ad, tur: 'kiyas', source: `yahoo:${b.yahoo}`, points: mergePoints(prev?.points, points) };
+    const rows = await tefas(code, full ? 60 : 1);
+    if (!rows.length) throw new Error('TEFAS\'ta bu kodla fon bulunamadı');
+    const s = { id: code, ad: rows[rows.length - 1].name || code, tur: 'fon', pb: 'TRY', source: 'tefas', points: mergePoints(full ? [] : prev.points, rows.map((r) => [r.date, r.price])) };
     await saveSeries(s);
-    log(`${b.id}: ${points.length} satır`);
+    log(`${code}: TEFAS ${rows.length} satır, son ${rows[rows.length - 1].date} ${rows[rows.length - 1].price}`);
     return s;
   } catch (e) {
-    log(`${b.id}: Yahoo hata: ${e.message}`);
-    return prev ? { ...prev, hata: e.message } : { id: b.id, ad: b.ad, tur: 'kiyas', points: [], hata: e.message };
+    log(`${code}: ${e.message}`);
+    return prev ? { ...prev, hata: e.message } : { id: code, ad: code, tur: 'fon', points: [], hata: e.message };
   }
+}
+
+async function updateBench(b, years) {
+  const prev = await loadSeries(b.id);
+  const fresh = !prev?.points?.length || !String(prev.source || '').startsWith('tv:');
+  const bars = fresh ? Math.round(years * 365) : 40;
+  const from = new Date(Date.now() - (fresh ? years * 365 : 40) * 864e5);
+  const attempts = [];
+  if (b.tv) attempts.push([`tv:${b.tv}`, () => tvHistory(b.tv, bars)]);
+  if (b.canli) attempts.push([`canlidoviz:${b.canli}`, () => canlidoviz(b.canli, from, b.bolen || 1)]);
+  if (b.isyatirim) attempts.push([`isyatirim:${b.isyatirim}`, () => isyatirim(b.isyatirim, from)]);
+  const errs = [];
+  for (const [source, run] of attempts) {
+    try {
+      const pts = await run();
+      if (!pts.length) throw new Error('boş');
+      // Kaynak değişirse eski seriyle karıştırma (ölçek farkı olabilir)
+      const base = prev && prev.source === source ? prev.points : [];
+      const s = { id: b.id, ad: b.ad, tur: 'kiyas', source, points: mergePoints(base, pts) };
+      await saveSeries(s);
+      log(`${b.id}: ${source} ${pts.length} satır, son ${pts[pts.length - 1][0]} ${pts[pts.length - 1][1]}`);
+      return s;
+    } catch (e) { errs.push(`${source}: ${e.message}`); }
+  }
+  log(`${b.id}: hata — ${errs.join(' | ')}`);
+  return prev ? { ...prev, hata: errs.join(' | ') } : { id: b.id, ad: b.ad, tur: 'kiyas', points: [], hata: errs.join(' | ') };
 }
 
 async function main() {
   await mkdir(SERIES, { recursive: true });
   const cfg = JSON.parse(await readFile(path.join(DATA, 'config.json'), 'utf8'));
-  const today = new Date(iso(new Date()) + 'T00:00:00Z');
   const index = { guncelleme: new Date().toISOString(), seriler: {} };
   const put = (s) => {
     const last = s.points?.[s.points.length - 1];
     index.seriler[s.id] = { ad: s.ad, tur: s.tur, kaynak: s.source || null, ilk: s.points?.[0]?.[0] || null, son: last?.[0] || null, deger: last?.[1] ?? null, adet: s.points?.length || 0, ...(s.hata ? { hata: s.hata } : {}) };
   };
-
-  for (const code of cfg.fonlar || []) put(await updateFund(code.toUpperCase().trim(), cfg.gecmisYil || 10, today));
-  for (const b of cfg.kiyaslar || []) put(await updateBench(b, cfg.gecmisYil || 10, today));
-
-  // TCMB yedeği: Yahoo döviz kuru eskiyse bugünün kurunu ekle
-  try {
-    const t = await tcmbToday();
-    if (t) for (const [id, key] of [['USDTRY', 'USD'], ['EURTRY', 'EUR'], ['JPYTRY', 'JPY']]) {
-      const s = (await loadSeries(id)) || { id, ad: id, tur: 'kiyas', source: 'tcmb', points: [] };
-      const last = s.points[s.points.length - 1]?.[0];
-      const v = key === 'JPY' && t[key] ? t[key] / 100 : t[key];
-      if (v && (!last || last < t.date)) {
-        s.points = mergePoints(s.points, [[t.date, v]]);
-        await saveSeries(s);
-        put(s);
-        log(`${id}: TCMB ${t.date} ${v}`);
-      }
-    }
-  } catch (e) { log('TCMB hata:', e.message); }
-
-  // Tüm TEFAS fonlarının son fiyatı: uygulamada listede olmayan bir fonu eklerken anında fiyat gösterebilmek için
-  try {
-    const son = {};
-    for (const fontip of ['YAT', 'EMK', 'BYF']) {
-      const rows = await tefasQuery({ fontip, from: new Date(today.getTime() - 7 * 864e5), to: today });
-      for (const r of rows) if (!son[r.code] || son[r.code][0] < r.date) son[r.code] = [r.date, r.price, r.name];
-      await sleep(500);
-    }
-    if (Object.keys(son).length) {
-      await writeFile(path.join(DATA, 'tefas-son.json'), JSON.stringify(son));
-      log(`tefas-son: ${Object.keys(son).length} fon`);
-    }
-  } catch (e) { log('tefas-son hata:', e.message); }
-
+  for (const code of cfg.fonlar || []) { put(await updateFund(code.toUpperCase().trim())); await sleep(500); }
+  for (const b of cfg.kiyaslar || []) put(await updateBench(b, cfg.gecmisYil || 10));
   await writeFile(path.join(DATA, 'index.json'), JSON.stringify(index, null, 1));
   const errs = Object.entries(index.seriler).filter(([, v]) => v.hata);
-  log(`bitti. ${Object.keys(index.seriler).length} seri, ${errs.length} hatalı`);
+  log(`bitti. ${Object.keys(index.seriler).length} seri, ${errs.length} hatalı${errs.length ? ': ' + errs.map(([k]) => k).join(', ') : ''}`);
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {

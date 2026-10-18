@@ -29,10 +29,8 @@ jobs:
         with:
           node-version: 22
       - name: Fiyatları çek
-        if: github.event_name != 'push'
         run: node portfoy/scripts/veri-cek.mjs
       - name: Değişiklikleri kaydet
-        if: github.event_name != 'push'
         run: |
           git config user.name "portfoy-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

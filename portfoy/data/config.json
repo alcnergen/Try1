@@ -1,17 +1,17 @@
 {
-  "aciklama": "GitHub Actions bu listeyi her gün okur ve fiyat geçmişini data/series altına yazar. Yeni bir fon aldığınızda kodunu 'fonlar' listesine ekleyin.",
-  "fonlar": ["YFBL1", "YFBL7", "TGT"],
-  "gecmisYil": 10,
+  "aciklama": "GitHub Actions bu listeyi her gün okur ve fiyat geçmişini data/series altına yazar. Yeni bir TEFAS fonu aldığınızda kodunu 'fonlar' listesine ekleyin.",
+  "fonlar": ["TGT", "YFBL1", "YFBL7"],
+  "gecmisYil": 12,
   "kiyaslar": [
-    { "id": "USDTRY", "yahoo": "USDTRY=X", "ad": "Dolar/TL" },
-    { "id": "EURTRY", "yahoo": "EURTRY=X", "ad": "Euro/TL" },
-    { "id": "JPYTRY", "yahoo": "JPYTRY=X", "ad": "Yen/TL" },
-    { "id": "GOLD", "yahoo": "GC=F", "ad": "Altın (ons, $)" },
-    { "id": "XU100", "yahoo": "XU100.IS", "ad": "BIST 100" },
-    { "id": "SPX", "yahoo": "^GSPC", "ad": "S&P 500" },
-    { "id": "NDX", "yahoo": "^NDX", "ad": "Nasdaq 100" },
-    { "id": "DAX", "yahoo": "^GDAXI", "ad": "DAX" },
-    { "id": "N225", "yahoo": "^N225", "ad": "Nikkei 225" },
-    { "id": "MSCIW", "yahoo": "URTH", "ad": "MSCI Dünya (URTH)" }
+    { "id": "USDTRY", "ad": "Dolar/TL", "tv": "FX_IDC:USDTRY", "canli": 1 },
+    { "id": "EURTRY", "ad": "Euro/TL", "tv": "FX_IDC:EURTRY", "canli": 50 },
+    { "id": "JPYTRY", "ad": "Yen/TL", "tv": "FX_IDC:JPYTRY", "canli": 57, "bolen": 100 },
+    { "id": "GOLD", "ad": "Altın (ons, $)", "tv": "TVC:GOLD" },
+    { "id": "XU100", "ad": "BIST 100", "tv": "BIST:XU100", "isyatirim": "XU100" },
+    { "id": "SPX", "ad": "S&P 500", "tv": "SP:SPX" },
+    { "id": "NDX", "ad": "Nasdaq 100", "tv": "NASDAQ:NDX" },
+    { "id": "DAX", "ad": "DAX", "tv": "XETR:DAX" },
+    { "id": "N225", "ad": "Nikkei 225", "tv": "TVC:NI225" },
+    { "id": "MSCIW", "ad": "MSCI Dünya (URTH)", "tv": "AMEX:URTH" }
   ]
 }
