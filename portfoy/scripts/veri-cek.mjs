@@ -194,7 +194,8 @@ async function fromTv(code, sym, prev, years) {
   const full = !prev?.points?.length || prev.source !== source;
   const pts = await tvHistory(sym, full ? Math.round(years * 365) : 40);
   const i = pts.info || {};
-  const tur = i.tip === 'fund' ? 'fon' : 'hisse';
+  // Borsada işlem gören fonlar (ETF) TradingView'da 'fund' türündedir; TEFAS fonlarından ayrı tutulur
+  const tur = i.tip === 'fund' ? 'etf' : 'hisse';
   return { id: code, ad: i.ad || prev?.ad || code, tur, pb: i.pb || prev?.pb || 'TRY', borsa: i.borsa || sym.split(':')[0], source, points: mergePoints(full ? [] : prev.points, pts) };
 }
 
