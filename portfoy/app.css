@@ -11,7 +11,7 @@
   --down: #c8302f;
   --warn: #b26a00;
   --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100; --s5: #e87ba4;
-  --s6: #008300; --s7: #6250d6; --s8: #e34948; --s9: #8a6d3b; --s10: #4f6d7a; --s11: #9a9890;
+  --s6: #008300; --s7: #6250d6; --s8: #e34948; --s9: #8a6d3b; --s10: #4f6d7a; --s11: #9a9890; --s12: #b4446f;
   --r: 14px;
 }
 @media (prefers-color-scheme: dark) {
@@ -20,7 +20,7 @@
     --bg: #141413; --card: #1d1d1b; --line: #2f2f2c; --text: #f0efec; --text2: #c3c2b7; --muted: #8f8e86;
     --accent: #3987e5; --up: #3fbf74; --down: #ef6b6a; --warn: #e3a33a;
     --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181;
-    --s6: #2f9e2f; --s7: #9085e9; --s8: #e66767; --s9: #b0915a; --s10: #7d9cab; --s11: #8f8e86;
+    --s6: #2f9e2f; --s7: #9085e9; --s8: #e66767; --s9: #b0915a; --s10: #7d9cab; --s11: #8f8e86; --s12: #e0729b;
   }
 }
 :root[data-theme="dark"] {
@@ -28,7 +28,7 @@
   --bg: #141413; --card: #1d1d1b; --line: #2f2f2c; --text: #f0efec; --text2: #c3c2b7; --muted: #8f8e86;
   --accent: #3987e5; --up: #3fbf74; --down: #ef6b6a; --warn: #e3a33a;
   --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181;
-  --s6: #2f9e2f; --s7: #9085e9; --s8: #e66767; --s9: #b0915a; --s10: #7d9cab; --s11: #8f8e86;
+  --s6: #2f9e2f; --s7: #9085e9; --s8: #e66767; --s9: #b0915a; --s10: #7d9cab; --s11: #8f8e86; --s12: #e0729b;
 }
 
 * { box-sizing: border-box; }
@@ -183,3 +183,10 @@ dialog.sheet::backdrop { background: rgb(0 0 0 / .4); }
 .bar .neg { background: var(--down); opacity: .55; }
 .bar .mark { position: absolute; top: -3px; bottom: -3px; width: 2px; margin-left: -1px; background: var(--s1); border-radius: 1px; }
 .tag { font-size: 10px; font-weight: 600; color: var(--text2); border: 1px solid var(--line); border-radius: 6px; padding: 1px 5px; margin-left: 4px; vertical-align: 2px; letter-spacing: .02em; }
+.notice { border-color: color-mix(in srgb, var(--warn) 45%, var(--line)); background: color-mix(in srgb, var(--warn) 7%, var(--card)); }
+.notice.err { border-color: color-mix(in srgb, var(--down) 45%, var(--line)); background: color-mix(in srgb, var(--down) 6%, var(--card)); }
+.notice p { margin: 4px 0 10px; color: var(--text2); }
+.steps { margin: 0; padding-left: 18px; display: grid; gap: 6px; color: var(--text2); }
+code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .92em; }
+a.btn { text-decoration: none; display: inline-block; }
+.kpis .wide { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 10px; }

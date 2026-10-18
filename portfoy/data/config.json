@@ -17,6 +17,7 @@
     { "id": "NDX", "ad": "Nasdaq 100", "tv": "NASDAQ:NDX" },
     { "id": "DAX", "ad": "DAX", "tv": "XETR:DAX" },
     { "id": "N225", "ad": "Nikkei 225", "tv": "TVC:NI225" },
-    { "id": "MSCIW", "ad": "MSCI Dünya (URTH)", "tv": "AMEX:URTH" }
+    { "id": "MSCIW", "ad": "MSCI Dünya (URTH)", "tv": "AMEX:URTH" },
+    { "id": "TUFE", "ad": "TÜFE (aylık endeks)", "tv": "ECONOMICS:TRCPI", "tf": "1M" }
   ]
 }

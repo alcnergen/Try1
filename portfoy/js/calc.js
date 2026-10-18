@@ -182,3 +182,26 @@ export function monthsToTarget({ start, annual, monthly = 0, target }) {
   }
   return null;
 }
+
+// Aylık TÜFE endeksini günlük seriye çevirir. Her ayın değeri o ayın 15'ine yerleştirilir, aradaki günler
+// bileşik (geometrik) olarak doldurulur. Son açıklanan aydan sonrası, son 3 ayın ortalama aylık artışıyla
+// tahmin edilir (TÜİK veriyi bir sonraki ayın başında açıklar). Dönüş: { points, estimatedAfter }
+export function cpiDaily(monthly, end = todayISO()) {
+  if (!monthly || monthly.length < 2) return { points: [], estimatedAfter: null };
+  const anchors = monthly.map(([d, v]) => [d.slice(0, 8) + '15', v]);
+  const n = anchors.length;
+  const k = Math.min(3, n - 1);
+  const mRate = Math.pow(anchors[n - 1][1] / anchors[n - 1 - k][1], 1 / k); // aylık çarpan
+  const dRate = Math.pow(mRate, 12 / 365);
+  const out = [];
+  for (let i = 0; i < n - 1; i++) {
+    const [d0, v0] = anchors[i], [d1, v1] = anchors[i + 1];
+    const span = daysBetween(d0, d1);
+    const g = Math.pow(v1 / v0, 1 / span);
+    for (let j = 0; j < span; j++) out.push([addDays(d0, j), v0 * Math.pow(g, j)]);
+  }
+  const [lastD, lastV] = anchors[n - 1];
+  out.push([lastD, lastV]);
+  for (let d = addDays(lastD, 1), v = lastV * dRate; d <= end; d = addDays(d, 1), v *= dRate) out.push([d, v]);
+  return { points: out, estimatedAfter: lastD };
+}

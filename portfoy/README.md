@@ -19,6 +19,14 @@ Telefonda ana ekrana eklenen, yalnızca kişisel kullanım için fon portföyü 
 - Sonuçlar `data/series/*.json` olarak depoya kaydedilir; böylece uygulama hiç açılmasa da fiyat geçmişi gün gün birikir.
 - Yeni bir fonu otomatik takibe almak için `data/config.json` içindeki `fonlar` listesine kodunu ekle.
 
+## Otomatik yedek
+
+Ayarlar → *Otomatik yedek*: veri telefonda kullanıcının parolasıyla şifrelenir (AES-GCM-256, PBKDF2-SHA256 310.000 tur) ve GitHub hesabındaki gizli bir Gist'e (`portfoyum-yedek.json`) yazılır. Her değişiklikten birkaç saniye sonra yeniden yedeklenir; eski sürümler Gist geçmişinde kalır. Yeni cihazda *GitHub yedeğinden geri yükle* ile anahtar + parola girilerek geri alınır. Parola cihazdan çıkmaz; unutulursa yedek açılamaz.
+
+## Enflasyon
+
+TÜFE aylık endeksi (TradingView `ECONOMICS:TRCPI`) günlük seriye çevrilir (her ay o ayın 15'ine yerleşir, aralar bileşik doldurulur). Son açıklanan aydan sonrası son 3 ayın ortalama artışıyla tahmin edilir. Özet'te enflasyona göre gerçek getiri, Kıyas'ta "Enflasyon (TÜFE)" satırı, Senaryo'da bugünün parasıyla değer gösterilir.
+
 ## Gizlilik
 
 Depo herkese açık olduğundan **adet, maliyet ve diğer varlık değerleri depoya yazılmaz**; yalnızca telefonun tarayıcı deposunda (localStorage) tutulur. Depoda yalnızca herkese açık fiyatlar ve takip edilen fon kodları bulunur. Ayarlar → *Yedeği indir* ile düzenli yedek al.

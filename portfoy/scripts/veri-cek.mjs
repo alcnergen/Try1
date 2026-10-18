@@ -78,7 +78,7 @@ export function parseTvMessage(raw, onBar) {
   return events;
 }
 
-function tvHistory(symbol, bars, timeoutMs = 25000) {
+function tvHistory(symbol, bars, timeoutMs = 25000, tf = '1D') {
   return new Promise((resolve, reject) => {
     const ws = new WebSocket('wss://data.tradingview.com/socket.io/websocket?type=chart', { headers: { Origin: 'https://www.tradingview.com', 'User-Agent': UA } });
     const cs = 'cs_' + Math.random().toString(36).slice(2, 14);
@@ -101,7 +101,7 @@ function tvHistory(symbol, bars, timeoutMs = 25000) {
       ws.send(tvPacket({ m: 'set_auth_token', p: ['unauthorized_user_token'] }));
       ws.send(tvPacket({ m: 'chart_create_session', p: [cs, ''] }));
       ws.send(tvPacket({ m: 'resolve_symbol', p: [cs, 'ser_1', '=' + JSON.stringify({ symbol, adjustment: 'splits', session: 'regular' })] }));
-      ws.send(tvPacket({ m: 'create_series', p: [cs, '$prices', 's1', 'ser_1', '1D', bars, ''] }));
+      ws.send(tvPacket({ m: 'create_series', p: [cs, '$prices', 's1', 'ser_1', tf, bars, ''] }));
     };
     ws.onerror = (e) => { err = 'bağlantı hatası ' + (e?.message || ''); done(); };
     ws.onclose = () => done();
@@ -239,10 +239,11 @@ async function updateAsset(entry, years) {
 async function updateBench(b, years) {
   const prev = await loadSeries(b.id);
   const fresh = !prev?.points?.length || !String(prev.source || '').startsWith('tv:');
-  const bars = fresh ? Math.round(years * 365) : 40;
+  const monthly = b.tf === '1M'; // ekonomik veriler (TÜFE) aylık
+  const bars = monthly ? (fresh ? Math.round(years * 12) + 12 : 6) : fresh ? Math.round(years * 365) : 40;
   const from = new Date(Date.now() - (fresh ? years * 365 : 40) * 864e5);
   const attempts = [];
-  if (b.tv) attempts.push([`tv:${b.tv}`, () => tvHistory(b.tv, bars)]);
+  if (b.tv) attempts.push([`tv:${b.tv}`, () => tvHistory(b.tv, bars, 25000, b.tf || '1D')]);
   if (b.canli) attempts.push([`canlidoviz:${b.canli}`, () => canlidoviz(b.canli, from, b.bolen || 1)]);
   if (b.isyatirim) attempts.push([`isyatirim:${b.isyatirim}`, () => isyatirim(b.isyatirim, from)]);
   const errs = [];
