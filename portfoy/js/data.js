@@ -1,5 +1,5 @@
 // Piyasa verisini (GitHub Actions'ın kaydettiği JSON'lar) yükler ve kıyas serilerini türetir.
-import { combine, mergePoints, addDays, todayISO, cpiDaily } from './calc.js';
+import { combine, mergePoints, addDays, todayISO, cpiDaily, valueAtOrFirst } from './calc.js';
 
 const OZ = 31.1034768;
 
@@ -27,7 +27,7 @@ async function getJSON(url) {
 export async function loadMarket(fundCodes) {
   const market = { index: null, raw: {}, names: {}, meta: {}, errors: [], tefasSon: null };
   try { market.index = await getJSON('data/index.json'); } catch (e) { market.errors.push('Veri dizini yok (Actions henüz çalışmamış olabilir)'); }
-  const ids = new Set([...fundCodes, 'USDTRY', 'EURTRY', 'JPYTRY', 'GOLD', 'XU100', 'SPX', 'NDX', 'DAX', 'N225', 'MSCIW', 'TUFE']);
+  const ids = new Set([...fundCodes, 'USDTRY', 'EURTRY', 'JPYTRY', 'GOLD', 'XU100', 'SPX', 'NDX', 'DAX', 'N225', 'MSCIW', 'TUFE', 'MEVFAIZ']);
   await Promise.all([...ids].map(async (id) => {
     try {
       const s = await getJSON(`data/series/${encodeURIComponent(id)}.json`);
@@ -71,7 +71,23 @@ export function series(market, manual, id) {
   return mergePoints(market.raw[id] || [], m);
 }
 
-export function benchSeries(market, manual, depositRate) {
+// Mevduat: her gün o günkü yıllık faizin stopaj sonrası kısmıyla büyüyen sentetik seri.
+// Otomatikte TCMB mevduat faizi (aylık) kullanılır; yoksa ya da kapalıysa elle girilen net faiz.
+export function depositSeries(rates, { auto = true, tax = 0.175, manualRate = 0.4 } = {}, end = todayISO()) {
+  const useAuto = auto && rates?.length;
+  const start = addDays(end, -3650);
+  const pts = [];
+  let v = 100;
+  for (let d = start; d <= end; d = addDays(d, 1)) {
+    pts.push([d, v]);
+    const net = useAuto ? (valueAtOrFirst(rates, d) / 100) * (1 - tax) : manualRate;
+    v *= 1 + net / 365;
+  }
+  const gross = useAuto ? rates[rates.length - 1][1] / 100 : null;
+  return { points: pts, auto: !!useAuto, gross, net: useAuto ? gross * (1 - tax) : manualRate, asOf: useAuto ? rates[rates.length - 1][0] : null };
+}
+
+export function benchSeries(market, manual, settings = {}) {
   const s = {};
   for (const id of ['USDTRY', 'EURTRY', 'JPYTRY', 'GOLD', 'XU100', 'SPX', 'NDX', 'DAX', 'N225', 'MSCIW', 'TUFE']) s[id] = series(market, manual, id);
   const out = {};
@@ -79,12 +95,8 @@ export function benchSeries(market, manual, depositRate) {
     if (b.id === 'MEVDUAT') continue;
     out[b.id] = b.need.every((n) => s[n]?.length) ? b.tl(s) : [];
   }
-  // Mevduat: yıllık net faizle günlük bileşik büyüyen sentetik seri (son 10 yıl)
-  const t = todayISO();
-  const pts = [];
-  const r = Math.pow(1 + (depositRate || 0), 1 / 365);
-  let v = 100;
-  for (let d = addDays(t, -3650); d <= t; d = addDays(d, 1)) { pts.push([d, v]); v *= r; }
-  out.MEVDUAT = pts;
+  const dep = depositSeries(series(market, manual, 'MEVFAIZ'), { auto: settings.depositAuto !== false, tax: settings.depositTax ?? 0.175, manualRate: settings.deposit ?? 0.4 });
+  out.MEVDUAT = dep.points;
+  out.depositInfo = dep;
   return out;
 }

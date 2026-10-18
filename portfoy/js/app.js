@@ -47,7 +47,11 @@ export function parseNum(s) {
 }
 const COLORS = { PORT: 'var(--s1)', USD: 'var(--s2)', XU100: 'var(--s3)', ALTIN: 'var(--s4)', NDX: 'var(--s5)', DAX: 'var(--s6)', SPX: 'var(--s7)', EUR: 'var(--s8)', N225: 'var(--s9)', MSCIW: 'var(--s10)', MEVDUAT: 'var(--s11)', TUFE: 'var(--s12)', COST: 'var(--muted)' };
 const FUND_COLORS = ['var(--s1)', 'var(--s7)', 'var(--s3)', 'var(--s5)', 'var(--s6)', 'var(--s8)'];
-const benchName = (id) => (id === 'MEVDUAT' ? `Mevduat (%${num(S.settings.deposit * 100, 0)} yıllık)` : BENCHES.find((b) => b.id === id)?.ad || id);
+const benchName = (id) => {
+  if (id !== 'MEVDUAT') return BENCHES.find((b) => b.id === id)?.ad || id;
+  const d = C?.benches?.depositInfo;
+  return d?.auto ? `Mevduat (TCMB faizi, net %${num(d.net * 100, 1)})` : `Mevduat (%${num((d?.net ?? S.settings.deposit) * 100, 0)} yıllık)`;
+};
 const fundName = (code) => S.funds.find((f) => f.code === code)?.name || M.names[code] || code;
 
 // ---------- Hesaplama ----------
@@ -86,7 +90,7 @@ function compute() {
   const fx = { USD: usd, EUR: series(M, S.manual, 'EURTRY'), JPY: series(M, S.manual, 'JPYTRY') };
   const funds = S.funds.map((f) => toTRY(f, fx));
   const pmap = Object.fromEntries(funds.map((f) => [f.code, f.pts]));
-  const benches = benchSeries(M, S.manual, S.settings.deposit);
+  const benches = benchSeries(M, S.manual, S.settings);
   const hist = portfolioHistory(funds, pmap, usd, { taxRate: S.settings.tax, end: today });
   const last = hist[hist.length - 1] || null;
   // Bir önceki "fiyat günü" (bugünün satırı yalnızca son fiyatın tekrarıysa onu atla)
@@ -206,6 +210,7 @@ function ozet(root) {
       })()}
     </div>
   </section>
+  ${wealthCard(ccy)}
   <section class="card"><div class="row between"><h2>Değer gelişimi</h2></div><div id="rng"></div><div id="ch1" class="chart"></div><div id="lg1"></div></section>
   <section class="card"><h2>Yatırımlar</h2><div id="hold"></div></section>
   <section class="card"><div class="row between"><h2>Günlük kayıt</h2><span class="muted small">Her gün otomatik</span></div><div id="hist"></div></section>
@@ -267,6 +272,46 @@ function emptyState() {
     <button class="btn" onclick="window.__app.addFund()">Fon ekle</button>
     <button class="btn ghost" onclick="window.__app.backupRestore()">GitHub yedeğinden geri yükle</button>
     <button class="btn ghost" onclick="window.__app.importFile()">Dosyadan içe aktar</button>
+  </section>`;
+}
+
+// ---------- TOPLAM SERVET ----------
+// Sabit sıra ve renk: kategori hangi sırada olursa olsun rengi değişmez
+const WEALTH_CATS = [
+  ['Fonlar', 'var(--s1)'], ['BIST hisse', 'var(--s3)'], ['Yabancı hisse / ETF', 'var(--s7)'],
+  ['Gayrimenkul', 'var(--s2)'], ['Arsa', 'var(--s4)'], ['Araç', 'var(--s9)'], ['BES', 'var(--s6)'], ['Nakit', 'var(--s10)'], ['Diğer', 'var(--s11)'],
+];
+function wealthParts() {
+  const parts = Object.fromEntries(WEALTH_CATS.map(([k]) => [k, 0]));
+  for (const { f, s } of C.states) {
+    const kind = assetKind(f.code);
+    const cat = kind === 'fon' ? 'Fonlar' : f.ccy === 'TRY' ? 'BIST hisse' : 'Yabancı hisse / ETF';
+    parts[cat] += s.value;
+  }
+  const vals = S.others.vals.slice().sort((a, b) => a.date.localeCompare(b.date));
+  const last = vals[vals.length - 1];
+  if (last) for (const a of S.others.assets) {
+    const v = Number(last.values[a.id]) || 0;
+    parts[CATS.includes(a.cat) ? a.cat : 'Diğer'] += v;
+  }
+  return { parts, last };
+}
+function wealthCard(ccy) {
+  const { parts, last } = wealthParts();
+  if (!last) return '';
+  const inv = C.states.reduce((a, x) => a + x.s.value, 0);
+  const total = Object.values(parts).reduce((a, b) => a + b, 0);
+  if (!(total > 0)) return '';
+  const k = ccy === 'USD' ? C.usdNow || C.last?.usd || 1 : 1;
+  const rows = WEALTH_CATS.filter(([cat]) => parts[cat] > 0);
+  const nakit = parts.Nakit, cost = C.last?.cost || 0;
+  const dup = nakit > 0 && cost > 0 && Math.abs(nakit - cost) / cost < 0.05;
+  return `<section class="card"><div class="row between"><h2>Toplam servet</h2><span class="muted small">${ccy === 'USD' ? 'bugünkü kurla' : ''}</span></div>
+    <div class="big">${money(total / k, ccy, 0)}</div>
+    <div class="sub muted">Yatırımlar ${money(inv / k, ccy, 0)} (canlı) + diğer varlıklar ${money((total - inv) / k, ccy, 0)} (${dTR(last.date)} değerlemesi)</div>
+    <div class="stack" role="img" aria-label="Varlık dağılımı">${rows.map(([cat, col]) => `<span style="flex:${parts[cat]};background:${col}" title="${cat} %${num((parts[cat] / total) * 100, 1)}"></span>`).join('')}</div>
+    <div class="dist">${rows.map(([cat, col]) => `<div class="dist-row"><span class="sw" style="background:${col}"></span><span>${cat}</span><b>${money(parts[cat] / k, ccy, 0)}</b><span class="muted">%${num((parts[cat] / total) * 100, 1)}</span></div>`).join('')}</div>
+    ${dup ? `<p class="small warn">⚠︎ Diğer varlıklardaki "Nakit" (${money(nakit, 'TRY', 0)}) fonlarının maliyetiyle neredeyse aynı. Aynı para iki kez sayılıyor olabilir; fonlara geçtiysen Diğer sekmesinden yeni bir değerleme açıp Nakit'i düzelt.</p>` : ''}
   </section>`;
 }
 
@@ -837,11 +882,16 @@ function settings() {
     })()}
     </div><form class="form" id="st">
     <label>Varsayılan stopaj (%)<input name="tax" inputmode="decimal" value="${num(S.settings.tax * 100, 1)}"></label>
-    <label>Mevduat kıyası: yıllık net faiz (%)<input name="deposit" inputmode="decimal" value="${num(S.settings.deposit * 100, 1)}"></label>
+    <fieldset><legend>Mevduat kıyası</legend>
+      <label class="check"><input type="checkbox" name="depositAuto" ${S.settings.depositAuto !== false ? 'checked' : ''}> TCMB mevduat faizini kullan (her ay güncellenir)</label>
+      ${(() => { const d = C.benches.depositInfo; return d?.gross != null ? `<p class="muted small">Güncel: brüt %${num(d.gross * 100, 2)} (${dTR(d.asOf).slice(3)}) → stopaj sonrası %${num(d.gross * (1 - (S.settings.depositTax ?? 0.175)) * 100, 2)}</p>` : '<p class="muted small">TCMB faiz verisi henüz yok; elle girilen faiz kullanılır.</p>'; })()}
+      <label>Mevduat stopajı (%)<input name="depositTax" inputmode="decimal" value="${num((S.settings.depositTax ?? 0.175) * 100, 1)}"></label>
+      <label>Elle yıllık net faiz (%) — otomatik kapalıysa<input name="deposit" inputmode="decimal" value="${num(S.settings.deposit * 100, 1)}"></label>
+    </fieldset>
     <button class="btn" type="submit">Kaydet</button></form>
     <h3>Veri durumu</h3>
     <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Seri</th><th>Son</th><th>Değer</th><th></th></tr></thead><tbody>
-    ${[...S.funds.map((f) => f.code), 'USDTRY', 'EURTRY', 'GOLD', 'XU100', 'SPX', 'NDX', 'DAX', 'N225', 'MSCIW'].map((id) => {
+    ${[...S.funds.map((f) => f.code), 'USDTRY', 'EURTRY', 'GOLD', 'XU100', 'SPX', 'NDX', 'DAX', 'N225', 'MSCIW', 'TUFE', 'MEVFAIZ'].map((id) => {
       const p = series(M, S.manual, id); const l = p[p.length - 1];
       return `<tr><td>${esc(id)}${idx[id]?.hata ? ' <span class="warn" title="' + esc(idx[id].hata) + '">⚠︎</span>' : ''}</td><td>${l ? dTR(l[0]) : '—'}</td><td>${l ? num(l[1], 4) : '—'}</td><td><button type="button" class="link" data-m="${esc(id)}">Elle gir</button></td></tr>`;
     }).join('')}</tbody></table></div>
@@ -858,9 +908,11 @@ function settings() {
   dlg.querySelector('#st').onsubmit = (e) => {
     e.preventDefault();
     const fd = new FormData(e.target);
-    const t = parseNum(fd.get('tax')), d = parseNum(fd.get('deposit'));
+    const t = parseNum(fd.get('tax')), d = parseNum(fd.get('deposit')), dt = parseNum(fd.get('depositTax'));
     if (Number.isFinite(t)) S.settings.tax = t / 100;
     if (Number.isFinite(d)) S.settings.deposit = d / 100;
+    if (Number.isFinite(dt)) S.settings.depositTax = dt / 100;
+    S.settings.depositAuto = fd.get('depositAuto') === 'on';
     persist(); dlg.close(); render();
   };
   dlg.querySelectorAll('[data-m]').forEach((b) => (b.onclick = () => { dlg.close(); manualPrice(b.dataset.m, ['USDTRY', 'EURTRY'].includes(b.dataset.m) ? 'Kur' : b.dataset.m === 'GOLD' ? 'Ons altın ($)' : undefined); }));
