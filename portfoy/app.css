@@ -190,3 +190,6 @@ dialog.sheet::backdrop { background: rgb(0 0 0 / .4); }
 code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .92em; }
 a.btn { text-decoration: none; display: inline-block; }
 .kpis .wide { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 10px; }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(80px + env(safe-area-inset-bottom)); z-index: 20; max-width: min(92vw, 520px); background: var(--text); color: var(--bg); padding: 10px 14px; border-radius: 12px; font-size: 14px; box-shadow: 0 6px 20px rgb(0 0 0 / .2); }
+.toast[hidden] { display: none; }
+.sheet-body .notice { margin: 4px 0 12px; padding: 12px; }

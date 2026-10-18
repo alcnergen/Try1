@@ -23,6 +23,10 @@ Telefonda ana ekrana eklenen, yalnızca kişisel kullanım için fon portföyü 
 
 Ayarlar → *Otomatik yedek*: veri telefonda kullanıcının parolasıyla şifrelenir (AES-GCM-256, PBKDF2-SHA256 310.000 tur) ve GitHub hesabındaki gizli bir Gist'e (`portfoyum-yedek.json`) yazılır. Her değişiklikten birkaç saniye sonra yeniden yedeklenir; eski sürümler Gist geçmişinde kalır. Yeni cihazda *GitHub yedeğinden geri yükle* ile anahtar + parola girilerek geri alınır. Parola cihazdan çıkmaz; unutulursa yedek açılamaz.
 
+## Otomatik takip
+
+Ayarlar → *Otomatik takip* için depoya yazma izni olan bir GitHub anahtarı (fine-grained token, yalnızca bu depo, *Contents: Read and write*) girilir. Uygulamada verisi olmayan yeni bir kod eklenince uygulama kodu `data/config.json`'daki `fonlar` ya da `hisseler` listesine yazar; bu push veri iş akışını tetikler ve fiyat geçmişi birkaç dakika içinde gelir. Uygulama bu sürede yeni seriyi kendisi kontrol eder.
+
 ## Enflasyon
 
 TÜFE aylık endeksi (TradingView `ECONOMICS:TRCPI`) günlük seriye çevrilir (her ay o ayın 15'ine yerleşir, aralar bileşik doldurulur). Son açıklanan aydan sonrası son 3 ayın ortalama artışıyla tahmin edilir. Özet'te enflasyona göre gerçek getiri, Kıyas'ta "Enflasyon (TÜFE)" satırı, Senaryo'da bugünün parasıyla değer gösterilir.

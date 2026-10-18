@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { valueAt, positionAt, fundState, portfolioHistory, replicate, periodReturn, projectScenario, monthsToTarget, combine, cpiDaily } from '../js/calc.js';
+import { addToConfig, isTracked, repoInfo } from '../js/track.js';
 import { parseTefas, parseTvMessage, tvDate, parseCanli, mergePoints, pickTvSymbol, assetEntry } from '../scripts/veri-cek.mjs';
 
 const close = (a, b, eps = 1e-6) => assert.ok(Math.abs(a - b) < eps, `${a} ≈ ${b}`);
@@ -106,4 +107,15 @@ test('aylık TÜFE günlük seriye çevrilir, son aydan sonrası tahmin edilir',
   // son iki ayın ortalama artışı ~%2,02/ay; 30 gün sonra ≈ 102 × 1,0202^(12×30/365)
   const m = Math.sqrt(102 / 98);
   close(valueAt(points, '2026-10-15'), 102 * Math.pow(m, 12 * 30 / 365), 1e-9);
+});
+
+test('otomatik takip: kod doğru listeye bir kez eklenir', () => {
+  const cfg = { fonlar: ['TGT', { kod: 'YFBL1', tefas: 'YLB' }], hisseler: [] };
+  assert.equal(isTracked(cfg, 'YFBL1'), true);
+  assert.equal(addToConfig(cfg, 'TGT', 'fon'), false);
+  assert.equal(addToConfig(cfg, 'AAPL', 'hisse'), true);
+  assert.equal(addToConfig(cfg, 'IPB', 'fon'), true);
+  assert.deepEqual(cfg.hisseler, ['AAPL']);
+  assert.deepEqual(cfg.fonlar.at(-1), 'IPB');
+  assert.deepEqual(repoInfo({ hostname: 'alcnergen.github.io', pathname: '/Try1/' }), { owner: 'alcnergen', repo: 'Try1' });
 });

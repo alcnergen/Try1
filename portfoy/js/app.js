@@ -1,5 +1,6 @@
 import * as store from './store.js';
 import * as backup from './backup.js';
+import * as track from './track.js';
 import { loadMarket, loadOne, series, benchSeries, BENCHES } from './data.js';
 import {
   todayISO, addDays, daysBetween, valueAt, valueAtOrFirst, sortTx, fundState, portfolioHistory,
@@ -311,6 +312,7 @@ function fundDetail(code) {
       <div><span class="label">Maliyet</span><b>${money(s.cost)}</b><span class="muted small">ort. ₺${num(s.avg, isListed(code) ? 2 : 6)}</span></div>
       <div><span class="label">Brüt / Net kâr</span><b class="${cls(s.gross)}">${signMoney(s.gross)}</b><span class="${cls(s.net)} small">net ${signMoney(s.net)} · stopaj %${num(rate * 100, 1)}</span></div>
     </div>
+    ${!M.meta?.[code] ? `<div class="card notice"><b>${pending.has(code) ? 'Takibe alınıyor…' : 'Otomatik fiyat yok'}</b><p class="small">${pending.has(code) ? 'Fiyat geçmişi birkaç dakika içinde gelecek.' : 'Bu kodun fiyatı her gün otomatik çekilmiyor.'}</p>${pending.has(code) ? '' : '<div class="row gap wrap"><button class="btn small" data-a="track" data-k="fon">Fon olarak takibe al</button><button class="btn small ghost" data-a="track" data-k="hisse">Hisse / ETF olarak takibe al</button></div>'}</div>` : ''}
     <div class="row gap wrap"><button class="btn small" data-a="tx">+ Alış/Satış</button><button class="btn small ghost" data-a="price">Fiyat gir</button><button class="btn small ghost" data-a="tax">Stopaj</button></div>
     <h3>Fiyat ve kıyas (₺, 100'e endeksli)</h3><div id="frng"></div><div id="fch" class="chart"></div><div id="flg"></div>
     <h3>Dönemsel getiri (₺)</h3><div id="fret"></div>
@@ -345,6 +347,7 @@ function fundDetail(code) {
     const n = parseNum(v);
     if (Number.isFinite(n)) { f.tax = n / 100; persist(); dlg.close(); render(); fundDetail(code); }
   };
+  dlg.querySelectorAll('[data-a=track]').forEach((b) => (b.onclick = () => { dlg.close(); startTracking(code, b.dataset.k); }));
   dlg.querySelector('[data-a=del]').onclick = () => {
     if (!confirm(`${code} ve tüm işlemleri silinsin mi?`)) return;
     S.funds = S.funds.filter((x) => x.code !== code); persist(); dlg.close(); render();
@@ -687,6 +690,7 @@ function addFund(code = '') {
     <div class="seg full" role="group" aria-label="İşlem"><label><input type="radio" name="type" value="buy" checked> Alış</label><label><input type="radio" name="type" value="sell"> Satış</label></div>
     <label>Tarih<input name="date" type="date" required value="${C.today}" max="${C.today}"></label>
     <label>Adet (pay)<input name="qty" inputmode="decimal" required></label>
+    <label id="kindRow" hidden>Tür<select name="kind"><option value="fon">Fon (TEFAS)</option><option value="hisse">Hisse / ETF (borsa)</option></select></label>
     <label>Para birimi<select name="pb"><option value="TRY">TL</option><option value="USD">ABD doları</option><option value="EUR">Euro</option></select></label>
     <label><span id="plbl">Birim fiyat (TL)</span><input name="price" inputmode="decimal" required placeholder="ör. 0,124680"></label>
     <label>Komisyon (aynı para biriminde, isteğe bağlı)<input name="fee" inputmode="decimal"></label>
@@ -699,11 +703,15 @@ function addFund(code = '') {
     const c = form.code.value.trim().toUpperCase();
     const pts = series(M, S.manual, c);
     const known = M.meta?.[c]?.pb || S.funds.find((x) => x.code === c)?.pb;
+    const hasData = !!M.raw[c]?.length && !!M.meta?.[c];
+    const kindRow = dlg.querySelector('#kindRow');
+    kindRow.hidden = !c || hasData;
+    if (!hasData && !form.kind.dataset.touched) form.kind.value = guessKind(c, form.pb.value);
     if (known) { form.pb.value = known; form.pb.disabled = true; } else form.pb.disabled = false;
     dlg.querySelector('#plbl').textContent = `Birim fiyat (${form.pb.value === 'TRY' ? 'TL' : form.pb.value})`;
     const p = pts?.length ? valueAt(pts, form.date.value) ?? pts[pts.length - 1][1] : M.tefasSon?.[c]?.[1];
     const d = isListed(c) ? 2 : form.pb.value === 'TRY' ? 6 : 4;
-    hint.textContent = p ? `${fundName(c)} — ${form.date.value ? dTR(form.date.value) : ''} fiyatı: ${num(p, d)}` : c ? 'Bu kod için henüz veri yok; fiyatı elle gir. Otomatik takip için kodu config.json\'daki "fonlar" ya da "hisseler" listesine ekle (Ayarlar).' : '';
+    hint.textContent = p ? `${fundName(c)} — ${form.date.value ? dTR(form.date.value) : ''} fiyatı: ${num(p, d)}` : c ? 'Bu kod henüz takipte değil. Kaydedince otomatik takibe alınır; geçmiş fiyatlar birkaç dakika içinde gelir. O zamana kadar alış fiyatını sen gir.' : '';
     if (p && !form.price.value) form.price.value = num(p, d);
   };
   let timer;
@@ -713,6 +721,7 @@ function addFund(code = '') {
   };
   form.date.onchange = () => { form.price.value = ''; fill(); };
   form.pb.onchange = fill;
+  form.kind.onchange = () => { form.kind.dataset.touched = '1'; };
   if (code) fill(); else form.code.oninput();
   form.onsubmit = (e) => {
     e.preventDefault();
@@ -724,7 +733,73 @@ function addFund(code = '') {
     if (!M.meta?.[c]?.pb && form.pb.value !== 'TRY') f.pb = form.pb.value;
     f.txs.push({ id: store.uid(), date: form.date.value, type: form.type.value, qty, price, fee });
     persist(); dlg.close(); render();
-    if (!M.raw[c]?.length) refresh();
+    if (!M.raw[c]?.length || !M.meta?.[c]) startTracking(c, form.kind.value);
+  };
+}
+
+// 3 harfli TL kodlar çoğunlukla TEFAS fonudur; döviz cinsinden ya da daha uzun kodlar borsa (hisse/ETF)
+const guessKind = (code, pb) => (pb === 'TRY' && code.length === 3 ? 'fon' : 'hisse');
+
+function toast(msg, ms = 4500) {
+  let t = document.querySelector('.toast');
+  if (!t) { t = document.createElement('div'); t.className = 'toast'; t.setAttribute('role', 'status'); document.body.append(t); }
+  t.textContent = msg; t.hidden = false;
+  clearTimeout(t._h); t._h = setTimeout(() => { t.hidden = true; }, ms);
+}
+
+const pending = new Set();
+async function startTracking(code, kind) {
+  const token = track.loadToken();
+  if (!token) return trackTokenSheet(`${code} kodunu otomatik takibe almak için uygulamanın GitHub'daki takip listesine yazabilmesi gerekiyor. Bu bir kerelik bir ayar.`, () => startTracking(code, kind));
+  try {
+    const r = await track.track(token, code, kind);
+    pending.add(code);
+    toast(r === 'zaten' ? `${code} zaten takipte; veri birkaç dakika içinde gelecek.` : `${code} takibe alındı. Fiyat geçmişi birkaç dakika içinde gelecek.`, 6000);
+    pollTracked(code);
+  } catch (e) {
+    if (e.code === 'auth' || e.code === 'perm') trackTokenSheet(`⚠︎ ${e.message}. Aşağıdaki adımlarla yeni bir anahtar oluştur.`, () => startTracking(code, kind));
+    else toast(`⚠︎ ${code} takibe alınamadı: ${e.message}`, 8000);
+  }
+}
+
+// Veri iş akışı ve yayın 2-5 dk sürer; bu sürede arada bir yeni seriyi kontrol et
+function pollTracked(code, tries = 0) {
+  if (tries > 20) { pending.delete(code); toast(`${code} için veri henüz gelmedi. Kod doğru mu? Ayarlar → Veri durumu'na bak.`, 8000); return; }
+  setTimeout(async () => {
+    delete M.raw[code];
+    if (await loadOne(M, code) && M.meta?.[code]) { pending.delete(code); toast(`${code} verisi geldi ✓`); refresh(); }
+    else pollTracked(code, tries + 1);
+  }, (window.__trackDelay ?? (tries === 0 ? 90000 : 30000)));
+}
+
+const PAT_URL = 'https://github.com/settings/personal-access-tokens/new';
+function trackTokenSheet(intro, onSaved) {
+  const { owner, repo } = track.repoInfo();
+  const body = h(`<form class="form" id="tf">
+    <p class="small">${esc(intro)}</p>
+    <ol class="small steps">
+      <li><a href="${PAT_URL}" target="_blank" rel="noopener">Bu bağlantıyla</a> GitHub'da yeni bir anahtar (fine-grained token) oluştur. Ad: <b>Portföyüm</b>, Expiration: <b>No expiration</b> (yoksa en uzun süre).</li>
+      <li><b>Repository access</b> → <b>Only select repositories</b> → <b>${esc(repo)}</b>.</li>
+      <li><b>Permissions</b> → <b>Repositories</b> → <b>Contents: Read and write</b>.</li>
+      <li>İstersen aynı anahtarı yedek için de kullan: <b>Account</b> → <b>Gists: Read and write</b>.</li>
+      <li>En altta <b>Generate token</b>; çıkan <code>github_pat_…</code> anahtarını yapıştır.</li>
+    </ol>
+    <label>GitHub anahtarı<input name="token" required autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="github_pat_…"></label>
+    <p class="small" id="tmsg" role="status"></p>
+    <button class="btn full" type="submit">Kaydet</button></form>`);
+  const dlg = sheet('Otomatik takip', body);
+  const form = dlg.querySelector('#tf'), msg = dlg.querySelector('#tmsg');
+  form.onsubmit = async (e) => {
+    e.preventDefault();
+    const token = form.token.value.trim();
+    const btn = form.querySelector('button[type=submit]');
+    btn.disabled = true; msg.textContent = `${owner}/${repo} erişimi kontrol ediliyor…`;
+    try {
+      await track.verify(token);
+      track.saveToken(token);
+      dlg.close();
+      onSaved?.();
+    } catch (err) { msg.textContent = '⚠︎ ' + err.message; btn.disabled = false; }
   };
 }
 
@@ -771,6 +846,9 @@ function settings() {
       return `<tr><td>${esc(id)}${idx[id]?.hata ? ' <span class="warn" title="' + esc(idx[id].hata) + '">⚠︎</span>' : ''}</td><td>${l ? dTR(l[0]) : '—'}</td><td>${l ? num(l[1], 4) : '—'}</td><td><button type="button" class="link" data-m="${esc(id)}">Elle gir</button></td></tr>`;
     }).join('')}</tbody></table></div>
     <p class="muted small">Fiyatlar GitHub Actions ile her iş günü akşam ve sabah çekilir. Yeni bir fon kodunu otomatik takibe almak için <a href="${repoEdit}" target="_blank" rel="noopener">config.json</a> dosyasındaki "fonlar" listesine ekle. Hemen güncellemek için <a href="${runUrl}" target="_blank" rel="noopener">Actions → Run workflow</a>.</p>
+    <h3>Otomatik takip</h3>
+    <p class="small">${track.loadToken() ? 'Açık. Uygulamada eklediğin yeni fon ve hisseler GitHub\'daki takip listesine kendiliğinden yazılır.' : 'Kapalı. Yeni eklediğin kodların fiyatı otomatik gelmez.'}</p>
+    <div class="row gap wrap"><button class="btn small ${track.loadToken() ? 'ghost' : ''}" type="button" id="trset">${track.loadToken() ? 'Anahtarı değiştir' : 'Otomatik takibi aç'}</button>${track.loadToken() ? '<button class="btn small ghost danger" type="button" id="troff">Kapat</button>' : ''}</div>
     <h3>Elle yedek</h3>
     <div class="row gap wrap"><button class="btn small ghost" type="button" id="exp">Yedeği indir</button><button class="btn small ghost" type="button" id="imp">Yedekten yükle</button><button class="btn small ghost" type="button" id="lnk">Aktarım bağlantısı oluştur</button><button class="btn small ghost" type="button" id="paste">Bağlantıyı yapıştır</button></div>
     <h3>Ana ekrana ekleme</h3>
@@ -789,6 +867,8 @@ function settings() {
   dlg.querySelector('#exp').onclick = exportFile;
   const on = (id, fn) => { const el = dlg.querySelector(id); if (el) el.onclick = fn; };
   on('#bkset', () => { dlg.close(); backupSetup(); });
+  on('#trset', () => { dlg.close(); trackTokenSheet('Uygulamada yeni bir fon ya da hisse eklediğinde, kodu GitHub\'daki takip listesine kendisi yazar ve fiyatlar otomatik gelmeye başlar.', () => toast('Otomatik takip açık ✓')); });
+  on('#troff', () => { if (confirm('Otomatik takip kapatılsın mı? (Takipteki kodlar listede kalır.)')) { track.saveToken(null); dlg.close(); } });
   on('#bkres', () => { dlg.close(); backupRestore(); });
   on('#bknow', async (e) => {
     e.target.disabled = true; e.target.textContent = 'Yedekleniyor…';
@@ -828,7 +908,8 @@ function backupSetup() {
       <li>Çıkan <code>ghp_…</code> ile başlayan anahtarı kopyalayıp aşağı yapıştır.</li>
       <li>Bir yedek parolası belirle. <b>Unutma:</b> parola olmadan yedek açılamaz; kimse kurtaramaz.</li>
     </ol>
-    <label>GitHub anahtarı<input name="token" required autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="ghp_…"></label>
+    <label>GitHub anahtarı<input name="token" required autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="ghp_…" value="${esc(track.loadToken() || '')}"></label>
+    ${track.loadToken() ? '<p class="muted small">Otomatik takip anahtarın dolduruldu; ona "Gists: Read and write" izni verdiysen yeni anahtar gerekmez.</p>' : ''}
     <label>Yedek parolası (en az 8 karakter)<input name="pass" type="password" required minlength="8" autocomplete="new-password"></label>
     <label>Parola tekrar<input name="pass2" type="password" required minlength="8" autocomplete="new-password"></label>
     <p class="small" id="bmsg" role="status"></p>
