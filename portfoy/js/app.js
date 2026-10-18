@@ -97,7 +97,10 @@ function compute() {
   let prev = null;
   if (last) for (let i = hist.length - 2; i >= 0; i--) if (Math.abs(hist[i].value - last.value) > 1e-6 || i === 0) { prev = hist[i]; break; }
   const states = funds.map((f) => ({ f, s: fundState(f, pmap[f.code], today, S.settings.tax), pts: pmap[f.code] }));
-  C = { today, funds, pmap, usd, benches, hist, last, prev, states, usdNow: valueAt(usd, today), cpiEst: cpiDaily(series(M, S.manual, 'TUFE')).estimatedAfter };
+  // Kıyas tarihi: yatırımların en son fiyatlandığı gün (hafta sonu mevduat/enflasyon "fazladan" işlemesin)
+  const priceDates = funds.map((f) => f.native[f.native.length - 1]?.[0]).filter(Boolean).sort();
+  const asOf = priceDates.length ? (priceDates[priceDates.length - 1] < today ? priceDates[priceDates.length - 1] : today) : today;
+  C = { today, asOf, funds, pmap, usd, benches, hist, last, prev, states, usdNow: valueAt(usd, today), cpiEst: cpiDaily(series(M, S.manual, 'TUFE')).estimatedAfter };
 
   // Günlük kayıt: her açılışta bugünün özetini sakla
   if (last && last.value > 0) {
@@ -202,7 +205,7 @@ function ozet(root) {
       <div><span class="label">Günlük ort. (net)</span><b class="${cls(netPct)}">${pct(dailyRate(netPct, days), 4)}</b><span class="muted">USD: ${pct(dailyRate(usdPct, days), 4)}</span></div>
       <div><span class="label">Yıllık karşılığı (net)</span><b class="${cls(netPct)}">${pct(annualize(netPct, days), 1)}</b><span class="muted">USD kuru ${num(C.usdNow ?? L.usd, 4)}</span></div>
       ${(() => {
-        const infVal = replicate(C.funds, C.benches.TUFE, C.today);
+        const infVal = replicate(C.funds, C.benches.TUFE, C.asOf);
         if (!infVal) return '';
         const infl = infVal / L.cost - 1, real = (L.cost + L.net) / infVal - 1;
         const est = C.cpiEst && C.cpiEst < C.today;
@@ -419,14 +422,14 @@ function kiyas(root) {
   const net = ui.cmpNet ?? true;
   const L = C.last;
   const start = startDate();
-  const days = daysBetween(start, C.today);
+  const days = daysBetween(start, C.asOf);
   const conv = (v, d) => (ccy === 'USD' ? (v == null ? null : v / valueAtOrFirst(C.usd, d)) : v);
-  const portVal = conv(net ? L.cost + L.net : L.value, C.today);
+  const portVal = conv(net ? L.cost + L.net : L.value, C.asOf);
   const invested = ccy === 'USD' ? L.costUsd : L.cost;
   const portRet = invested ? portVal / invested - 1 : null;
 
   const all = BENCHES.map((b) => {
-    const v = conv(replicate(C.funds, C.benches[b.id], C.today), C.today);
+    const v = conv(replicate(C.funds, C.benches[b.id], C.asOf), C.asOf);
     const pts = C.benches[b.id] || [];
     return { id: b.id, name: benchName(b.id), v, ret: v != null && invested ? v / invested - 1 : null, last: pts[pts.length - 1]?.[0] };
   });
@@ -441,7 +444,7 @@ function kiyas(root) {
 
   root.append(h(`
     <section class="card">
-      <div class="row between wrap"><h2>${dTR(start)}'den beri</h2>
+      <div class="row between wrap"><h2>${dTR(start)} – ${dTR(C.asOf)}</h2>
         <div class="row gap">
           <div class="seg" role="group" aria-label="Kâr türü"><button data-n="1" class="${net ? 'on' : ''}">Net</button><button data-n="0" class="${net ? '' : 'on'}">Brüt</button></div>
           <div class="seg" role="group" aria-label="Para birimi"><button data-c="TRY" class="${ccy === 'TRY' ? 'on' : ''}">₺</button><button data-c="USD" class="${ccy === 'USD' ? 'on' : ''}">$</button></div>
