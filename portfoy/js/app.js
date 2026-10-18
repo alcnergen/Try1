@@ -53,13 +53,16 @@ const fundName = (code) => S.funds.find((f) => f.code === code)?.name || M.names
 // Varlığın para birimi ve türü (veri dosyasından; yoksa kullanıcının girdiği)
 const assetCcy = (code) => M.meta?.[code]?.pb || S.funds.find((f) => f.code === code)?.pb || 'TRY';
 const assetKind = (code) => M.meta?.[code]?.tur || 'fon';
+// Borsada işlem görenler (hisse, ETF): 2 ondalık, varsayılan stopaj %0
+const isListed = (code) => ['hisse', 'etf'].includes(assetKind(code));
+const KIND_LABEL = { hisse: 'Hisse', etf: 'ETF', fon: 'Fon' };
 const CCY_SIGN = { TRY: '₺', USD: '$', EUR: '€', JPY: '¥', GBP: '£' };
 const fmtPrice = (v, code) => {
   const ccy = assetCcy(code);
-  const d = assetKind(code) === 'hisse' ? 2 : ccy === 'TRY' ? 6 : 4;
+  const d = isListed(code) ? 2 : ccy === 'TRY' ? 6 : 4;
   return v == null ? '—' : (ccy === 'TRY' ? '' : CCY_SIGN[ccy] || ccy + ' ') + num(v, d);
 };
-const defaultTax = (code) => (assetKind(code) === 'hisse' ? 0 : S.settings.tax);
+const defaultTax = (code) => (isListed(code) ? 0 : S.settings.tax);
 
 // Hesaplamalar TL ile yapılır: yabancı para birimli hisselerin fiyatı ve işlemleri o günün kuruyla TL'ye çevrilir
 function toTRY(f, fx) {
@@ -277,7 +280,7 @@ function fonlar(root) {
     const r1 = periodReturn(pts, periodStart('1Y', C.today), C.today);
     const ra = periodReturn(pts, periodStart('1A', C.today), C.today);
     list.append(h(`<button class="hold" data-code="${esc(f.code)}">
-      <div class="row between"><b class="code">${esc(f.code)} <span class="tag">${assetKind(f.code) === 'hisse' ? 'Hisse' : 'Fon'}${f.ccy !== 'TRY' ? ' · ' + f.ccy : ''}</span></b><span class="muted small">${last ? dTR(last[0]) : 'veri yok'}</span></div>
+      <div class="row between"><b class="code">${esc(f.code)} <span class="tag">${KIND_LABEL[assetKind(f.code)] || 'Fon'}${f.ccy !== 'TRY' ? ' · ' + f.ccy : ''}</span></b><span class="muted small">${last ? dTR(last[0]) : 'veri yok'}</span></div>
       <div class="name">${esc(fundName(f.code))}</div>
       <div class="grid3">
         <div><span class="label">Fiyat</span>${fmtPrice(last?.[1], f.code)}</div>
@@ -286,7 +289,7 @@ function fonlar(root) {
       </div>
       <div class="grid3">
         <div><span class="label">Adet</span>${num(s.qty, 0)}</div>
-        <div><span class="label">Ort. maliyet (₺)</span>${num(s.avg, assetKind(f.code) === 'hisse' ? 2 : 6)}</div>
+        <div><span class="label">Ort. maliyet (₺)</span>${num(s.avg, isListed(f.code) ? 2 : 6)}</div>
         <div><span class="label">Net kâr</span><span class="${cls(s.net)}">${signMoney(s.net)}</span></div>
       </div></button>`));
   }
@@ -305,7 +308,7 @@ function fundDetail(code) {
     <div class="kpis">
       <div><span class="label">Fiyat</span><b>${fmtPrice(nat?.[1], code)}</b><span class="muted small">${nat ? dTR(nat[0]) : 'veri yok'}${fc.ccy !== 'TRY' ? ` · ₺${num(s.price, 2)}` : ''}</span></div>
       <div><span class="label">Değer</span><b>${money(s.value)}</b><span class="muted small">${num(s.qty, 0)} adet</span></div>
-      <div><span class="label">Maliyet</span><b>${money(s.cost)}</b><span class="muted small">ort. ₺${num(s.avg, assetKind(code) === 'hisse' ? 2 : 6)}</span></div>
+      <div><span class="label">Maliyet</span><b>${money(s.cost)}</b><span class="muted small">ort. ₺${num(s.avg, isListed(code) ? 2 : 6)}</span></div>
       <div><span class="label">Brüt / Net kâr</span><b class="${cls(s.gross)}">${signMoney(s.gross)}</b><span class="${cls(s.net)} small">net ${signMoney(s.net)} · stopaj %${num(rate * 100, 1)}</span></div>
     </div>
     <div class="row gap wrap"><button class="btn small" data-a="tx">+ Alış/Satış</button><button class="btn small ghost" data-a="price">Fiyat gir</button><button class="btn small ghost" data-a="tax">Stopaj</button></div>
@@ -699,7 +702,7 @@ function addFund(code = '') {
     if (known) { form.pb.value = known; form.pb.disabled = true; } else form.pb.disabled = false;
     dlg.querySelector('#plbl').textContent = `Birim fiyat (${form.pb.value === 'TRY' ? 'TL' : form.pb.value})`;
     const p = pts?.length ? valueAt(pts, form.date.value) ?? pts[pts.length - 1][1] : M.tefasSon?.[c]?.[1];
-    const d = assetKind(c) === 'hisse' ? 2 : form.pb.value === 'TRY' ? 6 : 4;
+    const d = isListed(c) ? 2 : form.pb.value === 'TRY' ? 6 : 4;
     hint.textContent = p ? `${fundName(c)} — ${form.date.value ? dTR(form.date.value) : ''} fiyatı: ${num(p, d)}` : c ? 'Bu kod için henüz veri yok; fiyatı elle gir. Otomatik takip için kodu config.json\'daki "fonlar" ya da "hisseler" listesine ekle (Ayarlar).' : '';
     if (p && !form.price.value) form.price.value = num(p, d);
   };
