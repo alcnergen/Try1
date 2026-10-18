@@ -24,7 +24,7 @@ async function getJSON(url) {
 }
 
 export async function loadMarket(fundCodes) {
-  const market = { index: null, raw: {}, names: {}, errors: [], tefasSon: null };
+  const market = { index: null, raw: {}, names: {}, meta: {}, errors: [], tefasSon: null };
   try { market.index = await getJSON('data/index.json'); } catch (e) { market.errors.push('Veri dizini yok (Actions henüz çalışmamış olabilir)'); }
   const ids = new Set([...fundCodes, 'USDTRY', 'EURTRY', 'JPYTRY', 'GOLD', 'XU100', 'SPX', 'NDX', 'DAX', 'N225', 'MSCIW']);
   await Promise.all([...ids].map(async (id) => {
@@ -32,6 +32,7 @@ export async function loadMarket(fundCodes) {
       const s = await getJSON(`data/series/${encodeURIComponent(id)}.json`);
       market.raw[id] = s.points || [];
       market.names[id] = s.ad;
+      market.meta[id] = { pb: s.pb || 'TRY', tur: s.tur };
     } catch { market.raw[id] = []; }
   }));
   const missing = fundCodes.filter((c) => !market.raw[c]?.length);
@@ -52,7 +53,7 @@ export async function loadOne(market, code) {
   if (market.raw[code]?.length) return true;
   try {
     const s = await getJSON(`data/series/${encodeURIComponent(code)}.json`);
-    market.raw[code] = s.points || []; market.names[code] = s.ad;
+    market.raw[code] = s.points || []; market.names[code] = s.ad; market.meta[code] = { pb: s.pb || 'TRY', tur: s.tur };
   } catch {
     try {
       market.tefasSon ||= await getJSON('data/tefas-son.json');

@@ -49,19 +49,46 @@ const benchName = (id) => (id === 'MEVDUAT' ? `Mevduat (%${num(S.settings.deposi
 const fundName = (code) => S.funds.find((f) => f.code === code)?.name || M.names[code] || code;
 
 // ---------- Hesaplama ----------
+// Varlığın para birimi ve türü (veri dosyasından; yoksa kullanıcının girdiği)
+const assetCcy = (code) => M.meta?.[code]?.pb || S.funds.find((f) => f.code === code)?.pb || 'TRY';
+const assetKind = (code) => M.meta?.[code]?.tur || 'fon';
+const CCY_SIGN = { TRY: '₺', USD: '$', EUR: '€', JPY: '¥', GBP: '£' };
+const fmtPrice = (v, code) => {
+  const ccy = assetCcy(code);
+  const d = assetKind(code) === 'hisse' ? 2 : ccy === 'TRY' ? 6 : 4;
+  return v == null ? '—' : (ccy === 'TRY' ? '' : CCY_SIGN[ccy] || ccy + ' ') + num(v, d);
+};
+const defaultTax = (code) => (assetKind(code) === 'hisse' ? 0 : S.settings.tax);
+
+// Hesaplamalar TL ile yapılır: yabancı para birimli hisselerin fiyatı ve işlemleri o günün kuruyla TL'ye çevrilir
+function toTRY(f, fx) {
+  const ccy = assetCcy(f.code);
+  const native = series(M, S.manual, f.code);
+  const base = { ...f, tax: f.tax ?? defaultTax(f.code), ccy, native };
+  const rate = fx[ccy];
+  if (ccy === 'TRY' || !rate?.length) return { ...base, pts: native };
+  const at = (d) => valueAtOrFirst(rate, d);
+  return {
+    ...base,
+    pts: combine(native, rate, (p, k) => p * k),
+    txs: (f.txs || []).map((t) => ({ ...t, price: t.price * at(t.date), fee: (Number(t.fee) || 0) * at(t.date) })),
+  };
+}
+
 function compute() {
   const today = todayISO();
-  const pmap = {};
-  for (const f of S.funds) pmap[f.code] = series(M, S.manual, f.code);
   const usd = series(M, S.manual, 'USDTRY');
+  const fx = { USD: usd, EUR: series(M, S.manual, 'EURTRY'), JPY: series(M, S.manual, 'JPYTRY') };
+  const funds = S.funds.map((f) => toTRY(f, fx));
+  const pmap = Object.fromEntries(funds.map((f) => [f.code, f.pts]));
   const benches = benchSeries(M, S.manual, S.settings.deposit);
-  const hist = portfolioHistory(S.funds, pmap, usd, { taxRate: S.settings.tax, end: today });
+  const hist = portfolioHistory(funds, pmap, usd, { taxRate: S.settings.tax, end: today });
   const last = hist[hist.length - 1] || null;
   // Bir önceki "fiyat günü" (bugünün satırı yalnızca son fiyatın tekrarıysa onu atla)
   let prev = null;
   if (last) for (let i = hist.length - 2; i >= 0; i--) if (Math.abs(hist[i].value - last.value) > 1e-6 || i === 0) { prev = hist[i]; break; }
-  const states = S.funds.map((f) => ({ f, s: fundState(f, pmap[f.code], today, S.settings.tax), pts: pmap[f.code] }));
-  C = { today, pmap, usd, benches, hist, last, prev, states, usdNow: valueAt(usd, today) };
+  const states = funds.map((f) => ({ f, s: fundState(f, pmap[f.code], today, S.settings.tax), pts: pmap[f.code] }));
+  C = { today, funds, pmap, usd, benches, hist, last, prev, states, usdNow: valueAt(usd, today) };
 
   // Günlük kayıt: her açılışta bugünün özetini sakla
   if (last && last.value > 0) {
@@ -142,7 +169,7 @@ function ozet(root) {
     </div>
   </section>
   <section class="card"><div class="row between"><h2>Değer gelişimi</h2></div><div id="rng"></div><div id="ch1" class="chart"></div><div id="lg1"></div></section>
-  <section class="card"><h2>Fonlar</h2><div id="hold"></div></section>
+  <section class="card"><h2>Yatırımlar</h2><div id="hold"></div></section>
   <section class="card"><div class="row between"><h2>Günlük kayıt</h2><span class="muted small">Her gün otomatik</span></div><div id="hist"></div></section>
   `));
   root.querySelectorAll('[data-ccy]').forEach((b) => (b.onclick = () => { S.settings.ccy = b.dataset.ccy; persist(); render(); }));
@@ -159,8 +186,9 @@ function ozet(root) {
 
   // Fon kartları
   const hold = root.querySelector('#hold');
-  for (const { f, s, pts } of C.states) {
+  for (const { f, s } of C.states) {
     if (s.qty <= 0 && !s.realized) continue;
+    const pts = f.native;
     const p = pts[pts.length - 1], q = pts[pts.length - 2];
     const dch = p && q ? p[1] / q[1] - 1 : null;
     const stale = !p || daysBetween(p[0], C.today) > 4;
@@ -169,7 +197,7 @@ function ozet(root) {
       <div class="row between"><b class="code">${esc(f.code)}</b><span class="${cls(dch)}">${pct(dch)}</span></div>
       <div class="name">${esc(fundName(f.code))}</div>
       <div class="grid3">
-        <div><span class="label">Fiyat</span>${num(s.price, 6)}${stale ? ' <span class="warn" title="Fiyat güncel değil">⚠︎</span>' : ''}<span class="muted small">${p ? dTR(p[0]) : 'veri yok'}</span></div>
+        <div><span class="label">Fiyat</span>${fmtPrice(p?.[1], f.code)}${stale ? ' <span class="warn" title="Fiyat güncel değil">⚠︎</span>' : ''}<span class="muted small">${p ? dTR(p[0]) : 'veri yok'}</span></div>
         <div><span class="label">Değer</span>${money(s.value)}<span class="muted small">${num(s.qty, 0)} adet</span></div>
         <div><span class="label">Kâr (net)</span><span class="${cls(s.net)}">${signMoney(s.net)}</span><span class="${cls(gp)} small">${pct(gp)} brüt</span></div>
       </div></button>`);
@@ -205,25 +233,25 @@ function emptyState() {
 
 // ---------- FONLAR ----------
 function fonlar(root) {
-  root.append(h(`<section class="card"><div class="row between"><h2>Fonlarım</h2><button class="btn small" id="add">+ Fon / işlem</button></div><div id="list"></div></section>`));
+  root.append(h(`<section class="card"><div class="row between"><h2>Yatırımlarım</h2><button class="btn small" id="add">+ Fon / hisse</button></div><div id="list"></div></section>`));
   root.querySelector('#add').onclick = () => addFund();
   const list = root.querySelector('#list');
-  if (!S.funds.length) list.innerHTML = '<p class="muted">Henüz fon yok.</p>';
+  if (!S.funds.length) list.innerHTML = '<p class="muted">Henüz yatırım yok.</p>';
   for (const { f, s, pts } of C.states) {
-    const last = pts[pts.length - 1];
+    const last = f.native[f.native.length - 1];
     const r1 = periodReturn(pts, periodStart('1Y', C.today), C.today);
     const ra = periodReturn(pts, periodStart('1A', C.today), C.today);
     list.append(h(`<button class="hold" data-code="${esc(f.code)}">
-      <div class="row between"><b class="code">${esc(f.code)}</b><span class="muted small">${last ? dTR(last[0]) : 'veri yok'}</span></div>
+      <div class="row between"><b class="code">${esc(f.code)} <span class="tag">${assetKind(f.code) === 'hisse' ? 'Hisse' : 'Fon'}${f.ccy !== 'TRY' ? ' · ' + f.ccy : ''}</span></b><span class="muted small">${last ? dTR(last[0]) : 'veri yok'}</span></div>
       <div class="name">${esc(fundName(f.code))}</div>
       <div class="grid3">
-        <div><span class="label">Fiyat</span>${num(s.price, 6)}</div>
+        <div><span class="label">Fiyat</span>${fmtPrice(last?.[1], f.code)}</div>
         <div><span class="label">1 ay</span><span class="${cls(ra)}">${pct(ra)}</span></div>
         <div><span class="label">1 yıl</span><span class="${cls(r1)}">${pct(r1)}</span></div>
       </div>
       <div class="grid3">
         <div><span class="label">Adet</span>${num(s.qty, 0)}</div>
-        <div><span class="label">Ort. maliyet</span>${num(s.avg, 6)}</div>
+        <div><span class="label">Ort. maliyet (₺)</span>${num(s.avg, assetKind(f.code) === 'hisse' ? 2 : 6)}</div>
         <div><span class="label">Net kâr</span><span class="${cls(s.net)}">${signMoney(s.net)}</span></div>
       </div></button>`));
   }
@@ -232,15 +260,17 @@ function fonlar(root) {
 
 function fundDetail(code) {
   const f = S.funds.find((x) => x.code === code);
+  const fc = C.funds.find((x) => x.code === code);
   const pts = C.pmap[code];
-  const s = fundState(f, pts, C.today, S.settings.tax);
-  const rate = f.tax ?? S.settings.tax;
+  const s = fundState(fc, pts, C.today, S.settings.tax);
+  const rate = fc.tax;
+  const nat = fc.native[fc.native.length - 1];
   const body = h(`
     <div class="name">${esc(fundName(code))}</div>
     <div class="kpis">
-      <div><span class="label">Fiyat</span><b>${num(s.price, 6)}</b><span class="muted small">${pts.length ? dTR(pts[pts.length - 1][0]) : 'veri yok'}</span></div>
+      <div><span class="label">Fiyat</span><b>${fmtPrice(nat?.[1], code)}</b><span class="muted small">${nat ? dTR(nat[0]) : 'veri yok'}${fc.ccy !== 'TRY' ? ` · ₺${num(s.price, 2)}` : ''}</span></div>
       <div><span class="label">Değer</span><b>${money(s.value)}</b><span class="muted small">${num(s.qty, 0)} adet</span></div>
-      <div><span class="label">Maliyet</span><b>${money(s.cost)}</b><span class="muted small">ort. ${num(s.avg, 6)}</span></div>
+      <div><span class="label">Maliyet</span><b>${money(s.cost)}</b><span class="muted small">ort. ₺${num(s.avg, assetKind(code) === 'hisse' ? 2 : 6)}</span></div>
       <div><span class="label">Brüt / Net kâr</span><b class="${cls(s.gross)}">${signMoney(s.gross)}</b><span class="${cls(s.net)} small">net ${signMoney(s.net)} · stopaj %${num(rate * 100, 1)}</span></div>
     </div>
     <div class="row gap wrap"><button class="btn small" data-a="tx">+ Alış/Satış</button><button class="btn small ghost" data-a="price">Fiyat gir</button><button class="btn small ghost" data-a="tax">Stopaj</button></div>
@@ -264,13 +294,13 @@ function fundDetail(code) {
   requestAnimationFrame(draw);
   dlg.querySelector('#fret').innerHTML = returnsTable([[code, pts], ...['USD', 'ALTIN', 'XU100', 'SPX'].map((id) => [benchName(id), C.benches[id]])], 'TRY');
   const txs = sortTx(f.txs || []).reverse();
-  dlg.querySelector('#ftx').innerHTML = txs.length ? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Tarih</th><th>İşlem</th><th>Adet</th><th>Fiyat</th><th>Tutar</th><th></th></tr></thead><tbody>${txs.map((t) => `<tr><td>${dTR(t.date)}</td><td>${t.type === 'sell' ? 'Satış' : 'Alış'}</td><td>${num(t.qty, 0)}</td><td>${num(t.price, 6)}</td><td>${num(t.qty * t.price)}</td><td><button class="link" data-del="${t.id}" aria-label="İşlemi sil">Sil</button></td></tr>`).join('')}</tbody></table></div>` : '<p class="muted">İşlem yok</p>';
+  dlg.querySelector('#ftx').innerHTML = txs.length ? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Tarih</th><th>İşlem</th><th>Adet</th><th>Fiyat</th><th>Tutar</th><th></th></tr></thead><tbody>${txs.map((t) => `<tr><td>${dTR(t.date)}</td><td>${t.type === 'sell' ? 'Satış' : 'Alış'}</td><td>${num(t.qty, 0)}</td><td>${fmtPrice(t.price, code)}</td><td>${(fc.ccy === 'TRY' ? '' : CCY_SIGN[fc.ccy] || '') + num(t.qty * t.price)}</td><td><button class="link" data-del="${t.id}" aria-label="İşlemi sil">Sil</button></td></tr>`).join('')}</tbody></table></div>` : '<p class="muted">İşlem yok</p>';
   dlg.querySelectorAll('[data-del]').forEach((b) => (b.onclick = () => {
     if (!confirm('Bu işlem silinsin mi?')) return;
     f.txs = f.txs.filter((t) => t.id !== b.dataset.del); persist(); dlg.close(); render(); fundDetail(code);
   }));
   dlg.querySelector('[data-a=tx]').onclick = () => { dlg.close(); addFund(code); };
-  dlg.querySelector('[data-a=price]').onclick = () => { dlg.close(); manualPrice(code); };
+  dlg.querySelector('[data-a=price]').onclick = () => { dlg.close(); manualPrice(code, `Birim fiyat (${fc.ccy === 'TRY' ? 'TL' : fc.ccy})`); };
   dlg.querySelector('[data-a=tax]').onclick = () => {
     const v = prompt('Bu fon için stopaj oranı (%). Hisse yoğun fonlarda 0 olabilir.', num(rate * 100, 1));
     if (v == null) return;
@@ -310,7 +340,7 @@ function kiyas(root) {
   const portRet = invested ? portVal / invested - 1 : null;
 
   const all = BENCHES.map((b) => {
-    const v = conv(replicate(S.funds, C.benches[b.id], C.today), C.today);
+    const v = conv(replicate(C.funds, C.benches[b.id], C.today), C.today);
     const pts = C.benches[b.id] || [];
     return { id: b.id, name: benchName(b.id), v, ret: v != null && invested ? v / invested - 1 : null, last: pts[pts.length - 1]?.[0] };
   });
@@ -379,7 +409,7 @@ function kiyas(root) {
 
   const dates = C.hist.map((r) => r.date);
   const ser = [{ name: 'Portföyüm', color: COLORS.PORT, points: C.hist.map((r) => [r.date, conv(net ? r.cost + r.net : r.value, r.date)]) }];
-  for (const id of S.settings.compare) ser.push({ name: benchName(id), color: COLORS[id], points: dates.map((d) => [d, conv(replicate(S.funds, C.benches[id], d), d)]).filter((p) => p[1] != null) });
+  for (const id of S.settings.compare) ser.push({ name: benchName(id), color: COLORS[id], points: dates.map((d) => [d, conv(replicate(C.funds, C.benches[id], d), d)]).filter((p) => p[1] != null) });
   ser.push({ name: 'Yatırılan', color: COLORS.COST, dashed: true, points: C.hist.map((r) => [r.date, ccy === 'USD' ? r.costUsd : r.cost]) });
   requestAnimationFrame(() => lineChart(root.querySelector('#ch2'), ser, { fmtY: compact, fmtTip: (v) => money(v, ccy) }));
   root.querySelector('#lg2').innerHTML = legend(ser);
@@ -610,23 +640,28 @@ function sheet(title, content) {
 
 function addFund(code = '') {
   const body = h(`<form class="form" id="ff">
-    <label>Fon kodu<input name="code" required autocapitalize="characters" value="${esc(code)}" placeholder="ör. TGT" ${code ? 'readonly' : ''}></label>
+    <label>Fon ya da hisse kodu<input name="code" required autocapitalize="characters" value="${esc(code)}" placeholder="ör. TGT, THYAO, AAPL" ${code ? 'readonly' : ''}></label>
     <div class="seg full" role="group" aria-label="İşlem"><label><input type="radio" name="type" value="buy" checked> Alış</label><label><input type="radio" name="type" value="sell"> Satış</label></div>
     <label>Tarih<input name="date" type="date" required value="${C.today}" max="${C.today}"></label>
     <label>Adet (pay)<input name="qty" inputmode="decimal" required></label>
-    <label>Birim fiyat (₺)<input name="price" inputmode="decimal" required placeholder="ör. 0,124680"></label>
-    <label>Komisyon (₺, isteğe bağlı)<input name="fee" inputmode="decimal"></label>
+    <label>Para birimi<select name="pb"><option value="TRY">TL</option><option value="USD">ABD doları</option><option value="EUR">Euro</option></select></label>
+    <label><span id="plbl">Birim fiyat (TL)</span><input name="price" inputmode="decimal" required placeholder="ör. 0,124680"></label>
+    <label>Komisyon (aynı para biriminde, isteğe bağlı)<input name="fee" inputmode="decimal"></label>
     <p class="muted small" id="hint"></p>
     <button class="btn full" type="submit">Kaydet</button></form>`);
-  const dlg = sheet(code ? `${code} işlem` : 'Fon / işlem ekle', body);
+  const dlg = sheet(code ? `${code} işlem` : 'Fon / hisse ekle', body);
   const form = dlg.querySelector('#ff');
   const hint = dlg.querySelector('#hint');
   const fill = () => {
     const c = form.code.value.trim().toUpperCase();
-    const pts = C.pmap[c]?.length ? C.pmap[c] : M.raw[c];
+    const pts = series(M, S.manual, c);
+    const known = M.meta?.[c]?.pb || S.funds.find((x) => x.code === c)?.pb;
+    if (known) { form.pb.value = known; form.pb.disabled = true; } else form.pb.disabled = false;
+    dlg.querySelector('#plbl').textContent = `Birim fiyat (${form.pb.value === 'TRY' ? 'TL' : form.pb.value})`;
     const p = pts?.length ? valueAt(pts, form.date.value) ?? pts[pts.length - 1][1] : M.tefasSon?.[c]?.[1];
-    hint.textContent = p ? `${fundName(c)} — ${form.date.value ? dTR(form.date.value) : ''} fiyatı: ${num(p, 6)}` : c ? 'Bu kod için henüz veri yok; fiyatı elle gir. Otomatik takip için kodu config.json\'a ekle (Ayarlar).' : '';
-    if (p && !form.price.value) form.price.value = num(p, 6);
+    const d = assetKind(c) === 'hisse' ? 2 : form.pb.value === 'TRY' ? 6 : 4;
+    hint.textContent = p ? `${fundName(c)} — ${form.date.value ? dTR(form.date.value) : ''} fiyatı: ${num(p, d)}` : c ? 'Bu kod için henüz veri yok; fiyatı elle gir. Otomatik takip için kodu config.json\'daki "fonlar" ya da "hisseler" listesine ekle (Ayarlar).' : '';
+    if (p && !form.price.value) form.price.value = num(p, d);
   };
   let timer;
   form.code.oninput = () => {
@@ -634,6 +669,7 @@ function addFund(code = '') {
     timer = setTimeout(async () => { const c = form.code.value.trim().toUpperCase(); if (c.length >= 3) await loadOne(M, c); fill(); }, 300);
   };
   form.date.onchange = () => { form.price.value = ''; fill(); };
+  form.pb.onchange = fill;
   if (code) fill(); else form.code.oninput();
   form.onsubmit = (e) => {
     e.preventDefault();
@@ -642,6 +678,7 @@ function addFund(code = '') {
     if (!c || !(qty > 0) || !(price > 0)) return alert('Kod, adet ve fiyat gerekli');
     let f = S.funds.find((x) => x.code === c);
     if (!f) { f = { code: c, txs: [] }; S.funds.push(f); }
+    if (!M.meta?.[c]?.pb && form.pb.value !== 'TRY') f.pb = form.pb.value;
     f.txs.push({ id: store.uid(), date: form.date.value, type: form.type.value, qty, price, fee });
     persist(); dlg.close(); render();
     if (!M.raw[c]?.length) refresh();

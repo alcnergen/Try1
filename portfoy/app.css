@@ -182,3 +182,4 @@ dialog.sheet::backdrop { background: rgb(0 0 0 / .4); }
 .bar .pos { background: var(--up); opacity: .55; }
 .bar .neg { background: var(--down); opacity: .55; }
 .bar .mark { position: absolute; top: -3px; bottom: -3px; width: 2px; margin-left: -1px; background: var(--s1); border-radius: 1px; }
+.tag { font-size: 10px; font-weight: 600; color: var(--text2); border: 1px solid var(--line); border-radius: 6px; padding: 1px 5px; margin-left: 4px; vertical-align: 2px; letter-spacing: .02em; }

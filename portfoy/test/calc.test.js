@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { valueAt, positionAt, fundState, portfolioHistory, replicate, periodReturn, projectScenario, monthsToTarget, combine } from '../js/calc.js';
-import { parseTefas, parseTvMessage, tvDate, parseCanli, mergePoints } from '../scripts/veri-cek.mjs';
+import { parseTefas, parseTvMessage, tvDate, parseCanli, mergePoints, pickTvSymbol, assetEntry } from '../scripts/veri-cek.mjs';
 
 const close = (a, b, eps = 1e-6) => assert.ok(Math.abs(a - b) < eps, `${a} ≈ ${b}`);
 
@@ -81,4 +81,18 @@ test('TEFAS, TradingView ve canlidoviz yanıtlarını ayrıştırma', () => {
 
   assert.deepEqual(parseCanli({ 1790553600: '49.0102|49.1733|48.9702|48.9824' }), [['2026-09-28', 48.9824]]);
   assert.deepEqual(mergePoints([['a', 1], ['b', 2]], [['b', 3], ['c', 4]]), [['a', 1], ['b', 3], ['c', 4]]);
+});
+
+test('hisse kodu çözümleme', () => {
+  const res = { symbols: [
+    { symbol: 'AAPL', type: 'stock', exchange: 'BMV' },
+    { symbol: 'AAPL', type: 'stock', exchange: 'NASDAQ' },
+    { symbol: 'AAPLX', type: 'stock', exchange: 'NASDAQ' },
+  ] };
+  assert.equal(pickTvSymbol(res, 'AAPL'), 'NASDAQ:AAPL');
+  assert.equal(pickTvSymbol({ symbols: [{ symbol: 'THYAO', type: 'stock', exchange: 'BIST' }] }, 'THYAO'), 'BIST:THYAO');
+  assert.equal(pickTvSymbol({ symbols: [] }, 'YOK'), null);
+  assert.deepEqual(assetEntry(' thyao '), { kod: 'THYAO' });
+  assert.deepEqual(assetEntry('sap', 'hisse'), { kod: 'SAP', tip: 'hisse' });
+  assert.deepEqual(assetEntry({ kod: 'yfbl1', tefas: 'ylb' }), { kod: 'YFBL1', tefas: 'YLB' });
 });
