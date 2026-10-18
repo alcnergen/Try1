@@ -1,9 +1,10 @@
 {
- "guncelleme": "2026-10-18T12:56:25.680Z",
+ "guncelleme": "2026-10-18T19:14:54.926Z",
  "seriler": {
   "TGT": {
    "ad": "GARANTİ PORTFÖY KISA VADELİ BORÇLANMA ARAÇLARI FONU",
    "tur": "fon",
+   "pb": "TRY",
    "kaynak": "tefas:TGT",
    "ilk": "2021-10-18",
    "son": "2026-10-16",
@@ -13,6 +14,7 @@
   "YFBL1": {
    "ad": "YAPI KREDİ PORTFÖY PARA PİYASASI FONU",
    "tur": "fon",
+   "pb": "TRY",
    "kaynak": "tefas:YLB",
    "ilk": "2021-10-18",
    "son": "2026-10-16",
@@ -22,6 +24,7 @@
   "YFBL7": {
    "ad": "YAPI KREDİ PORTFÖY İKİNCİ PARA PİYASASI (TL) FONU",
    "tur": "fon",
+   "pb": "TRY",
    "kaynak": "tefas:YVD",
    "ilk": "2022-07-04",
    "son": "2026-10-16",
@@ -31,33 +34,37 @@
   "USDTRY": {
    "ad": "Dolar/TL",
    "tur": "kiyas",
+   "pb": "TRY",
    "kaynak": "tv:FX_IDC:USDTRY",
    "ilk": "2010-01-04",
-   "son": "2026-10-16",
-   "deger": 49.5091,
-   "adet": 4380
+   "son": "2026-10-19",
+   "deger": 49.5166,
+   "adet": 4381
   },
   "EURTRY": {
    "ad": "Euro/TL",
    "tur": "kiyas",
+   "pb": "TRY",
    "kaynak": "tv:FX_IDC:EURTRY",
    "ilk": "2010-01-04",
-   "son": "2026-10-16",
-   "deger": 55.6369,
-   "adet": 4380
+   "son": "2026-10-19",
+   "deger": 55.4874,
+   "adet": 4381
   },
   "JPYTRY": {
    "ad": "Yen/TL",
    "tur": "kiyas",
+   "pb": "TRY",
    "kaynak": "tv:FX_IDC:JPYTRY",
    "ilk": "2009-12-31",
-   "son": "2026-10-16",
-   "deger": 0.313267,
-   "adet": 4380
+   "son": "2026-10-19",
+   "deger": 0.313428,
+   "adet": 4381
   },
   "GOLD": {
    "ad": "Altın (ons, $)",
    "tur": "kiyas",
+   "pb": "TRY",
    "kaynak": "tv:TVC:GOLD",
    "ilk": "2009-05-27",
    "son": "2026-10-16",
@@ -67,6 +74,7 @@
   "XU100": {
    "ad": "BIST 100",
    "tur": "kiyas",
+   "pb": "TRY",
    "kaynak": "tv:BIST:XU100",
    "ilk": "2009-05-06",
    "son": "2026-10-16",
@@ -76,6 +84,7 @@
   "SPX": {
    "ad": "S&P 500",
    "tur": "kiyas",
+   "pb": "TRY",
    "kaynak": "tv:SP:SPX",
    "ilk": "2016-07-01",
    "son": "2026-10-16",
@@ -85,6 +94,7 @@
   "NDX": {
    "ad": "Nasdaq 100",
    "tur": "kiyas",
+   "pb": "TRY",
    "kaynak": "tv:NASDAQ:NDX",
    "ilk": "2009-05-20",
    "son": "2026-10-16",
@@ -94,6 +104,7 @@
   "DAX": {
    "ad": "DAX",
    "tur": "kiyas",
+   "pb": "TRY",
    "kaynak": "tv:XETR:DAX",
    "ilk": "2009-07-21",
    "son": "2026-10-16",
@@ -103,6 +114,7 @@
   "N225": {
    "ad": "Nikkei 225",
    "tur": "kiyas",
+   "pb": "TRY",
    "kaynak": "tv:TVC:NI225",
    "ilk": "2008-11-12",
    "son": "2026-10-16",
@@ -112,11 +124,22 @@
   "MSCIW": {
    "ad": "MSCI Dünya (URTH)",
    "tur": "kiyas",
+   "pb": "TRY",
    "kaynak": "tv:AMEX:URTH",
    "ilk": "2012-01-12",
    "son": "2026-10-16",
    "deger": 206.34,
    "adet": 3515
+  },
+  "TUFE": {
+   "ad": "TÜFE (aylık endeks)",
+   "tur": "kiyas",
+   "pb": "TRY",
+   "kaynak": "tv:ECONOMICS:TRCPI",
+   "ilk": "2013-10-01",
+   "son": "2026-09-01",
+   "deger": 137.23,
+   "adet": 156
   }
  }
 }
