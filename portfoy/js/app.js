@@ -254,6 +254,11 @@ function ozet(root) {
     { name: 'Maliyet', color: COLORS.COST, dashed: true, points: clip(C.hist.map((r) => [r.date, pickCost(r)]).filter((p) => p[1] != null), ui.ozetRange) },
   ];
   requestAnimationFrame(() => lineChart(root.querySelector('#ch1'), ser, { fmtY: compact, fmtTip: (v) => money(v, ccy) }));
+  const wch = root.querySelector('#wch');
+  if (wch) {
+    const wp = wealthSeries().map(([d, v]) => [d, ccy === 'USD' ? v / (valueAtOrFirst(C.usd, d) || 1) : v]);
+    requestAnimationFrame(() => lineChart(wch, [{ name: 'Toplam servet', color: COLORS.PORT, area: true, points: wp }], { height: 150, fmtY: compact, fmtTip: (v) => money(v, ccy, 0) }));
+  }
   root.querySelector('#lg1').innerHTML = legend(ser);
 
   // Fon kartları
@@ -325,6 +330,20 @@ function wealthParts() {
   }
   return { parts, last };
 }
+// Gün gün toplam servet: o güne kadarki son değerleme + o günkü yatırım değeri
+function wealthSeries() {
+  const vals = S.others.vals.slice().sort((a, b) => a.date.localeCompare(b.date));
+  if (!vals.length) return [];
+  const othersTotal = (v) => S.others.assets.reduce((a, x) => a + (Number(v.values[x.id]) || 0), 0);
+  const inv = C.hist.map((r) => [r.date, r.value]);
+  const dates = [...new Set([...vals.map((v) => v.date), ...inv.map((p) => p[0]), C.today])].filter((d) => d >= vals[0].date && d <= C.today).sort();
+  return dates.map((d) => {
+    let ov = null;
+    for (const v of vals) if (v.date <= d) ov = v;
+    return [d, othersTotal(ov) + (valueAt(inv, d) || 0)];
+  });
+}
+
 function wealthCard(ccy) {
   const { parts, last } = wealthParts();
   if (!last) return '';
@@ -335,9 +354,15 @@ function wealthCard(ccy) {
   const rows = WEALTH_CATS.filter(([cat]) => parts[cat] > 0);
   const nakit = parts.Nakit, cost = C.last?.cost || 0;
   const dup = nakit > 0 && cost > 0 && Math.abs(nakit - cost) / cost < 0.05;
-  return `<section class="card"><div class="row between"><h2>Toplam servet</h2><span class="muted small">${ccy === 'USD' ? 'bugünkü kurla' : ''}</span></div>
+  const ws = wealthSeries();
+  const before = ws.filter((x) => x[0] < C.asOf); // son fiyat gününden önceki gün
+  const prevW = before.length ? before[before.length - 1] : null;
+  const dW = prevW ? total - prevW[1] : null;
+  return `<section class="card"><div class="row between"><h2>Toplam servet</h2><span class="muted small">${dTR(C.today)} itibarıyla${ccy === 'USD' ? ', bugünkü kurla' : ''}</span></div>
     <div class="big">${money(total / k, ccy, 0)}</div>
-    <div class="sub muted">Yatırımlar ${money(inv / k, ccy, 0)} (canlı) + diğer varlıklar ${money((total - inv) / k, ccy, 0)} (${dTR(last.date)} değerlemesi)</div>
+    ${prevW ? `<div class="sub ${cls(dW)}">${arrow(dW)} ${signMoney(dW / k, ccy, 0)} (${pct(total / prevW[1] - 1)}) <span class="muted">önceki güne göre (${dTR(prevW[0])})</span></div>` : ''}
+    <div class="sub muted small">Yatırımlar bugünkü fiyatlarla ${money(inv / k, ccy, 0)} · diğer varlıklar son bilinen değerleriyle ${money((total - inv) / k, ccy, 0)} (${dTR(last.date)} değerlemesi)</div>
+    <div id="wch" class="chart" style="min-height:150px"></div>
     <div class="stack" role="img" aria-label="Varlık dağılımı">${rows.map(([cat, col]) => `<span style="flex:${parts[cat]};background:${col}" title="${cat} %${num((parts[cat] / total) * 100, 1)}"></span>`).join('')}</div>
     <div class="dist">${rows.map(([cat, col]) => `<div class="dist-row"><span class="sw" style="background:${col}"></span><span>${cat}</span><b>${money(parts[cat] / k, ccy, 0)}</b><span class="muted">%${num((parts[cat] / total) * 100, 1)}</span></div>`).join('')}</div>
     ${dup ? `<p class="small warn">⚠︎ Diğer varlıklardaki "Nakit" (${money(nakit, 'TRY', 0)}) fonlarının maliyetiyle neredeyse aynı. Aynı para iki kez sayılıyor olabilir; fonlara geçtiysen düzelt.</p><button class="btn small" onclick="window.__app.fixCash()">Çift sayımı düzelt</button>` : ''}

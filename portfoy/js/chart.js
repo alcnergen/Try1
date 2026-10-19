@@ -57,10 +57,17 @@ export function lineChart(container, series, opts = {}) {
     grid.appendChild(tx);
   }
   if (opts.baseline != null) grid.appendChild(el('line', { x1: pad.l, x2: W - pad.r, y1: Y(opts.baseline), y2: Y(opts.baseline), class: 'baseline' }));
+  // Tarih etiketleri zamana göre eşit aralıklı; birbirine çok yakın olanlar atlanır
   const nx = Math.min(4, allX.length);
+  const placed = [];
   for (let i = 0; i < nx; i++) {
-    const d = allX[Math.round((i * (allX.length - 1)) / Math.max(1, nx - 1))];
-    const tx = el('text', { x: X(d), y: H - 6, class: 'tick', 'text-anchor': i === 0 ? 'start' : i === nx - 1 ? 'end' : 'middle' });
+    const target = t0 + (i / Math.max(1, nx - 1)) * (t1 - t0);
+    let d = allX[0];
+    for (const x of allX) if (Math.abs(Date.parse(x) - target) < Math.abs(Date.parse(d) - target)) d = x;
+    const px = X(d);
+    if (placed.some((q) => Math.abs(q - px) < 56)) continue;
+    placed.push(px);
+    const tx = el('text', { x: px, y: H - 6, class: 'tick', 'text-anchor': i === 0 ? 'start' : i === nx - 1 ? 'end' : 'middle' });
     tx.textContent = fmtDateAxis(d, span);
     grid.appendChild(tx);
   }
