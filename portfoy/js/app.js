@@ -8,7 +8,7 @@ import {
 } from './calc.js';
 import { lineChart, legend } from './chart.js';
 
-export const APP_VERSION = '2026.10.19-b';
+export const APP_VERSION = '2026.10.19-c';
 
 // ---------- Durum ----------
 let S = store.load();
@@ -682,7 +682,7 @@ function diger(root) {
     ${cur ? `<div class="big">${money(ccy === 'USD' ? total(cur) / usdOf(cur) : total(cur), ccy, 0)}</div>
     <div class="sub">${dTR(cur.date)} değerlemesi · USD kuru ${num(usdOf(cur), 4)}</div>
     ${prevV ? (() => { const a = total(cur), b = total(prevV), au = a / usdOf(cur), bu = b / usdOf(prevV); return `<div class="sub ${cls(a - b)}">${arrow(a - b)} ${signMoney(a - b, 'TRY', 0)} (${pct(a / b - 1)}) · $ bazında ${pct(au / bu - 1)} <span class="muted">${dTR(prevV.date)}'e göre</span></div>`; })() : ''}` : '<p>Henüz değerleme yok.</p>'}
-    <div class="row gap wrap"><button class="btn small" id="newval">+ Yeni değerleme</button><button class="btn small ghost" id="addas">+ Varlık ekle</button>${cur ? '<button class="btn small ghost" id="editusd">Kuru düzenle</button><button class="btn small ghost danger" id="delval">Değerlemeyi sil</button>' : ''}</div>
+    <div class="row gap wrap"><button class="btn small" id="newval">+ Yeni değerleme</button><button class="btn small ghost" id="addas">+ Varlık ekle</button><button class="btn small ghost" id="pastelink">Düzeltme bağlantısı</button>${cur ? '<button class="btn small ghost" id="editusd">Kuru düzenle</button><button class="btn small ghost danger" id="delval">Değerlemeyi sil</button>' : ''}</div>
   </section>
   ${vals.length ? `<section class="card"><h2>Değerleme tarihi</h2><div id="dsel"></div><div id="items"></div></section>
   <section class="card"><h2>Toplam varlık seyri</h2><div id="ch5" class="chart"></div></section>
@@ -700,6 +700,7 @@ function diger(root) {
     ui.otherDate = iso; persist(); render();
   };
   root.querySelector('#addas').onclick = () => assetEdit(null, cur);
+  root.querySelector('#pastelink').onclick = () => pasteLink();
   if (cur) {
     root.querySelector('#editusd').onclick = () => {
       const v = prompt(`${dTR(cur.date)} için USD/TL kuru`, num(usdOf(cur), 4));
@@ -952,7 +953,11 @@ function settings() {
       return `<p class="small">${c.error ? `<span class="warn">⚠︎ ${esc(c.error)}</span>` : `Açık. Son yedek: ${c.last ? new Date(c.last).toLocaleString('tr-TR') : '—'}`}<br><span class="muted">Her değişiklikten birkaç saniye sonra şifrelenip GitHub'daki gizli Gist'ine yazılır. Eski sürümler Gist geçmişinde saklanır.</span></p>
         <div class="row gap wrap"><button class="btn small" type="button" id="bknow">Şimdi yedekle</button>${c.gistId ? `<a class="btn small ghost" href="https://gist.github.com/${esc(c.gistId)}/revisions" target="_blank" rel="noopener">Yedek geçmişi</a>` : ''}<button class="btn small ghost" type="button" id="bkres">Geri yükle</button><button class="btn small ghost danger" type="button" id="bkoff">Kapat</button></div>`;
     })()}
-    </div><form class="form" id="st">
+    </div>
+    <h3>Bağlantı</h3>
+    <div class="row gap wrap"><button class="btn small" type="button" data-paste>Aktarım / düzeltme bağlantısını yapıştır</button></div>
+    <h3>Ayarlar</h3>
+    <form class="form" id="st">
     <label>Varsayılan stopaj (%)<input name="tax" inputmode="decimal" value="${num(S.settings.tax * 100, 1)}"></label>
     <fieldset><legend>Mevduat kıyası</legend>
       <label class="check"><input type="checkbox" name="depositAuto" ${S.settings.depositAuto !== false ? 'checked' : ''}> TCMB mevduat faizini kullan (her ay güncellenir)</label>
@@ -961,19 +966,19 @@ function settings() {
       <label>Elle yıllık net faiz (%) — otomatik kapalıysa<input name="deposit" inputmode="decimal" value="${num(S.settings.deposit * 100, 1)}"></label>
     </fieldset>
     <button class="btn" type="submit">Kaydet</button></form>
-    <h3>Veri durumu</h3>
+    <details class="fold"><summary><h3>Veri durumu</h3></summary>
     <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Seri</th><th>Son</th><th>Değer</th><th></th></tr></thead><tbody>
     ${[...S.funds.map((f) => f.code), 'USDTRY', 'EURTRY', 'GOLD', 'XU100', 'SPX', 'NDX', 'DAX', 'N225', 'MSCIW', 'TUFE', 'MEVFAIZ'].map((id) => {
       const p = series(M, S.manual, id); const l = p[p.length - 1];
       return `<tr><td>${esc(id)}${idx[id]?.hata ? ' <span class="warn" title="' + esc(idx[id].hata) + '">⚠︎</span>' : ''}</td><td>${l ? dTR(l[0]) : '—'}</td><td>${l ? num(l[1], 4) : '—'}</td><td><button type="button" class="link" data-m="${esc(id)}">Elle gir</button></td></tr>`;
     }).join('')}</tbody></table></div>
-    <p class="muted small">Fiyatlar GitHub Actions ile her iş günü akşam ve sabah çekilir. Yeni bir fon kodunu otomatik takibe almak için <a href="${repoEdit}" target="_blank" rel="noopener">config.json</a> dosyasındaki "fonlar" listesine ekle. Hemen güncellemek için <a href="${runUrl}" target="_blank" rel="noopener">Actions → Run workflow</a>.</p>
+    <p class="muted small">Fiyatlar GitHub Actions ile her iş günü akşam ve sabah çekilir. Yeni bir fon kodunu otomatik takibe almak için <a href="${repoEdit}" target="_blank" rel="noopener">config.json</a> dosyasındaki "fonlar" listesine ekle. Hemen güncellemek için <a href="${runUrl}" target="_blank" rel="noopener">Actions → Run workflow</a>.</p></details>
     <div class="row gap wrap"><button class="btn small ghost" type="button" id="fetchnow">Fiyatları şimdi çek</button></div>
     <h3>Otomatik takip</h3>
     <p class="small">${track.loadToken() ? 'Açık. Uygulamada eklediğin yeni fon ve hisseler GitHub\'daki takip listesine kendiliğinden yazılır.' : 'Kapalı. Yeni eklediğin kodların fiyatı otomatik gelmez.'}</p>
     <div class="row gap wrap"><button class="btn small ${track.loadToken() ? 'ghost' : ''}" type="button" id="trset">${track.loadToken() ? 'Anahtarı değiştir' : 'Otomatik takibi aç'}</button>${track.loadToken() ? '<button class="btn small ghost danger" type="button" id="troff">Kapat</button>' : ''}</div>
     <h3>Elle yedek</h3>
-    <div class="row gap wrap"><button class="btn small ghost" type="button" id="exp">Yedeği indir</button><button class="btn small ghost" type="button" id="imp">Yedekten yükle</button><button class="btn small ghost" type="button" id="lnk">Aktarım bağlantısı oluştur</button><button class="btn small ghost" type="button" id="paste">Bağlantıyı yapıştır</button></div>
+    <div class="row gap wrap"><button class="btn small ghost" type="button" id="exp">Yedeği indir</button><button class="btn small ghost" type="button" id="imp">Yedekten yükle</button><button class="btn small ghost" type="button" id="lnk">Aktarım bağlantısı oluştur</button><button class="btn small ghost" type="button" data-paste>Bağlantıyı yapıştır</button></div>
     <h3>Ana ekrana ekleme</h3>
     <p class="muted small">iPhone: Safari'de Paylaş → Ana Ekrana Ekle. Android: Chrome menüsü → Ana ekrana ekle / Uygulamayı yükle.</p>
     <button class="btn ghost danger small" type="button" id="reset">Tüm verileri sil</button>
@@ -1013,18 +1018,7 @@ function settings() {
     const url = `${location.origin}${location.pathname}#veri=${store.encodeShare(rest)}`;
     try { await navigator.clipboard.writeText(url); alert('Bağlantı kopyalandı. Diğer cihazında açınca portföy oraya aktarılır. Bağlantıyı kimseyle paylaşma.'); } catch { prompt('Bağlantıyı kopyala:', url); }
   };
-  dlg.querySelector('#paste').onclick = () => {
-    const v = prompt('Aktarım ya da düzeltme bağlantısını buraya yapıştır');
-    const y = v && v.match(/#yama=([A-Za-z0-9_-]+)/);
-    if (y) {
-      try { if (applyPatchCode(y[1])) { dlg.close(); render(); toast('Değerleme güncellendi ✓'); } } catch { alert('Düzeltme bağlantısı okunamadı'); }
-      return;
-    }
-    const m = v && v.match(/#veri=([A-Za-z0-9_-]+)/);
-    if (!m) return v && alert('Geçerli bir aktarım bağlantısı değil');
-    try { S = store.normalize({ ...store.decodeShare(m[1]), snapshots: S.snapshots }); persist(); dlg.close(); refresh(); }
-    catch { alert('Bağlantı okunamadı'); }
-  };
+  dlg.querySelectorAll('[data-paste]').forEach((b) => (b.onclick = () => pasteLink(() => dlg.close())));
   dlg.querySelector('#reset').onclick = () => {
     if (!confirm('Bu cihazdaki tüm portföy verisi silinsin mi? Önce yedek almanı öneririm.')) return;
     S = structuredClone(store.DEFAULT); persist(); dlg.close(); render();
@@ -1175,6 +1169,23 @@ async function maybeRequestFetch({ force = false } = {}) {
       } catch { /* sonra tekrar */ }
     }, 30000);
   } catch (e) { toast('⚠︎ Fiyat çekimi başlatılamadı: ' + e.message, 7000); }
+}
+
+// Aktarım (#veri=) ya da değerleme düzeltme (#yama=) bağlantısını yapıştırma
+function pasteLink(before) {
+  const v = prompt('Aktarım ya da düzeltme bağlantısını buraya yapıştır');
+  if (!v) return;
+  const y = v.match(/#yama=([A-Za-z0-9_-]+)/);
+  if (y) {
+    try { if (applyPatchCode(y[1])) { before?.(); render(); toast('Değerleme güncellendi ✓'); } } catch { alert('Düzeltme bağlantısı okunamadı. Bağlantının tamamını kopyaladığından emin ol.'); }
+    return;
+  }
+  const m = v.match(/#veri=([A-Za-z0-9_-]+)/);
+  if (!m) return alert('Geçerli bir bağlantı değil. Bağlantının tamamını (https://… ile başlayan) kopyaladığından emin ol.');
+  try {
+    if ((S.funds.length || S.others.assets.length) && !confirm('Bağlantıdaki portföy bu cihaza aktarılsın mı? Mevcut veri değiştirilecek.')) return;
+    S = store.normalize({ ...store.decodeShare(m[1]), snapshots: S.snapshots }); persist(); before?.(); refresh();
+  } catch { alert('Bağlantı okunamadı'); }
 }
 
 function fixCash() {
