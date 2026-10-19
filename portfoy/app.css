@@ -200,3 +200,8 @@ a.btn { text-decoration: none; display: inline-block; }
 .dist-row .muted { text-align: right; font-size: 13px; }
 .form .check { display: flex; gap: 8px; align-items: center; color: var(--text); }
 .form .check input { width: auto; }
+details.fold > summary { list-style: none; cursor: pointer; }
+details.fold > summary::-webkit-details-marker { display: none; }
+details.fold > summary h3 { display: inline-block; }
+details.fold > summary h3::after { content: ' ▸'; }
+details.fold[open] > summary h3::after { content: ' ▾'; }
