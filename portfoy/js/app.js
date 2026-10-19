@@ -8,6 +8,8 @@ import {
 } from './calc.js';
 import { lineChart, legend } from './chart.js';
 
+export const APP_VERSION = '2026.10.19-b';
+
 // ---------- Durum ----------
 let S = store.load();
 let M = { raw: {}, names: {}, index: null, errors: [] };
@@ -974,7 +976,8 @@ function settings() {
     <div class="row gap wrap"><button class="btn small ghost" type="button" id="exp">Yedeği indir</button><button class="btn small ghost" type="button" id="imp">Yedekten yükle</button><button class="btn small ghost" type="button" id="lnk">Aktarım bağlantısı oluştur</button><button class="btn small ghost" type="button" id="paste">Bağlantıyı yapıştır</button></div>
     <h3>Ana ekrana ekleme</h3>
     <p class="muted small">iPhone: Safari'de Paylaş → Ana Ekrana Ekle. Android: Chrome menüsü → Ana ekrana ekle / Uygulamayı yükle.</p>
-    <button class="btn ghost danger small" type="button" id="reset">Tüm verileri sil</button>`);
+    <button class="btn ghost danger small" type="button" id="reset">Tüm verileri sil</button>
+    <p class="muted small" style="margin-top:14px">Sürüm ${APP_VERSION}</p>`);
   const dlg = sheet('Ayarlar', body);
   dlg.querySelector('#st').onsubmit = (e) => {
     e.preventDefault();
@@ -1186,12 +1189,21 @@ export async function init() {
   importFromHash();
   document.querySelectorAll('.tabbar button').forEach((b) => (b.onclick = () => setTab(b.dataset.tab)));
   $('#settings').onclick = settings;
-  $('#reload').onclick = async () => { await refresh(); maybeRequestFetch(); };
+  $('#reload').onclick = async () => {
+    try { await (await navigator.serviceWorker?.getRegistration())?.update(); } catch { /* yok */ }
+    await refresh(); maybeRequestFetch();
+  };
   try { await navigator.storage?.persist?.(); } catch { /* yok */ }
   render();
   await refresh();
   let w = innerWidth;
   addEventListener('resize', () => { if (Math.abs(innerWidth - w) > 40) { w = innerWidth; render(); } });
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && C.today !== todayISO()) refresh(); });
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+  if ('serviceWorker' in navigator) {
+    // Yeni sürüm yüklenince sayfayı bir kez yenile ki yeni kod hemen çalışsın
+    const had = !!navigator.serviceWorker.controller;
+    let reloaded = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => { if (had && !reloaded) { reloaded = true; location.reload(); } });
+    navigator.serviceWorker.register('sw.js').then((r) => r.update()).catch(() => {});
+  }
 }
