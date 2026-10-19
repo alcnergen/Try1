@@ -14,7 +14,7 @@ Telefonda ana ekrana eklenen, yalnızca kişisel kullanım için fon portföyü 
 
 ## Veri nereden gelir
 
-- `.github/workflows/portfoy.yml` her iş günü 18:35 ve 22:50'de, her gün 08:20'de (TR saati) `scripts/veri-cek.mjs`'i çalıştırır.
+- `.github/workflows/portfoy.yml` her iş günü 18:35, 20:35 ve 22:50'de, her gün 08:20'de (TR saati) `scripts/veri-cek.mjs`'i çalıştırır. TEFAS bir günün fon fiyatını o gün akşam açıklar; uygulamada genelde 20:35 ya da 22:50 çalışmasıyla, en geç ertesi sabah görünür.
 - Fon fiyatları **TEFAS**'tan (YAT/EMK/BYF), bulunamazsa Yahoo Finance'ten (`KOD.IS`); döviz, altın ve endeksler Yahoo Finance'ten, Dolar/Euro için TCMB yedek.
 - Sonuçlar `data/series/*.json` olarak depoya kaydedilir; böylece uygulama hiç açılmasa da fiyat geçmişi gün gün birikir.
 - Yeni bir fonu otomatik takibe almak için `data/config.json` içindeki `fonlar` listesine kodunu ekle.

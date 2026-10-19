@@ -4,7 +4,8 @@ name: Portföy verisi ve yayın
 on:
   schedule:
     - cron: '35 15 * * 1-5'   # 18:35 TR: borsa kapanışı
-    - cron: '50 19 * * 1-5'   # 22:50 TR: TEFAS fon fiyatları
+    - cron: '35 17 * * 1-5'   # 20:35 TR: TEFAS fon fiyatları (ilk)
+    - cron: '50 19 * * 1-5'   # 22:50 TR: TEFAS fon fiyatları (geç açıklananlar)
     - cron: '20 5 * * *'      # 08:20 TR: gece eksik kalanlar
   workflow_dispatch:
   push:
