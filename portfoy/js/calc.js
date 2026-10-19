@@ -205,3 +205,43 @@ export function cpiDaily(monthly, end = todayISO()) {
   for (let d = addDays(lastD, 1), v = lastV * dRate; d <= end; d = addDays(d, 1), v *= dRate) out.push([d, v]);
   return { points: out, estimatedAfter: lastD };
 }
+
+// Nakit çift sayımı: Diğer varlıklardaki bir "Nakit" değeri, o değerleme tarihinden sonraki 7 gün içinde yapılan
+// fon/hisse alımlarının toplam maliyetine (%0,5 içinde) eşitse, aynı para iki kez sayılıyor demektir.
+export function findCashDuplicates(others, funds, tol = 0.005) {
+  const out = [];
+  const cashIds = new Set((others?.assets || []).filter((a) => a.cat === 'Nakit').map((a) => a.id));
+  for (const v of others?.vals || []) {
+    let cost = 0;
+    for (const f of funds || []) {
+      if (f.pb && f.pb !== 'TRY') continue;
+      for (const t of f.txs || []) {
+        if (t.type !== 'sell' && t.date >= v.date && daysBetween(v.date, t.date) <= 7) cost += t.qty * t.price + (Number(t.fee) || 0);
+      }
+    }
+    if (!(cost > 0)) continue;
+    for (const id of cashIds) {
+      const x = Number(v.values?.[id]);
+      if (x > 0 && Math.abs(x - cost) / cost <= tol) out.push({ date: v.date, assetId: id, value: x, cost });
+    }
+  }
+  return out;
+}
+
+// Tekrarı kaldırır: yalnızca çakışan değerlemedeki nakit değeri silinir; başka tarihte kullanılmayan nakit kalemi de kalkar
+export function removeCashDuplicates(others, dups) {
+  for (const d of dups) {
+    const v = others.vals.find((x) => x.date === d.date);
+    if (v) delete v.values[d.assetId];
+  }
+  const used = new Set(others.vals.flatMap((v) => Object.keys(v.values || {})));
+  others.assets = others.assets.filter((a) => a.cat !== 'Nakit' || used.has(a.id));
+  return others;
+}
+
+// Hafta sonunu atlayarak sonraki iş günü (resmi tatiller hariç)
+export function nextBusinessDay(iso) {
+  let d = addDays(iso, 1);
+  while ([0, 6].includes(new Date(d + 'T00:00:00Z').getUTCDay())) d = addDays(d, 1);
+  return d;
+}

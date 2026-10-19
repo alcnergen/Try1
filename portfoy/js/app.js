@@ -4,7 +4,7 @@ import * as track from './track.js';
 import { loadMarket, loadOne, series, benchSeries, BENCHES } from './data.js';
 import {
   todayISO, addDays, daysBetween, valueAt, valueAtOrFirst, sortTx, fundState, portfolioHistory,
-  replicate, periodReturn, periodStart, annualize, dailyRate, projectScenario, monthsToTarget, combine, cpiDaily,
+  replicate, periodReturn, periodStart, annualize, dailyRate, projectScenario, monthsToTarget, combine, cpiDaily, findCashDuplicates, removeCashDuplicates, nextBusinessDay,
 } from './calc.js';
 import { lineChart, legend } from './chart.js';
 
@@ -84,8 +84,34 @@ function toTRY(f, fx) {
   };
 }
 
+// Fiyatı henüz açıklanmamış işlemler (ör. 16:00 sonrası talimat): fiyat gelince gerçek fiyatla güncellenir
+function resolvePendingPrices() {
+  const done = [];
+  for (const f of S.funds) for (const t of f.txs || []) {
+    if (!t.autoPrice) continue;
+    const exact = series(M, S.manual, f.code).find((p) => p[0] === t.date);
+    if (exact) { t.price = exact[1]; delete t.autoPrice; done.push(`${f.code} ${dTR(t.date)}`); }
+  }
+  if (done.length) { store.save(S); setTimeout(() => toast(`İşlem fiyatı açıklandı ve güncellendi: ${done.join(', ')}`, 6000), 300); }
+}
+
+// Tek seferlik veri düzeltmeleri (yedekten geri yüklenen eski veriye de uygulanır)
+function runMigrations() {
+  S.migrations ||= {};
+  if (!S.migrations.nakitDedupe) {
+    const dups = findCashDuplicates(S.others, S.funds);
+    if (dups.length) {
+      removeCashDuplicates(S.others, dups);
+      setTimeout(() => toast(`Fonlara geçen nakit (${dups.map((d) => money(d.value, 'TRY', 0) + ', ' + dTR(d.date)).join('; ')}) Diğer varlıklardan kaldırıldı; artık iki kez sayılmıyor.`, 8000), 500);
+    }
+    S.migrations.nakitDedupe = true;
+    persist();
+  }
+}
+
 function compute() {
   const today = todayISO();
+  resolvePendingPrices();
   const usd = series(M, S.manual, 'USDTRY');
   const fx = { USD: usd, EUR: series(M, S.manual, 'EURTRY'), JPY: series(M, S.manual, 'JPYTRY') };
   const funds = S.funds.map((f) => toTRY(f, fx));
@@ -314,7 +340,7 @@ function wealthCard(ccy) {
     <div class="sub muted">Yatırımlar ${money(inv / k, ccy, 0)} (canlı) + diğer varlıklar ${money((total - inv) / k, ccy, 0)} (${dTR(last.date)} değerlemesi)</div>
     <div class="stack" role="img" aria-label="Varlık dağılımı">${rows.map(([cat, col]) => `<span style="flex:${parts[cat]};background:${col}" title="${cat} %${num((parts[cat] / total) * 100, 1)}"></span>`).join('')}</div>
     <div class="dist">${rows.map(([cat, col]) => `<div class="dist-row"><span class="sw" style="background:${col}"></span><span>${cat}</span><b>${money(parts[cat] / k, ccy, 0)}</b><span class="muted">%${num((parts[cat] / total) * 100, 1)}</span></div>`).join('')}</div>
-    ${dup ? `<p class="small warn">⚠︎ Diğer varlıklardaki "Nakit" (${money(nakit, 'TRY', 0)}) fonlarının maliyetiyle neredeyse aynı. Aynı para iki kez sayılıyor olabilir; fonlara geçtiysen Diğer sekmesinden yeni bir değerleme açıp Nakit'i düzelt.</p>` : ''}
+    ${dup ? `<p class="small warn">⚠︎ Diğer varlıklardaki "Nakit" (${money(nakit, 'TRY', 0)}) fonlarının maliyetiyle neredeyse aynı. Aynı para iki kez sayılıyor olabilir; fonlara geçtiysen düzelt.</p><button class="btn small" onclick="window.__app.fixCash()">Çift sayımı düzelt</button>` : ''}
   </section>`;
 }
 
@@ -382,7 +408,7 @@ function fundDetail(code) {
   requestAnimationFrame(draw);
   dlg.querySelector('#fret').innerHTML = returnsTable([[code, pts], ...['USD', 'ALTIN', 'XU100', 'SPX'].map((id) => [benchName(id), C.benches[id]])], 'TRY');
   const txs = sortTx(f.txs || []).reverse();
-  dlg.querySelector('#ftx').innerHTML = txs.length ? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Tarih</th><th>İşlem</th><th>Adet</th><th>Fiyat</th><th>Tutar</th><th></th></tr></thead><tbody>${txs.map((t) => `<tr><td>${dTR(t.date)}</td><td>${t.type === 'sell' ? 'Satış' : 'Alış'}</td><td>${num(t.qty, 0)}</td><td>${fmtPrice(t.price, code)}</td><td>${(fc.ccy === 'TRY' ? '' : CCY_SIGN[fc.ccy] || '') + num(t.qty * t.price)}</td><td><button class="link" data-del="${t.id}" aria-label="İşlemi sil">Sil</button></td></tr>`).join('')}</tbody></table></div>` : '<p class="muted">İşlem yok</p>';
+  dlg.querySelector('#ftx').innerHTML = txs.length ? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Tarih</th><th>İşlem</th><th>Adet</th><th>Fiyat</th><th>Tutar</th><th></th></tr></thead><tbody>${txs.map((t) => `<tr><td>${dTR(t.date)}</td><td>${t.type === 'sell' ? 'Satış' : 'Alış'}</td><td>${num(t.qty, 0)}</td><td>${fmtPrice(t.price, code)}${t.autoPrice ? ' <span class="tag">tahmini</span>' : ''}</td><td>${(fc.ccy === 'TRY' ? '' : CCY_SIGN[fc.ccy] || '') + num(t.qty * t.price)}</td><td><button class="link" data-del="${t.id}" aria-label="İşlemi sil">Sil</button></td></tr>`).join('')}</tbody></table></div>` : '<p class="muted">İşlem yok</p>';
   dlg.querySelectorAll('[data-del]').forEach((b) => (b.onclick = () => {
     if (!confirm('Bu işlem silinsin mi?')) return;
     f.txs = f.txs.filter((t) => t.id !== b.dataset.del); persist(); dlg.close(); render(); fundDetail(code);
@@ -736,11 +762,14 @@ function addFund(code = '') {
   const body = h(`<form class="form" id="ff">
     <label>Fon ya da hisse kodu<input name="code" required autocapitalize="characters" value="${esc(code)}" placeholder="ör. TGT, THYAO, AAPL" ${code ? 'readonly' : ''}></label>
     <div class="seg full" role="group" aria-label="İşlem"><label><input type="radio" name="type" value="buy" checked> Alış</label><label><input type="radio" name="type" value="sell"> Satış</label></div>
-    <label>Tarih<input name="date" type="date" required value="${C.today}" max="${C.today}"></label>
+    <label>Talimat tarihi<input name="date" type="date" required value="${C.today}" max="${C.today}"></label>
+    <label class="check"><input type="checkbox" name="late"> Kesim saatinden sonra verildi (fon 16:00 sonrası → bir sonraki iş gününün fiyatı)</label>
+    <p class="small muted" id="pdate"></p>
     <label>Adet (pay)<input name="qty" inputmode="decimal" required></label>
     <label id="kindRow" hidden>Tür<select name="kind"><option value="fon">Fon (TEFAS)</option><option value="hisse">Hisse / ETF (borsa)</option></select></label>
     <label>Para birimi<select name="pb"><option value="TRY">TL</option><option value="USD">ABD doları</option><option value="EUR">Euro</option></select></label>
-    <label><span id="plbl">Birim fiyat (TL)</span><input name="price" inputmode="decimal" required placeholder="ör. 0,124680"></label>
+    <label><span id="plbl">Birim fiyat (TL)</span><input name="price" inputmode="decimal" placeholder="ör. 0,124680"></label>
+    <label class="check" id="autoRow" hidden><input type="checkbox" name="auto" checked> Fiyat henüz açıklanmadı: açıklanınca otomatik güncelle</label>
     <label>Komisyon (aynı para biriminde, isteğe bağlı)<input name="fee" inputmode="decimal"></label>
     <p class="muted small" id="hint"></p>
     <button class="btn full" type="submit">Kaydet</button></form>`);
@@ -757,9 +786,13 @@ function addFund(code = '') {
     if (!hasData && !form.kind.dataset.touched) form.kind.value = guessKind(c, form.pb.value);
     if (known) { form.pb.value = known; form.pb.disabled = true; } else form.pb.disabled = false;
     dlg.querySelector('#plbl').textContent = `Birim fiyat (${form.pb.value === 'TRY' ? 'TL' : form.pb.value})`;
-    const p = pts?.length ? valueAt(pts, form.date.value) ?? pts[pts.length - 1][1] : M.tefasSon?.[c]?.[1];
+    const pd = priceDate();
+    dlg.querySelector('#pdate').textContent = pd !== form.date.value ? `İşlem ${dTR(pd)} tarihli fiyattan gerçekleşir.` : '';
+    const exact = pts.find((x) => x[0] === pd);
+    dlg.querySelector('#autoRow').hidden = !!exact || !c;
+    const p = exact ? exact[1] : pts?.length ? valueAt(pts, pd) ?? pts[pts.length - 1][1] : M.tefasSon?.[c]?.[1];
     const d = isListed(c) ? 2 : form.pb.value === 'TRY' ? 6 : 4;
-    hint.textContent = p ? `${fundName(c)} — ${form.date.value ? dTR(form.date.value) : ''} fiyatı: ${num(p, d)}` : c ? 'Bu kod henüz takipte değil. Kaydedince otomatik takibe alınır; geçmiş fiyatlar birkaç dakika içinde gelir. O zamana kadar alış fiyatını sen gir.' : '';
+    hint.textContent = p ? `${fundName(c)} — ${exact ? `${dTR(pd)} fiyatı` : `son bilinen fiyat (${dTR(pd)} fiyatı henüz yok)`}: ${num(p, d)}` : c ? 'Bu kod henüz takipte değil. Kaydedince otomatik takibe alınır; geçmiş fiyatlar birkaç dakika içinde gelir. O zamana kadar alış fiyatını sen gir.' : '';
     if (p && !form.price.value) form.price.value = num(p, d);
   };
   let timer;
@@ -767,19 +800,26 @@ function addFund(code = '') {
     clearTimeout(timer);
     timer = setTimeout(async () => { const c = form.code.value.trim().toUpperCase(); if (c.length >= 3) await loadOne(M, c); fill(); }, 300);
   };
+  const priceDate = () => (form.late.checked ? nextBusinessDay(form.date.value) : form.date.value);
   form.date.onchange = () => { form.price.value = ''; fill(); };
+  form.late.onchange = () => { form.price.value = ''; fill(); };
   form.pb.onchange = fill;
   form.kind.onchange = () => { form.kind.dataset.touched = '1'; };
   if (code) fill(); else form.code.oninput();
   form.onsubmit = (e) => {
     e.preventDefault();
     const c = form.code.value.trim().toUpperCase();
-    const qty = parseNum(form.qty.value), price = parseNum(form.price.value), fee = parseNum(form.fee.value) || 0;
-    if (!c || !(qty > 0) || !(price > 0)) return alert('Kod, adet ve fiyat gerekli');
+    const qty = parseNum(form.qty.value), fee = parseNum(form.fee.value) || 0;
+    let price = parseNum(form.price.value);
+    const pd = priceDate();
+    const exact = series(M, S.manual, c).find((x) => x[0] === pd);
+    const auto = !exact && !dlg.querySelector('#autoRow').hidden && form.auto.checked;
+    if (!(price > 0) && auto) price = valueAt(series(M, S.manual, c), pd) ?? NaN; // geçici tahmin
+    if (!c || !(qty > 0) || !(price > 0)) return alert(auto ? 'Bu kod için henüz hiç fiyat yok; geçici bir fiyat gir, açıklanınca güncellenir.' : 'Kod, adet ve fiyat gerekli');
     let f = S.funds.find((x) => x.code === c);
     if (!f) { f = { code: c, txs: [] }; S.funds.push(f); }
     if (!M.meta?.[c]?.pb && form.pb.value !== 'TRY') f.pb = form.pb.value;
-    f.txs.push({ id: store.uid(), date: form.date.value, type: form.type.value, qty, price, fee });
+    f.txs.push({ id: store.uid(), date: pd, type: form.type.value, qty, price, fee, ...(auto ? { autoPrice: true } : {}), ...(pd !== form.date.value ? { order: form.date.value } : {}) });
     persist(); dlg.close(); render();
     if (!M.raw[c]?.length || !M.meta?.[c]) startTracking(c, form.kind.value);
   };
@@ -1035,6 +1075,7 @@ function importFile() {
 // ---------- Başlatma ----------
 async function refresh() {
   $('#status').textContent = 'Güncelleniyor…';
+  runMigrations();
   M = await loadMarket(S.funds.map((f) => f.code));
   for (const f of S.funds) if (!f.name && M.names[f.code] && M.names[f.code] !== f.code) f.name = M.names[f.code];
   persist();
@@ -1056,7 +1097,13 @@ function importFromHash() {
   tab = 'ozet';
 }
 
-window.__app = { addFund, importFile, backupRestore };
+function fixCash() {
+  const dups = findCashDuplicates(S.others, S.funds, 0.05);
+  if (!dups.length) return toast('Kaldırılacak bir çift sayım bulunamadı');
+  if (!confirm(`${dups.map((d) => `${dTR(d.date)} değerlemesindeki nakit (${money(d.value, 'TRY', 0)})`).join(', ')} fonlarla aynı para olduğu için kaldırılsın mı? Diğer tarihlerdeki değerler değişmez.`)) return;
+  removeCashDuplicates(S.others, dups); persist(); render();
+}
+window.__app = { addFund, importFile, backupRestore, fixCash };
 
 export async function init() {
   importFromHash();

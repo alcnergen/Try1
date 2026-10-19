@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { valueAt, positionAt, fundState, portfolioHistory, replicate, periodReturn, projectScenario, monthsToTarget, combine, cpiDaily } from '../js/calc.js';
+import { valueAt, positionAt, fundState, portfolioHistory, replicate, periodReturn, projectScenario, monthsToTarget, combine, cpiDaily, findCashDuplicates, removeCashDuplicates, nextBusinessDay } from '../js/calc.js';
 import { addToConfig, isTracked, repoInfo } from '../js/track.js';
 import { depositSeries } from '../js/data.js';
 import { parseTefas, parseTvMessage, tvDate, parseCanli, mergePoints, pickTvSymbol, assetEntry } from '../scripts/veri-cek.mjs';
@@ -132,4 +132,34 @@ test('mevduat: TCMB faizi stopaj sonrası günlük işler, değişen faizi izler
   const m = depositSeries([], { auto: true, manualRate: 0.4 }, end);
   assert.equal(m.auto, false);
   close(m.points[1][1] / m.points[0][1], 1 + 0.4 / 365);
+});
+
+test('nakit çift sayımı bulunur ve yalnızca o değerlemeden kaldırılır', () => {
+  const others = {
+    assets: [{ id: 'ev', name: 'Ev', cat: 'Gayrimenkul' }, { id: 'nakit', name: 'Nakit', cat: 'Nakit' }],
+    vals: [
+      { date: '2026-06-30', values: { ev: 100 } },
+      { date: '2026-10-02', values: { ev: 100, nakit: 5253066.1 } },
+    ],
+  };
+  const funds = [
+    { code: 'A', txs: [{ date: '2026-10-02', type: 'buy', qty: 134000, price: 1.89566597014925 }] },
+    { code: 'B', txs: [{ date: '2026-10-02', type: 'buy', qty: 90000, price: 4.599854 }] },
+    { code: 'C', txs: [{ date: '2026-10-02', type: 'buy', qty: 36774600, price: 0.124680078097382 }] },
+  ];
+  const d = findCashDuplicates(others, funds);
+  assert.equal(d.length, 1);
+  assert.equal(d[0].date, '2026-10-02');
+  removeCashDuplicates(others, d);
+  assert.deepEqual(others.vals[1].values, { ev: 100 });
+  assert.deepEqual(others.vals[0].values, { ev: 100 });
+  assert.deepEqual(others.assets.map((a) => a.id), ['ev']);
+  // farklı tutardaki nakit dokunulmaz
+  const o2 = { assets: [{ id: 'n', cat: 'Nakit' }], vals: [{ date: '2026-10-02', values: { n: 1000000 } }] };
+  assert.equal(findCashDuplicates(o2, funds).length, 0);
+});
+
+test('sonraki iş günü hafta sonunu atlar', () => {
+  assert.equal(nextBusinessDay('2026-10-16'), '2026-10-19');
+  assert.equal(nextBusinessDay('2026-10-19'), '2026-10-20');
 });
