@@ -1,5 +1,5 @@
 // Uygulama dosyaları önbellekten (çevrimdışı açılır); veri dosyaları önce ağdan, olmazsa önbellekten.
-const VER = 'portfoy-v8';
+const VER = 'portfoy-v9';
 const SHELL = ['./', 'index.html', 'app.css', 'js/app.js', 'js/calc.js', 'js/data.js', 'js/store.js', 'js/chart.js', 'js/backup.js', 'js/track.js', 'manifest.webmanifest', 'icons/icon.svg', 'icons/icon-180.png'];
 
 self.addEventListener('install', (e) => {
@@ -13,7 +13,8 @@ self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET' || url.origin !== location.origin) return;
   // Her şey önce ağdan: veri günceldir, uygulama güncellemesi hemen gelir; çevrimdışıysa önbellek
   e.respondWith(
-    fetch(e.request).then((res) => {
+    // cache: 'no-cache' → tarayıcının HTTP önbelleği atlanır, yeni sürüm hemen gelir
+    fetch(e.request, { cache: 'no-cache' }).then((res) => {
       if (res.ok) { const copy = res.clone(); caches.open(VER).then((c) => c.put(e.request, copy)); }
       return res;
     }).catch(() => caches.match(e.request, { ignoreSearch: true }).then((r) => r || caches.match('index.html')))
