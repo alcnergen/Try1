@@ -1,5 +1,5 @@
 {
- "guncelleme": "2026-10-19T18:35:23.198Z",
+ "guncelleme": "2026-10-19T18:42:16.611Z",
  "seriler": {
   "TGT": {
    "ad": "GARANTİ PORTFÖY KISA VADELİ BORÇLANMA ARAÇLARI FONU",
@@ -38,7 +38,7 @@
    "kaynak": "tv:FX_IDC:USDTRY",
    "ilk": "2010-01-04",
    "son": "2026-10-19",
-   "deger": 49.5469,
+   "deger": 49.5482,
    "adet": 4381
   },
   "EURTRY": {
@@ -48,7 +48,7 @@
    "kaynak": "tv:FX_IDC:EURTRY",
    "ilk": "2010-01-04",
    "son": "2026-10-19",
-   "deger": 55.5722,
+   "deger": 55.58257,
    "adet": 4381
   },
   "JPYTRY": {
@@ -58,7 +58,7 @@
    "kaynak": "tv:FX_IDC:JPYTRY",
    "ilk": "2009-12-31",
    "son": "2026-10-19",
-   "deger": 0.312577,
+   "deger": 0.312555,
    "adet": 4381
   },
   "GOLD": {
@@ -68,7 +68,7 @@
    "kaynak": "tv:TVC:GOLD",
    "ilk": "2009-05-27",
    "son": "2026-10-19",
-   "deger": 4143.869,
+   "deger": 4145.725,
    "adet": 4381
   },
   "XU100": {
@@ -88,7 +88,7 @@
    "kaynak": "tv:SP:SPX",
    "ilk": "2016-07-01",
    "son": "2026-10-19",
-   "deger": 7699.91,
+   "deger": 7697.47,
    "adet": 2589
   },
   "NDX": {
@@ -98,7 +98,7 @@
    "kaynak": "tv:NASDAQ:NDX",
    "ilk": "2009-05-20",
    "son": "2026-10-19",
-   "deger": 29576.7618,
+   "deger": 29531.0733,
    "adet": 4381
   },
   "DAX": {
@@ -128,7 +128,7 @@
    "kaynak": "tv:AMEX:URTH",
    "ilk": "2012-01-12",
    "son": "2026-10-19",
-   "deger": 206.76,
+   "deger": 206.94,
    "adet": 3516
   },
   "TUFE": {
