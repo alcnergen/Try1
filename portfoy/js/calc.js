@@ -245,3 +245,24 @@ export function nextBusinessDay(iso) {
   while ([0, 6].includes(new Date(d + 'T00:00:00Z').getUTCDay())) d = addDays(d, 1);
   return d;
 }
+
+// Değerleme yaması: belirli bir tarihteki diğer varlık değerlerini ada göre yazar (eksik kalem oluşturulur).
+// patch = { tarih, usd?, kalemler: [{ ad, tur, deger }], sonrakilere?: true }
+export function applyValuationPatch(others, patch, newId) {
+  const norm = (s) => String(s || '').trim().toLocaleLowerCase('tr-TR');
+  const byName = new Map(others.assets.map((a) => [norm(a.name), a]));
+  const values = {};
+  for (const k of patch.kalemler || []) {
+    let a = byName.get(norm(k.ad));
+    if (!a) { a = { id: newId(), name: k.ad, cat: k.tur || 'Diğer' }; others.assets.push(a); byName.set(norm(k.ad), a); }
+    else if (k.tur) a.cat = k.tur;
+    values[a.id] = Number(k.deger);
+  }
+  let v = others.vals.find((x) => x.date === patch.tarih);
+  if (!v) { v = { date: patch.tarih, usd: patch.usd ?? null, values: {} }; others.vals.push(v); }
+  if (patch.usd) v.usd = patch.usd;
+  v.values = values; // o tarihin değerleri yamadakilerle birebir aynı olur
+  if (patch.sonrakilere) for (const x of others.vals) if (x.date > patch.tarih) for (const [id, val] of Object.entries(values)) if (id in x.values) x.values[id] = val;
+  others.vals.sort((a, b) => a.date.localeCompare(b.date));
+  return others;
+}

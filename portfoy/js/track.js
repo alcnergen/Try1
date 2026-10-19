@@ -73,3 +73,15 @@ export async function track(token, code, kind) {
   }
   throw new Error('Takip listesi güncellenemedi, biraz sonra tekrar dene');
 }
+
+// "Şimdi çek": küçük bir istek dosyası yazar; bu push veri iş akışını hemen çalıştırır
+export async function requestFetch(token) {
+  const { owner, repo } = repoInfo();
+  const path = 'portfoy/data/istek.json';
+  let sha;
+  try { sha = (await gh(token, `/repos/${owner}/${repo}/contents/${path}?ref=master`)).sha; } catch (e) { if (e.code !== 'perm') throw e; }
+  await gh(token, `/repos/${owner}/${repo}/contents/${path}`, {
+    method: 'PUT',
+    body: JSON.stringify({ message: 'Fiyat çekimi isteği', content: enc(JSON.stringify({ istek: new Date().toISOString() }) + '\n'), branch: 'master', ...(sha ? { sha } : {}) }),
+  });
+}

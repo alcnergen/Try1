@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { valueAt, positionAt, fundState, portfolioHistory, replicate, periodReturn, projectScenario, monthsToTarget, combine, cpiDaily, findCashDuplicates, removeCashDuplicates, nextBusinessDay } from '../js/calc.js';
+import { valueAt, positionAt, fundState, portfolioHistory, replicate, periodReturn, projectScenario, monthsToTarget, combine, cpiDaily, findCashDuplicates, removeCashDuplicates, nextBusinessDay, applyValuationPatch } from '../js/calc.js';
 import { addToConfig, isTracked, repoInfo } from '../js/track.js';
 import { depositSeries } from '../js/data.js';
 import { parseTefas, parseTvMessage, tvDate, parseCanli, mergePoints, pickTvSymbol, assetEntry } from '../scripts/veri-cek.mjs';
@@ -162,4 +162,18 @@ test('nakit çift sayımı bulunur ve yalnızca o değerlemeden kaldırılır', 
 test('sonraki iş günü hafta sonunu atlar', () => {
   assert.equal(nextBusinessDay('2026-10-16'), '2026-10-19');
   assert.equal(nextBusinessDay('2026-10-19'), '2026-10-20');
+});
+
+test('değerleme yaması ada göre yazar, eksik kalemi oluşturur, diğer tarihlere dokunmaz', () => {
+  const others = {
+    assets: [{ id: 'g', name: 'Göztepe Ev', cat: 'Gayrimenkul' }, { id: 'b', name: 'Bademli Arsa', cat: 'Arsa' }, { id: 'o', name: 'Opel Corsa', cat: 'Araç' }],
+    vals: [{ date: '2026-06-30', usd: 48.24, values: { g: 23000000, b: 500000, o: 400000 } }],
+  };
+  let n = 0;
+  applyValuationPatch(others, { tarih: '2026-10-02', usd: 49.15, kalemler: [
+    { ad: 'göztepe ev', deger: 23000000 }, { ad: 'Bademli Arsa', tur: 'Arsa', deger: 600000 }, { ad: 'Volvo Ex30', tur: 'Araç', deger: 2500000 },
+  ] }, () => 'yeni' + n++);
+  assert.deepEqual(others.vals[0].values, { g: 23000000, b: 500000, o: 400000 });
+  assert.deepEqual(others.vals[1], { date: '2026-10-02', usd: 49.15, values: { g: 23000000, b: 600000, yeni0: 2500000 } });
+  assert.equal(others.assets.find((a) => a.id === 'yeni0').cat, 'Araç');
 });

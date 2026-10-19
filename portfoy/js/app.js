@@ -4,7 +4,7 @@ import * as track from './track.js';
 import { loadMarket, loadOne, series, benchSeries, BENCHES } from './data.js';
 import {
   todayISO, addDays, daysBetween, valueAt, valueAtOrFirst, sortTx, fundState, portfolioHistory,
-  replicate, periodReturn, periodStart, annualize, dailyRate, projectScenario, monthsToTarget, combine, cpiDaily, findCashDuplicates, removeCashDuplicates, nextBusinessDay,
+  replicate, periodReturn, periodStart, annualize, dailyRate, projectScenario, monthsToTarget, combine, cpiDaily, findCashDuplicates, removeCashDuplicates, nextBusinessDay, applyValuationPatch,
 } from './calc.js';
 import { lineChart, legend } from './chart.js';
 
@@ -721,7 +721,8 @@ function assetEdit(asset, val) {
   const body = h(`<form class="form" id="af">
     <label>Ad<input name="name" required value="${esc(a.name)}"></label>
     <label>Tür<select name="cat">${CATS.map((c) => `<option ${c === a.cat ? 'selected' : ''}>${c}</option>`).join('')}</select></label>
-    ${val ? `<label>${dTR(val.date)} değeri (₺)<input name="value" inputmode="decimal" value="${val.values[a.id] != null ? num(val.values[a.id], 2) : ''}" placeholder="Boş bırakılırsa bu tarihte yok sayılır"></label>` : '<p class="muted small">Önce bir değerleme tarihi oluştur, sonra değer gir.</p>'}
+    ${val ? `<label>${dTR(val.date)} değeri (₺)<input name="value" inputmode="decimal" value="${val.values[a.id] != null ? num(val.values[a.id], 2) : ''}" placeholder="Boş bırakılırsa bu tarihte yok sayılır"></label>
+    ${S.others.vals.some((x) => x.date > val.date) ? '<label class="check"><input type="checkbox" name="later" checked> Sonraki değerlemelere de uygula</label>' : ''}` : '<p class="muted small">Önce bir değerleme tarihi oluştur, sonra değer gir.</p>'}
     <div class="row gap"><button class="btn" type="submit">Kaydet</button>${isNew ? '' : '<button class="btn ghost danger" type="button" id="adel">Varlığı sil</button>'}</div></form>`);
   const dlg = sheet(isNew ? 'Varlık ekle' : a.name, body);
   dlg.querySelector('#af').onsubmit = (e) => {
@@ -732,6 +733,7 @@ function assetEdit(asset, val) {
     if (val) {
       const n = parseNum(fd.get('value'));
       if (Number.isFinite(n)) val.values[a.id] = n; else delete val.values[a.id];
+      if (fd.get('later') === 'on') for (const x of S.others.vals) if (x.date > val.date && a.id in x.values) { if (Number.isFinite(n)) x.values[a.id] = n; else delete x.values[a.id]; }
     }
     persist(); dlg.close(); render();
   };
@@ -939,6 +941,7 @@ function settings() {
       return `<tr><td>${esc(id)}${idx[id]?.hata ? ' <span class="warn" title="' + esc(idx[id].hata) + '">⚠︎</span>' : ''}</td><td>${l ? dTR(l[0]) : '—'}</td><td>${l ? num(l[1], 4) : '—'}</td><td><button type="button" class="link" data-m="${esc(id)}">Elle gir</button></td></tr>`;
     }).join('')}</tbody></table></div>
     <p class="muted small">Fiyatlar GitHub Actions ile her iş günü akşam ve sabah çekilir. Yeni bir fon kodunu otomatik takibe almak için <a href="${repoEdit}" target="_blank" rel="noopener">config.json</a> dosyasındaki "fonlar" listesine ekle. Hemen güncellemek için <a href="${runUrl}" target="_blank" rel="noopener">Actions → Run workflow</a>.</p>
+    <div class="row gap wrap"><button class="btn small ghost" type="button" id="fetchnow">Fiyatları şimdi çek</button></div>
     <h3>Otomatik takip</h3>
     <p class="small">${track.loadToken() ? 'Açık. Uygulamada eklediğin yeni fon ve hisseler GitHub\'daki takip listesine kendiliğinden yazılır.' : 'Kapalı. Yeni eklediğin kodların fiyatı otomatik gelmez.'}</p>
     <div class="row gap wrap"><button class="btn small ${track.loadToken() ? 'ghost' : ''}" type="button" id="trset">${track.loadToken() ? 'Anahtarı değiştir' : 'Otomatik takibi aç'}</button>${track.loadToken() ? '<button class="btn small ghost danger" type="button" id="troff">Kapat</button>' : ''}</div>
@@ -962,6 +965,7 @@ function settings() {
   dlg.querySelector('#exp').onclick = exportFile;
   const on = (id, fn) => { const el = dlg.querySelector(id); if (el) el.onclick = fn; };
   on('#bkset', () => { dlg.close(); backupSetup(); });
+  on('#fetchnow', () => { dlg.close(); maybeRequestFetch({ force: true }); });
   on('#trset', () => { dlg.close(); trackTokenSheet('Uygulamada yeni bir fon ya da hisse eklediğinde, kodu GitHub\'daki takip listesine kendisi yazar ve fiyatlar otomatik gelmeye başlar.', () => toast('Otomatik takip açık ✓')); });
   on('#troff', () => { if (confirm('Otomatik takip kapatılsın mı? (Takipteki kodlar listede kalır.)')) { track.saveToken(null); dlg.close(); } });
   on('#bkres', () => { dlg.close(); backupRestore(); });
@@ -982,7 +986,12 @@ function settings() {
     try { await navigator.clipboard.writeText(url); alert('Bağlantı kopyalandı. Diğer cihazında açınca portföy oraya aktarılır. Bağlantıyı kimseyle paylaşma.'); } catch { prompt('Bağlantıyı kopyala:', url); }
   };
   dlg.querySelector('#paste').onclick = () => {
-    const v = prompt('Aktarım bağlantısını buraya yapıştır');
+    const v = prompt('Aktarım ya da düzeltme bağlantısını buraya yapıştır');
+    const y = v && v.match(/#yama=([A-Za-z0-9_-]+)/);
+    if (y) {
+      try { if (applyPatchCode(y[1])) { dlg.close(); render(); toast('Değerleme güncellendi ✓'); } } catch { alert('Düzeltme bağlantısı okunamadı'); }
+      return;
+    }
     const m = v && v.match(/#veri=([A-Za-z0-9_-]+)/);
     if (!m) return v && alert('Geçerli bir aktarım bağlantısı değil');
     try { S = store.normalize({ ...store.decodeShare(m[1]), snapshots: S.snapshots }); persist(); dlg.close(); refresh(); }
@@ -1082,7 +1091,25 @@ async function refresh() {
   render();
 }
 
+// Değerleme yaması (#yama=…): yalnızca Diğer varlıklardaki bir tarihi düzeltir, başka hiçbir şeye dokunmaz
+function applyPatchCode(code) {
+  const p = store.decodeShare(code);
+  if (p?.tip !== 'degerleme' || !p.tarih || !Array.isArray(p.kalemler)) throw new Error('geçersiz');
+  const list = p.kalemler.map((k) => `• ${k.ad}: ${money(k.deger, 'TRY', 0)}`).join('\n');
+  if (!confirm(`${dTR(p.tarih)} değerlemesi şu kalemlerle güncellensin mi?\n\n${list}\n\nDiğer tarihler ve yatırımların değişmez.`)) return false;
+  applyValuationPatch(S.others, p, store.uid);
+  persist();
+  return true;
+}
+
 function importFromHash() {
+  const y = location.hash.match(/^#yama=(.+)$/);
+  if (y) {
+    try { if (applyPatchCode(y[1])) setTimeout(() => toast('Değerleme güncellendi ✓'), 600); } catch { alert('Düzeltme bağlantısı okunamadı'); }
+    history.replaceState(null, '', location.pathname + '#ozet');
+    tab = 'ozet';
+    return;
+  }
   const m = location.hash.match(/^#veri=(.+)$/);
   if (!m) return;
   try {
@@ -1097,6 +1124,31 @@ function importFromHash() {
   tab = 'ozet';
 }
 
+// Veri eskiyse (ör. banka yarının fiyatını açıkladı ama uygulamada yok) GitHub'da veri çekimini hemen başlatır
+let fetchWatch = null;
+async function maybeRequestFetch({ force = false } = {}) {
+  const token = track.loadToken();
+  const upd = M.index?.guncelleme ? Date.parse(M.index.guncelleme) : 0;
+  if (!token) { if (force) toast('Şimdi çekmek için Ayarlar → Otomatik takip anahtarı gerekli'); return; }
+  if (!force && Date.now() - upd < 30 * 60e3) return;
+  let last = 0; try { last = Number(localStorage.getItem('portfoy.istek')) || 0; } catch { /* yok */ }
+  if (Date.now() - last < 10 * 60e3) { toast('Fiyat çekimi zaten istendi; birkaç dakika içinde gelir.'); return; }
+  try {
+    await track.requestFetch(token);
+    try { localStorage.setItem('portfoy.istek', String(Date.now())); } catch { /* yok */ }
+    toast('Güncel fiyatlar çekiliyor; 3-5 dakika içinde gelir.', 6000);
+    clearInterval(fetchWatch);
+    let n = 0;
+    fetchWatch = setInterval(async () => {
+      if (++n > 16) return clearInterval(fetchWatch);
+      try {
+        const idx = await (await fetch('data/index.json', { cache: 'no-cache' })).json();
+        if (Date.parse(idx.guncelleme) > upd) { clearInterval(fetchWatch); await refresh(); toast('Fiyatlar güncellendi ✓'); }
+      } catch { /* sonra tekrar */ }
+    }, 30000);
+  } catch (e) { toast('⚠︎ Fiyat çekimi başlatılamadı: ' + e.message, 7000); }
+}
+
 function fixCash() {
   const dups = findCashDuplicates(S.others, S.funds, 0.05);
   if (!dups.length) return toast('Kaldırılacak bir çift sayım bulunamadı');
@@ -1109,7 +1161,7 @@ export async function init() {
   importFromHash();
   document.querySelectorAll('.tabbar button').forEach((b) => (b.onclick = () => setTab(b.dataset.tab)));
   $('#settings').onclick = settings;
-  $('#reload').onclick = refresh;
+  $('#reload').onclick = async () => { await refresh(); maybeRequestFetch(); };
   try { await navigator.storage?.persist?.(); } catch { /* yok */ }
   render();
   await refresh();
