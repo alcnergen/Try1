@@ -1,5 +1,5 @@
 {
- "guncelleme": "2026-10-19T10:51:26.353Z",
+ "guncelleme": "2026-10-19T16:30:35.038Z",
  "seriler": {
   "TGT": {
    "ad": "GARANTİ PORTFÖY KISA VADELİ BORÇLANMA ARAÇLARI FONU",
@@ -9,7 +9,8 @@
    "ilk": "2021-10-18",
    "son": "2026-10-19",
    "deger": 0.126811,
-   "adet": 1259
+   "adet": 1259,
+   "hata": "tefas:TGT → fetch failed"
   },
   "YFBL1": {
    "ad": "YAPI KREDİ PORTFÖY PARA PİYASASI FONU",
@@ -29,7 +30,8 @@
    "ilk": "2022-07-04",
    "son": "2026-10-19",
    "deger": 4.675786,
-   "adet": 1079
+   "adet": 1079,
+   "hata": "tefas:YVD → fetch failed"
   },
   "USDTRY": {
    "ad": "Dolar/TL",
@@ -38,7 +40,7 @@
    "kaynak": "tv:FX_IDC:USDTRY",
    "ilk": "2010-01-04",
    "son": "2026-10-19",
-   "deger": 49.5489,
+   "deger": 49.54748,
    "adet": 4381
   },
   "EURTRY": {
@@ -48,7 +50,7 @@
    "kaynak": "tv:FX_IDC:EURTRY",
    "ilk": "2010-01-04",
    "son": "2026-10-19",
-   "deger": 55.58521,
+   "deger": 55.57078,
    "adet": 4381
   },
   "JPYTRY": {
@@ -58,7 +60,7 @@
    "kaynak": "tv:FX_IDC:JPYTRY",
    "ilk": "2009-12-31",
    "son": "2026-10-19",
-   "deger": 0.313202,
+   "deger": 0.312583,
    "adet": 4381
   },
   "GOLD": {
@@ -68,7 +70,7 @@
    "kaynak": "tv:TVC:GOLD",
    "ilk": "2009-05-27",
    "son": "2026-10-19",
-   "deger": 4165.51,
+   "deger": 4141.936,
    "adet": 4381
   },
   "XU100": {
@@ -78,7 +80,7 @@
    "kaynak": "tv:BIST:XU100",
    "ilk": "2009-05-06",
    "son": "2026-10-19",
-   "deger": 11600.39,
+   "deger": 11430.14,
    "adet": 4381
   },
   "SPX": {
@@ -87,9 +89,9 @@
    "pb": "TRY",
    "kaynak": "tv:SP:SPX",
    "ilk": "2016-07-01",
-   "son": "2026-10-16",
-   "deger": 7659.44,
-   "adet": 2588
+   "son": "2026-10-19",
+   "deger": 7708.27,
+   "adet": 2589
   },
   "NDX": {
    "ad": "Nasdaq 100",
@@ -97,9 +99,9 @@
    "pb": "TRY",
    "kaynak": "tv:NASDAQ:NDX",
    "ilk": "2009-05-20",
-   "son": "2026-10-16",
-   "deger": 29187.5487,
-   "adet": 4380
+   "son": "2026-10-19",
+   "deger": 29699.6012,
+   "adet": 4381
   },
   "DAX": {
    "ad": "DAX",
@@ -108,7 +110,7 @@
    "kaynak": "tv:XETR:DAX",
    "ilk": "2009-07-21",
    "son": "2026-10-19",
-   "deger": 25303.9,
+   "deger": 25319.77,
    "adet": 4381
   },
   "N225": {
@@ -127,9 +129,9 @@
    "pb": "TRY",
    "kaynak": "tv:AMEX:URTH",
    "ilk": "2012-01-12",
-   "son": "2026-10-16",
-   "deger": 206.34,
-   "adet": 3515
+   "son": "2026-10-19",
+   "deger": 207,
+   "adet": 3516
   },
   "TUFE": {
    "ad": "TÜFE (aylık endeks)",
