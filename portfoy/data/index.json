@@ -1,5 +1,5 @@
 {
- "guncelleme": "2026-10-19T21:22:20.799Z",
+ "guncelleme": "2026-10-20T00:30:30.996Z",
  "seriler": {
   "TGT": {
    "ad": "GARANTİ PORTFÖY KISA VADELİ BORÇLANMA ARAÇLARI FONU",
@@ -37,9 +37,9 @@
    "pb": "TRY",
    "kaynak": "tv:FX_IDC:USDTRY",
    "ilk": "2010-01-04",
-   "son": "2026-10-19",
-   "deger": 49.5652,
-   "adet": 4381
+   "son": "2026-10-20",
+   "deger": 49.56287,
+   "adet": 4382
   },
   "EURTRY": {
    "ad": "Euro/TL",
@@ -47,9 +47,9 @@
    "pb": "TRY",
    "kaynak": "tv:FX_IDC:EURTRY",
    "ilk": "2010-01-04",
-   "son": "2026-10-19",
-   "deger": 55.57167,
-   "adet": 4381
+   "son": "2026-10-20",
+   "deger": 55.63271,
+   "adet": 4382
   },
   "JPYTRY": {
    "ad": "Yen/TL",
@@ -57,9 +57,9 @@
    "pb": "TRY",
    "kaynak": "tv:FX_IDC:JPYTRY",
    "ilk": "2009-12-31",
-   "son": "2026-10-19",
-   "deger": 0.312657,
-   "adet": 4381
+   "son": "2026-10-20",
+   "deger": 0.312683,
+   "adet": 4382
   },
   "GOLD": {
    "ad": "Altın (ons, $)",
@@ -67,9 +67,9 @@
    "pb": "TRY",
    "kaynak": "tv:TVC:GOLD",
    "ilk": "2009-05-27",
-   "son": "2026-10-19",
-   "deger": 4140.45,
-   "adet": 4381
+   "son": "2026-10-20",
+   "deger": 4135.25,
+   "adet": 4382
   },
   "XU100": {
    "ad": "BIST 100",
@@ -117,9 +117,9 @@
    "pb": "TRY",
    "kaynak": "tv:TVC:NI225",
    "ilk": "2008-11-12",
-   "son": "2026-10-19",
-   "deger": 64916.48,
-   "adet": 4381
+   "son": "2026-10-20",
+   "deger": 64338.67,
+   "adet": 4382
   },
   "MSCIW": {
    "ad": "MSCI Dünya (URTH)",
