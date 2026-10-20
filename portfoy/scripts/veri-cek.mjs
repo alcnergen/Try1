@@ -81,16 +81,20 @@ async function ykb(code) {
   return (await res.json())?.d?.Data?.FundList?.[0];
 }
 
-// Garanti BBVA Portföy: 1000'e endeksli günlük seri (tarihli) + son birim fiyat; TEFAS'taki son fiyata göre ölçeklenir
-export function garantiEarly(series, anchorDate, anchorPrice, latestUnit) {
-  const rows = (series || []).map(([t, v]) => [iso(new Date(t + 3 * 3600e3)), Number(v)]);
-  const a = rows.find((r) => r[0] === anchorDate);
-  if (!a) return [];
-  const later = rows.filter((r) => r[0] > anchorDate);
-  return later.map(([d, v], i) => {
-    const est = Math.round(((anchorPrice * v) / a[1]) * 1e6) / 1e6;
+// Garanti BBVA Portföy: 1000'e endeksli günlük seri + son birim fiyat. Seri fiyatı hesaplandığı günle tarihler
+// (TEFAS'ta ertesi iş günü); bu yüzden tarihler bir iş günü kaydırılır ve kayma TEFAS'taki son iki fiyatın
+// oranıyla doğrulanır. Tutmazsa (tatil vb.) hiçbir şey yazılmaz.
+export function garantiEarly(series, tefasPts, latestUnit) {
+  const rows = (series || []).map(([t, v]) => [nextBizDay(iso(new Date(t + 3 * 3600e3))), Number(v)]);
+  const [p0, p1] = tefasPts.slice(-2);
+  if (!p0 || !p1) return [];
+  const i = rows.findIndex((r) => r[0] === p1[0]);
+  if (i < 1 || rows[i - 1][0] !== p0[0] || Math.abs(rows[i][1] / rows[i - 1][1] / (p1[1] / p0[1]) - 1) > 2e-5) return [];
+  const later = rows.slice(i + 1);
+  return later.map(([d, v], k) => {
+    const est = Math.round(((p1[1] * v) / rows[i][1]) * 1e6) / 1e6;
     // son gün için sitenin verdiği kesin birim fiyat, endeksten hesaplanana yakınsa (aynı güne aitse) kullanılır
-    const exact = i === later.length - 1 && latestUnit > 0 && !same(latestUnit, anchorPrice) && Math.abs(latestUnit / est - 1) < 2e-4;
+    const exact = k === later.length - 1 && latestUnit > 0 && !same(latestUnit, p1[1]) && Math.abs(latestUnit / est - 1) < 2e-4;
     return [d, exact ? latestUnit : est];
   });
 }
@@ -107,9 +111,9 @@ async function earlyPrices(entry, s) {
   if (!last || !entry.erken) return [];
   if (entry.erken === 'ykb') return ykbEarly(await ykb(entry.ykbKod || entry.kod), last[0], last[1]);
   if (entry.erken === 'garanti') {
-    const from = iso(new Date(Date.parse(last[0]) - 7 * 864e5)), to = iso(new Date(Date.now() + 10 * 864e5));
+    const from = iso(new Date(Date.parse(last[0]) - 10 * 864e5)), to = iso(new Date(Date.now() + 10 * 864e5));
     const g = await garanti(entry.garantiKod || entry.tefas || entry.kod, from, to);
-    return garantiEarly(g.series, last[0], last[1], g.unit);
+    return garantiEarly(g.series, s.points, g.unit);
   }
   return [];
 }
