@@ -1,5 +1,5 @@
 {
- "guncelleme": "2026-10-20T00:30:30.996Z",
+ "guncelleme": "2026-10-20T10:08:26.070Z",
  "seriler": {
   "TGT": {
    "ad": "GARANTİ PORTFÖY KISA VADELİ BORÇLANMA ARAÇLARI FONU",
@@ -7,9 +7,9 @@
    "pb": "TRY",
    "kaynak": "tefas:TGT",
    "ilk": "2021-10-18",
-   "son": "2026-10-19",
-   "deger": 0.126811,
-   "adet": 1259
+   "son": "2026-10-20",
+   "deger": 0.126931,
+   "adet": 1260
   },
   "YFBL1": {
    "ad": "YAPI KREDİ PORTFÖY PARA PİYASASI FONU",
@@ -17,9 +17,9 @@
    "pb": "TRY",
    "kaynak": "tefas:YLB",
    "ilk": "2021-10-18",
-   "son": "2026-10-19",
-   "deger": 1.926975,
-   "adet": 1259
+   "son": "2026-10-20",
+   "deger": 1.928763,
+   "adet": 1260
   },
   "YFBL7": {
    "ad": "YAPI KREDİ PORTFÖY İKİNCİ PARA PİYASASI (TL) FONU",
@@ -27,9 +27,9 @@
    "pb": "TRY",
    "kaynak": "tefas:YVD",
    "ilk": "2022-07-04",
-   "son": "2026-10-19",
-   "deger": 4.675786,
-   "adet": 1079
+   "son": "2026-10-20",
+   "deger": 4.680003,
+   "adet": 1080
   },
   "USDTRY": {
    "ad": "Dolar/TL",
@@ -38,7 +38,7 @@
    "kaynak": "tv:FX_IDC:USDTRY",
    "ilk": "2010-01-04",
    "son": "2026-10-20",
-   "deger": 49.56287,
+   "deger": 49.5727,
    "adet": 4382
   },
   "EURTRY": {
@@ -48,7 +48,7 @@
    "kaynak": "tv:FX_IDC:EURTRY",
    "ilk": "2010-01-04",
    "son": "2026-10-20",
-   "deger": 55.63271,
+   "deger": 55.65087,
    "adet": 4382
   },
   "JPYTRY": {
@@ -58,7 +58,7 @@
    "kaynak": "tv:FX_IDC:JPYTRY",
    "ilk": "2009-12-31",
    "son": "2026-10-20",
-   "deger": 0.312683,
+   "deger": 0.313479,
    "adet": 4382
   },
   "GOLD": {
@@ -68,7 +68,7 @@
    "kaynak": "tv:TVC:GOLD",
    "ilk": "2009-05-27",
    "son": "2026-10-20",
-   "deger": 4135.25,
+   "deger": 4111.77,
    "adet": 4382
   },
   "XU100": {
@@ -77,9 +77,9 @@
    "pb": "TRY",
    "kaynak": "tv:BIST:XU100",
    "ilk": "2009-05-06",
-   "son": "2026-10-19",
-   "deger": 11430.14,
-   "adet": 4381
+   "son": "2026-10-20",
+   "deger": 11569.4,
+   "adet": 4382
   },
   "SPX": {
    "ad": "S&P 500",
@@ -107,9 +107,9 @@
    "pb": "TRY",
    "kaynak": "tv:XETR:DAX",
    "ilk": "2009-07-21",
-   "son": "2026-10-19",
-   "deger": 25319.77,
-   "adet": 4381
+   "son": "2026-10-20",
+   "deger": 25088.09,
+   "adet": 4382
   },
   "N225": {
    "ad": "Nikkei 225",
@@ -118,7 +118,7 @@
    "kaynak": "tv:TVC:NI225",
    "ilk": "2008-11-12",
    "son": "2026-10-20",
-   "deger": 64338.67,
+   "deger": 64075.35,
    "adet": 4382
   },
   "MSCIW": {
