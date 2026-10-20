@@ -1,5 +1,5 @@
 {
- "guncelleme": "2026-10-20T16:12:17.262Z",
+ "guncelleme": "2026-10-20T17:43:33.456Z",
  "seriler": {
   "TGT": {
    "ad": "GARANTİ PORTFÖY KISA VADELİ BORÇLANMA ARAÇLARI FONU",
@@ -15,22 +15,27 @@
    "ad": "YAPI KREDİ PORTFÖY PARA PİYASASI FONU",
    "tur": "fon",
    "pb": "TRY",
+   "erken": [
+    "2026-10-21"
+   ],
    "kaynak": "tefas:YLB",
    "ilk": "2021-10-18",
-   "son": "2026-10-20",
-   "deger": 1.928763,
-   "adet": 1260
+   "son": "2026-10-21",
+   "deger": 1.930786,
+   "adet": 1261
   },
   "YFBL7": {
    "ad": "YAPI KREDİ PORTFÖY İKİNCİ PARA PİYASASI (TL) FONU",
    "tur": "fon",
    "pb": "TRY",
+   "erken": [
+    "2026-10-21"
+   ],
    "kaynak": "tefas:YVD",
    "ilk": "2022-07-04",
-   "son": "2026-10-20",
-   "deger": 4.680003,
-   "adet": 1080,
-   "hata": "tefas:YVD → fetch failed"
+   "son": "2026-10-21",
+   "deger": 4.685044,
+   "adet": 1081
   },
   "USDTRY": {
    "ad": "Dolar/TL",
@@ -39,7 +44,7 @@
    "kaynak": "tv:FX_IDC:USDTRY",
    "ilk": "2010-01-04",
    "son": "2026-10-20",
-   "deger": 49.5719,
+   "deger": 49.5687,
    "adet": 4382
   },
   "EURTRY": {
@@ -49,7 +54,7 @@
    "kaynak": "tv:FX_IDC:EURTRY",
    "ilk": "2010-01-04",
    "son": "2026-10-20",
-   "deger": 55.7024,
+   "deger": 55.71351,
    "adet": 4382
   },
   "JPYTRY": {
@@ -59,7 +64,7 @@
    "kaynak": "tv:FX_IDC:JPYTRY",
    "ilk": "2009-12-31",
    "son": "2026-10-20",
-   "deger": 0.313296,
+   "deger": 0.313425,
    "adet": 4382
   },
   "GOLD": {
@@ -69,7 +74,7 @@
    "kaynak": "tv:TVC:GOLD",
    "ilk": "2009-05-27",
    "son": "2026-10-20",
-   "deger": 4128.69,
+   "deger": 4123.28,
    "adet": 4382
   },
   "XU100": {
@@ -89,7 +94,7 @@
    "kaynak": "tv:SP:SPX",
    "ilk": "2016-07-01",
    "son": "2026-10-20",
-   "deger": 7719.01,
+   "deger": 7722.28,
    "adet": 2590
   },
   "NDX": {
@@ -99,7 +104,7 @@
    "kaynak": "tv:NASDAQ:NDX",
    "ilk": "2009-05-20",
    "son": "2026-10-20",
-   "deger": 29587.4287,
+   "deger": 29572.2556,
    "adet": 4382
   },
   "DAX": {
@@ -129,7 +134,7 @@
    "kaynak": "tv:AMEX:URTH",
    "ilk": "2012-01-12",
    "son": "2026-10-20",
-   "deger": 207.62,
+   "deger": 207.76,
    "adet": 3517
   },
   "TUFE": {
