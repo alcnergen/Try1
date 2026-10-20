@@ -8,7 +8,7 @@ import {
 } from './calc.js';
 import { lineChart, legend } from './chart.js';
 
-export const APP_VERSION = '2026.10.19-c';
+export const APP_VERSION = '2026.10.20-a';
 
 // ---------- Durum ----------
 let S = store.load();
@@ -119,21 +119,27 @@ function compute() {
   const funds = S.funds.map((f) => toTRY(f, fx));
   const pmap = Object.fromEntries(funds.map((f) => [f.code, f.pts]));
   const benches = benchSeries(M, S.manual, S.settings);
-  const hist = portfolioHistory(funds, pmap, usd, { taxRate: S.settings.tax, end: today });
+  // Kurucular ertesi günün fiyatını 18:00'den sonra yayınlar; o fiyat geldiyse portföy o günün değeriyle gösterilir
+  const priceDates = funds.map((f) => f.native[f.native.length - 1]?.[0]).filter(Boolean).sort();
+  const latest = priceDates[priceDates.length - 1];
+  const end = latest > today ? latest : today;
+  const hist = portfolioHistory(funds, pmap, usd, { taxRate: S.settings.tax, end });
   const last = hist[hist.length - 1] || null;
   // Bir önceki "fiyat günü" (bugünün satırı yalnızca son fiyatın tekrarıysa onu atla)
   let prev = null;
   if (last) for (let i = hist.length - 2; i >= 0; i--) if (Math.abs(hist[i].value - last.value) > 1e-6 || i === 0) { prev = hist[i]; break; }
-  const states = funds.map((f) => ({ f, s: fundState(f, pmap[f.code], today, S.settings.tax), pts: pmap[f.code] }));
-  // Kıyas tarihi: yatırımların en son fiyatlandığı gün (hafta sonu mevduat/enflasyon "fazladan" işlemesin)
-  const priceDates = funds.map((f) => f.native[f.native.length - 1]?.[0]).filter(Boolean).sort();
-  const asOf = priceDates.length ? (priceDates[priceDates.length - 1] < today ? priceDates[priceDates.length - 1] : today) : today;
-  C = { today, asOf, funds, pmap, usd, benches, hist, last, prev, states, usdNow: valueAt(usd, today), cpiEst: cpiDaily(series(M, S.manual, 'TUFE')).estimatedAfter };
+  const states = funds.map((f) => ({ f, s: fundState(f, pmap[f.code], end, S.settings.tax), pts: pmap[f.code] }));
+  // Kıyas tarihi: yatırımların en son fiyatlandığı gün, en geç bugün (hafta sonu mevduat/enflasyon "fazladan" işlemesin)
+  const asOf = latest && latest < today ? latest : today;
+  const early = new Set(funds.flatMap((f) => M.meta?.[f.code]?.erken || []));
+  C = { today, asOf, ahead: end > today ? end : null, early, funds, pmap, usd, benches, hist, last, prev, states, usdNow: valueAt(usd, today), cpiEst: cpiDaily(series(M, S.manual, 'TUFE')).estimatedAfter };
 
   // Günlük kayıt: her açılışta bugünün özetini sakla
-  if (last && last.value > 0) {
+  const rowToday = [...hist].reverse().find((r) => r.date <= today);
+  if (rowToday && rowToday.value > 0) {
     const prices = {};
-    for (const { f, s } of states) prices[f.code] = s.price;
+    for (const { f, pts } of states) prices[f.code] = valueAt(pts, today);
+    const last = rowToday;
     S.snapshots[today] = { value: last.value, cost: last.cost, gross: last.gross, net: last.net, usd: last.usd, prices };
     persist();
   }
@@ -223,6 +229,7 @@ function ozet(root) {
     <div class="row between"><span class="label">Portföy değeri</span>
       <div class="seg" role="group" aria-label="Para birimi"><button data-ccy="TRY" class="${ccy === 'TRY' ? 'on' : ''}">₺</button><button data-ccy="USD" class="${ccy === 'USD' ? 'on' : ''}">$</button></div></div>
     <div class="big">${money(val, ccy)}</div>
+    ${C.ahead ? `<div class="tag">${dTR(C.ahead).slice(0, 5)} fiyatlarıyla · erken, kurucu sitesinden</div>` : ''}
     <div class="muted small">Stopaj sonrası: ${ccy === 'USD' ? money((L.cost + L.net) / (L.usd || 1), 'USD') : money(L.cost + L.net)}</div>
     <div class="sub ${cls(dayChg)}">${arrow(dayChg)} ${signMoney(dayChg, 'TRY')} (${pct(dayPct)}) <span class="muted">${P ? 'son fiyat gününe göre' : ''}</span></div>
     <div class="kpis">
@@ -408,7 +415,7 @@ function fundDetail(code) {
   const body = h(`
     <div class="name">${esc(fundName(code))}</div>
     <div class="kpis">
-      <div><span class="label">Fiyat</span><b>${fmtPrice(nat?.[1], code)}</b><span class="muted small">${nat ? dTR(nat[0]) : 'veri yok'}${fc.ccy !== 'TRY' ? ` · ₺${num(s.price, 2)}` : ''}</span></div>
+      <div><span class="label">Fiyat</span><b>${fmtPrice(nat?.[1], code)}</b><span class="muted small">${nat ? dTR(nat[0]) + (M.meta?.[code]?.erken?.includes(nat[0]) ? ' · erken (kurucu)' : '') : 'veri yok'}${fc.ccy !== 'TRY' ? ` · ₺${num(s.price, 2)}` : ''}</span></div>
       <div><span class="label">Değer</span><b>${money(s.value)}</b><span class="muted small">${num(s.qty, 0)} adet</span></div>
       <div><span class="label">Maliyet</span><b>${money(s.cost)}</b><span class="muted small">ort. ₺${num(s.avg, isListed(code) ? 2 : 6)}</span></div>
       <div><span class="label">Brüt / Net kâr</span><b class="${cls(s.gross)}">${signMoney(s.gross)}</b><span class="${cls(s.net)} small">net ${signMoney(s.net)} · stopaj %${num(rate * 100, 1)}</span></div>

@@ -56,6 +56,64 @@ async function tefas(code, periyod) {
   return parseTefas(await res.json());
 }
 
+// ---------- Kurucu siteleri: ertesi günün fiyatı (TEFAS'tan saatler önce) ----------
+// Fon fiyatı her iş günü 18:00'de ertesi iş günü için belirlenir; kurucular hemen yayınlar, TEFAS gece/sabah.
+// Tarih saate göre tahmin edilmez: kurucunun verdiği fiyatlar TEFAS'taki son fiyatla eşleştirilerek bulunur.
+export const nextBizDay = (isoDate) => {
+  let d = new Date(isoDate + 'T00:00:00Z');
+  do d = new Date(d.getTime() + 864e5); while ([0, 6].includes(d.getUTCDay()));
+  return iso(d);
+};
+const same = (a, b) => Math.abs(Number(a) - Number(b)) < 5e-7;
+
+// Yapı Kredi: BankBuysPrice = bir önceki fiyat, BankSellsPrice = en yeni fiyat
+export function ykbEarly(fund, lastDate, lastPrice) {
+  const sells = Number(fund?.BankSellsPrice), buys = Number(fund?.BankBuysPrice);
+  if (!(sells > 0) || same(sells, lastPrice)) return []; // yeni bilgi yok
+  return same(buys, lastPrice) ? [[nextBizDay(lastDate), sells]] : []; // eşleşmiyorsa tarihi bilinemez, yazma
+}
+async function ykb(code) {
+  const res = await fetchRetry('https://www.yapikredi.com.tr/yatirimci-kosesi/fon-detay.aspx/FundRiskData', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json; charset=UTF-8', Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest', Origin: 'https://www.yapikredi.com.tr', Referer: `https://www.yapikredi.com.tr/yatirimci-kosesi/fon-bilgileri/${code}` },
+    body: JSON.stringify({ fundCode: code }),
+  });
+  return (await res.json())?.d?.Data?.FundList?.[0];
+}
+
+// Garanti BBVA Portföy: 1000'e endeksli günlük seri (tarihli) + son birim fiyat; TEFAS'taki son fiyata göre ölçeklenir
+export function garantiEarly(series, anchorDate, anchorPrice, latestUnit) {
+  const rows = (series || []).map(([t, v]) => [iso(new Date(t + 3 * 3600e3)), Number(v)]);
+  const a = rows.find((r) => r[0] === anchorDate);
+  if (!a) return [];
+  const later = rows.filter((r) => r[0] > anchorDate);
+  return later.map(([d, v], i) => {
+    const est = Math.round(((anchorPrice * v) / a[1]) * 1e6) / 1e6;
+    // son gün için sitenin verdiği kesin birim fiyat, endeksten hesaplanana yakınsa (aynı güne aitse) kullanılır
+    const exact = i === later.length - 1 && latestUnit > 0 && !same(latestUnit, anchorPrice) && Math.abs(latestUnit / est - 1) < 2e-4;
+    return [d, exact ? latestUnit : est];
+  });
+}
+async function garanti(code, from, to) {
+  const opt = (body) => ({ method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json', Origin: 'https://www.garantibbvaportfoy.com.tr', Referer: 'https://www.garantibbvaportfoy.com.tr/' }, body: JSON.stringify(body) });
+  const parse = async (r) => { const t = await r.json(); return typeof t === 'string' ? JSON.parse(t) : t; };
+  const ser = await parse(await fetchRetry('https://www.garantibbvaportfoy.com.tr/webservice/fundsinddailyds', opt({ lang: 'tr', code, firstDate: from, lastDate: to, rollBack: 'T', value: 1000 })));
+  const unit = await parse(await fetchRetry('https://www.garantibbvaportfoy.com.tr/webservice/fundgroupvalues', opt({ Code: code, Date: to, Rollback: 'T', lang: 'tr' })));
+  return { series: ser?.data?.[0]?.Data || [], unit: Number(unit?.data?.[0]?.detail?.UnitPrice) || 0 };
+}
+
+async function earlyPrices(entry, s) {
+  const last = s.points[s.points.length - 1];
+  if (!last || !entry.erken) return [];
+  if (entry.erken === 'ykb') return ykbEarly(await ykb(entry.ykbKod || entry.kod), last[0], last[1]);
+  if (entry.erken === 'garanti') {
+    const from = iso(new Date(Date.parse(last[0]) - 7 * 864e5)), to = iso(new Date(Date.now() + 10 * 864e5));
+    const g = await garanti(entry.garantiKod || entry.tefas || entry.kod, from, to);
+    return garantiEarly(g.series, last[0], last[1], g.unit);
+  }
+  return [];
+}
+
 // ---------- TradingView (WebSocket, günlük mumlar) ----------
 const tvPacket = (o) => { const s = JSON.stringify(o); return `~m~${s.length}~m~${s}`; };
 
@@ -185,6 +243,8 @@ async function fromTefas(code, tefasCode, prev) {
   const source = `tefas:${tefasCode}`;
   const full = !prev?.points?.length || prev.source !== source;
   const rows = await tefas(tefasCode, full ? 60 : 1);
+  const early = new Set(prev?.erken || []); // erken fiyatlar resmi seriye karışmaz; applyEarly yeniden ekler
+  if (prev) prev = { ...prev, points: prev.points.filter((p) => !early.has(p[0])) };
   if (!rows.length) throw new Error(`TEFAS'ta ${tefasCode} yok`);
   return { id: code, ad: rows[rows.length - 1].name || code, tur: 'fon', pb: 'TRY', source, points: mergePoints(full ? [] : prev.points, rows.map((r) => [r.date, r.price])) };
 }
@@ -197,6 +257,23 @@ async function fromTv(code, sym, prev, years) {
   // Borsada işlem gören fonlar (ETF) TradingView'da 'fund' türündedir; TEFAS fonlarından ayrı tutulur
   const tur = i.tip === 'fund' ? 'etf' : 'hisse';
   return { id: code, ad: i.ad || prev?.ad || code, tur, pb: i.pb || prev?.pb || 'TRY', borsa: i.borsa || sym.split(':')[0], source, points: mergePoints(full ? [] : prev.points, pts) };
+}
+
+// Kurucu sitesinden gelen erken fiyatlar seriye "erken" işaretiyle eklenir; TEFAS aynı günü yayınlayınca
+// resmi fiyat yerine geçer. TEFAS'ın atladığı bir gün (ör. tatil) için yazılmış erken fiyat silinir.
+async function applyEarly(entry, s, prev) {
+  const tefasDates = new Set(s.points.map((p) => p[0]));
+  const lastTefas = s.points[s.points.length - 1]?.[0];
+  // önceki erken fiyatlar: TEFAS onayladıysa ya da geçtiyse işaret kalkar
+  const stillEarly = (prev?.erken || []).filter((d) => d > lastTefas);
+  const oldPts = new Map(prev?.points || []);
+  for (const d of stillEarly) s.points.push([d, oldPts.get(d)]);
+  let fresh = [];
+  try { fresh = await earlyPrices(entry, { points: s.points.filter((p) => tefasDates.has(p[0])) }); } catch (e) { log(`${entry.kod}: erken fiyat alınamadı: ${e.message}`); }
+  for (const [d, v] of fresh) if (d > lastTefas) { s.points = s.points.filter((p) => p[0] !== d); s.points.push([d, v]); }
+  s.points.sort((a, b) => a[0].localeCompare(b[0]));
+  s.erken = s.points.filter((p) => p[0] > lastTefas).map((p) => p[0]);
+  if (!s.erken.length) delete s.erken;
 }
 
 async function updateAsset(entry, years) {
@@ -226,9 +303,10 @@ async function updateAsset(entry, years) {
         if (!sym) throw new Error('TradingView aramasında bulunamadı');
         s = await fromTv(kod, sym, prev, years);
       }
+      if (kind === 'tefas') await applyEarly(entry, s, prev);
       await saveSeries(s);
       const last = s.points[s.points.length - 1];
-      log(`${kod}: ${s.source} (${s.tur}, ${s.pb}) ${s.points.length} satır, son ${last[0]} ${last[1]}`);
+      log(`${kod}: ${s.source} (${s.tur}, ${s.pb}) ${s.points.length} satır, son ${last[0]} ${last[1]}${s.erken?.length ? ` (erken: ${s.erken.join(', ')})` : ''}`);
       return s;
     } catch (e) { errs.push(`${kind}:${arg} → ${e.message}`); }
   }
@@ -270,7 +348,7 @@ async function main() {
   const index = { guncelleme: new Date().toISOString(), seriler: {} };
   const put = (s) => {
     const last = s.points?.[s.points.length - 1];
-    index.seriler[s.id] = { ad: s.ad, tur: s.tur, pb: s.pb || 'TRY', kaynak: s.source || null, ilk: s.points?.[0]?.[0] || null, son: last?.[0] || null, deger: last?.[1] ?? null, adet: s.points?.length || 0, ...(s.hata ? { hata: s.hata } : {}) };
+    index.seriler[s.id] = { ad: s.ad, tur: s.tur, pb: s.pb || 'TRY', ...(s.erken ? { erken: s.erken } : {}), kaynak: s.source || null, ilk: s.points?.[0]?.[0] || null, son: last?.[0] || null, deger: last?.[1] ?? null, adet: s.points?.length || 0, ...(s.hata ? { hata: s.hata } : {}) };
   };
   const assets = [...(cfg.fonlar || []).map((f) => assetEntry(f)), ...(cfg.hisseler || []).map((f) => assetEntry(f, 'hisse'))];
   for (const a of assets) {
