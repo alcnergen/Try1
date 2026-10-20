@@ -1,15 +1,18 @@
 {
- "guncelleme": "2026-10-20T19:50:21.889Z",
+ "guncelleme": "2026-10-20T22:56:34.781Z",
  "seriler": {
   "TGT": {
    "ad": "GARANTİ PORTFÖY KISA VADELİ BORÇLANMA ARAÇLARI FONU",
    "tur": "fon",
    "pb": "TRY",
+   "erken": [
+    "2026-10-21"
+   ],
    "kaynak": "tefas:TGT",
    "ilk": "2021-10-18",
-   "son": "2026-10-20",
-   "deger": 0.126931,
-   "adet": 1260
+   "son": "2026-10-21",
+   "deger": 0.127056,
+   "adet": 1261
   },
   "YFBL1": {
    "ad": "YAPI KREDİ PORTFÖY PARA PİYASASI FONU",
@@ -43,9 +46,9 @@
    "pb": "TRY",
    "kaynak": "tv:FX_IDC:USDTRY",
    "ilk": "2010-01-04",
-   "son": "2026-10-20",
-   "deger": 49.5688,
-   "adet": 4382
+   "son": "2026-10-21",
+   "deger": 49.5741,
+   "adet": 4383
   },
   "EURTRY": {
    "ad": "Euro/TL",
@@ -53,9 +56,9 @@
    "pb": "TRY",
    "kaynak": "tv:FX_IDC:EURTRY",
    "ilk": "2010-01-04",
-   "son": "2026-10-20",
-   "deger": 55.726,
-   "adet": 4382
+   "son": "2026-10-21",
+   "deger": 55.68353,
+   "adet": 4383
   },
   "JPYTRY": {
    "ad": "Yen/TL",
@@ -63,9 +66,9 @@
    "pb": "TRY",
    "kaynak": "tv:FX_IDC:JPYTRY",
    "ilk": "2009-12-31",
-   "son": "2026-10-20",
-   "deger": 0.313253,
-   "adet": 4382
+   "son": "2026-10-21",
+   "deger": 0.31315,
+   "adet": 4383
   },
   "GOLD": {
    "ad": "Altın (ons, $)",
@@ -73,9 +76,9 @@
    "pb": "TRY",
    "kaynak": "tv:TVC:GOLD",
    "ilk": "2009-05-27",
-   "son": "2026-10-20",
-   "deger": 4122.884,
-   "adet": 4382
+   "son": "2026-10-21",
+   "deger": 4120.99,
+   "adet": 4383
   },
   "XU100": {
    "ad": "BIST 100",
@@ -94,7 +97,7 @@
    "kaynak": "tv:SP:SPX",
    "ilk": "2016-07-01",
    "son": "2026-10-20",
-   "deger": 7706.24,
+   "deger": 7712.57,
    "adet": 2590
   },
   "NDX": {
@@ -104,7 +107,7 @@
    "kaynak": "tv:NASDAQ:NDX",
    "ilk": "2009-05-20",
    "son": "2026-10-20",
-   "deger": 29506.9663,
+   "deger": 29490.2834,
    "adet": 4382
   },
   "DAX": {
@@ -134,7 +137,7 @@
    "kaynak": "tv:AMEX:URTH",
    "ilk": "2012-01-12",
    "son": "2026-10-20",
-   "deger": 207.48,
+   "deger": 207.4,
    "adet": 3517
   },
   "TUFE": {
