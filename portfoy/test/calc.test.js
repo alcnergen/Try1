@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { valueAt, positionAt, fundState, portfolioHistory, replicate, periodReturn, projectScenario, monthsToTarget, combine, cpiDaily, findCashDuplicates, removeCashDuplicates, nextBusinessDay, applyValuationPatch } from '../js/calc.js';
 import { addToConfig, isTracked, repoInfo } from '../js/track.js';
 import { depositSeries } from '../js/data.js';
-import { parseTefas, parseTvMessage, tvDate, parseCanli, mergePoints, pickTvSymbol, assetEntry } from '../scripts/veri-cek.mjs';
+import { parseTefas, parseTvMessage, tvDate, parseCanli, mergePoints, pickTvSymbol, assetEntry, ykbEarly, garantiEarly, nextBizDay } from '../scripts/veri-cek.mjs';
 
 const close = (a, b, eps = 1e-6) => assert.ok(Math.abs(a - b) < eps, `${a} ≈ ${b}`);
 
@@ -176,4 +176,18 @@ test('değerleme yaması ada göre yazar, eksik kalemi oluşturur, diğer tarihl
   assert.deepEqual(others.vals[0].values, { g: 23000000, b: 500000, o: 400000 });
   assert.deepEqual(others.vals[1], { date: '2026-10-02', usd: 49.15, values: { g: 23000000, b: 600000, yeni0: 2500000 } });
   assert.equal(others.assets.find((a) => a.id === 'yeni0').cat, 'Araç');
+});
+
+test('kurucu sitelerinden erken (ertesi gün) fiyat', () => {
+  assert.equal(nextBizDay('2026-10-16'), '2026-10-19'); // cuma → pazartesi
+  // Yapı Kredi: alış = TEFAS'taki son fiyat → satış ertesi iş gününün fiyatı
+  assert.deepEqual(ykbEarly({ BankSellsPrice: 4.684, BankBuysPrice: 4.680003 }, '2026-10-20', 4.680003), [['2026-10-21', 4.684]]);
+  assert.deepEqual(ykbEarly({ BankSellsPrice: 4.680003, BankBuysPrice: 4.675786 }, '2026-10-20', 4.680003), []); // henüz yeni fiyat yok
+  assert.deepEqual(ykbEarly({ BankSellsPrice: 4.69, BankBuysPrice: 4.685 }, '2026-10-20', 4.680003), []); // eşleşmiyor → tarih belirsiz
+  // Garanti: endeks serisi TEFAS'taki son güne göre ölçeklenir; son gün için kesin birim fiyat
+  const ts = (d) => Date.parse(d + 'T00:00:00Z') - 3 * 3600e3;
+  const ser = [[ts('2026-10-19'), 1000], [ts('2026-10-20'), 1000.946], [ts('2026-10-21'), 1001.9]];
+  assert.deepEqual(garantiEarly(ser, '2026-10-20', 0.126931, 0.127052), [['2026-10-21', 0.127052]]);
+  assert.deepEqual(garantiEarly(ser, '2026-10-20', 0.126931, 0.126931), [['2026-10-21', Math.round(0.126931 * 1001.9 / 1000.946 * 1e6) / 1e6]]);
+  assert.deepEqual(garantiEarly(ser.slice(0, 2), '2026-10-20', 0.126931, 0.126931), []);
 });

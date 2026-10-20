@@ -14,7 +14,8 @@ Telefonda ana ekrana eklenen, yalnızca kişisel kullanım için fon portföyü 
 
 ## Veri nereden gelir
 
-- `.github/workflows/portfoy.yml` her iş günü 18:35'te ve 19:00–00:30 arası yarım saatte bir, her gün 08:20'de (TR saati) `scripts/veri-cek.mjs`'i çalıştırır. TEFAS bir günün fon fiyatını o gün akşam açıklar; uygulamada açıklandıktan en geç yarım saat sonra görünür. Uygulamadaki ↻ düğmesi, veri 30 dakikadan eskiyse çekimi hemen başlatır (otomatik takip anahtarı gerekir).
+- `.github/workflows/portfoy.yml` her iş günü 18:05, 18:20, 18:35'te ve 19:00–00:30 arası yarım saatte bir, her gün 08:20'de (TR saati) `scripts/veri-cek.mjs`'i çalıştırır. TEFAS bir günün fon fiyatını o gün akşam açıklar; uygulamada açıklandıktan en geç yarım saat sonra görünür. Uygulamadaki ↻ düğmesi, veri 30 dakikadan eskiyse çekimi hemen başlatır (otomatik takip anahtarı gerekir).
+- **Erken fiyat:** fonun ertesi iş günü fiyatı her gün 18:00'de belirlenir. Kurucular (Yapı Kredi Portföy, Garanti BBVA Portföy) bunu hemen sitelerinde yayınlar, TEFAS ise gece/sabah. `config.json`'da `"erken": "ykb"` ya da `"garanti"` yazılan fonlar için 18:05'ten itibaren kurucu sitesindeki fiyat seriye *erken* işaretiyle eklenir; tarihi saate göre tahmin edilmez, kurucunun bir önceki fiyatı TEFAS'taki son fiyatla eşleşirse yazılır. TEFAS aynı günü yayınlayınca resmi fiyat geçerli olur. (KAP günlük birim pay değeri yayınlamaz; yalnızca aylık raporlar vardır.)
 - Fon fiyatları **TEFAS**'tan (YAT/EMK/BYF), bulunamazsa Yahoo Finance'ten (`KOD.IS`); döviz, altın ve endeksler Yahoo Finance'ten, Dolar/Euro için TCMB yedek.
 - Sonuçlar `data/series/*.json` olarak depoya kaydedilir; böylece uygulama hiç açılmasa da fiyat geçmişi gün gün birikir.
 - Yeni bir fonu otomatik takibe almak için `data/config.json` içindeki `fonlar` listesine kodunu ekle.

@@ -3,7 +3,7 @@ name: Portföy verisi ve yayın
 # Her gün piyasa verisini çeker, data/ altına kaydeder ve portfoy/ klasörünü GitHub Pages'e yayınlar.
 on:
   schedule:
-    - cron: '35 15 * * 1-5'       # 18:35 TR: borsa kapanışı
+    - cron: '5,20,35 15 * * 1-5'  # 18:05–18:35 TR: kurucular yarının fon fiyatını açıklar, borsa kapanışı
     - cron: '*/30 16-21 * * 1-5'  # 19:00–00:30 TR, yarım saatte bir: TEFAS yarının fon fiyatlarını akşam açıklar
     - cron: '20 5 * * *'          # 08:20 TR: gece eksik kalanlar
   workflow_dispatch:
