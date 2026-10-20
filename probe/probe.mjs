@@ -1,18 +1,19 @@
 const UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36';
-const get = async (u) => { try { const r = await fetch(u, { headers: { 'User-Agent': UA, Accept: 'application/json, text/plain, */*', Referer: 'https://www.kap.org.tr/tr/' }, signal: AbortSignal.timeout(25000) }); return { s: r.status, t: await r.text() }; } catch (e) { return { s: 'ERR ' + e.message, t: '' }; } };
-console.log('saat', new Date().toISOString());
-const ids = { TGT: '33E5FED7E6A300EAE0530A4A622B2AEA', YLB: '33E5FED7E4E300EAE0530A4A622B2AEA' };
-for (const [c, id] of Object.entries(ids)) {
-  for (const type of ['ALL', '0', '8aca490d502e34b801502e380044002b']) {
-    for (const host of ['https://www.kap.org.tr', 'https://kap.org.tr']) {
-      const r = await get(`${host}/tr/api/disclosure/filter/FILTERYFBF/${id}/${type}/10`);
-      let summary = r.t.slice(0, 200);
-      try { const j = JSON.parse(r.t); summary = `${j.length} kayıt: ` + j.slice(0, 12).map((x) => `${x.disclosureBasic?.publishDate} | ${x.disclosureBasic?.title} | ${x.disclosureBasic?.summary || ''} | ${x.disclosureBasic?.disclosureType || ''} | ${x.disclosureBasic?.disclosureIndex}`).join('\n      '); } catch {}
-      console.log(`### ${c} type=${type} ${host} -> ${r.s}\n      ${summary}`);
-      if (r.s === 200) break;
-    }
-  }
+const post = async (u, body, h = {}) => { try { const r = await fetch(u, { method: 'POST', headers: { 'User-Agent': UA, 'Content-Type': 'application/json; charset=UTF-8', Accept: 'application/json, text/javascript, */*', 'X-Requested-With': 'XMLHttpRequest', ...h }, body: JSON.stringify(body), signal: AbortSignal.timeout(25000) }); return { s: r.status, t: await r.text() }; } catch (e) { return { s: 'ERR ' + e.message, t: '' }; } };
+const now = new Date(); console.log('saat UTC', now.toISOString());
+const iso = (d) => d.toISOString().slice(0, 10);
+const today = iso(new Date(now.getTime() + 3 * 3600e3)), tomorrow = iso(new Date(now.getTime() + 27 * 3600e3)), yest = iso(new Date(now.getTime() - 21 * 3600e3));
+for (const c of ['YFBL1', 'YFBL7']) {
+  const r = await post('https://www.yapikredi.com.tr/yatirimci-kosesi/fon-detay.aspx/FundRiskData', { fundCode: c }, { Origin: 'https://www.yapikredi.com.tr', Referer: `https://www.yapikredi.com.tr/yatirimci-kosesi/fon-bilgileri/${c}` });
+  let x = r.t.slice(0, 200); try { const f = JSON.parse(r.t).d.Data.FundList[0]; x = JSON.stringify(Object.fromEntries(Object.entries(f).filter(([k]) => /Price|Date|Time|Spk|Code|Valor|Tarih/i.test(k)))); } catch {}
+  console.log(`### YKB ${c} ${r.s} ${x}`);
 }
-const page = await get('https://www.kap.org.tr/tr/fon-bilgileri/genel/tgt-garanti-portfoy-kisa-vadeli-borclanma-araclari-fonu');
-const subj = [...new Set((page.t.match(/(disclosureType|disclosureClass|subject|typeName|itemName)\\?":\\?"[^"\\]{2,60}/g) || []))].slice(0, 60);
-console.log('### sayfa alanları', subj.join(' || '));
+for (const [d, rb] of [[yest, 'T'], [today, 'T'], [today, 'F'], [tomorrow, 'T'], [tomorrow, 'F']]) {
+  const r = await post('https://www.garantibbvaportfoy.com.tr/webservice/fundgroupvalues', { Code: 'TGT', Date: d, Rollback: rb, lang: 'tr' }, { Origin: 'https://www.garantibbvaportfoy.com.tr', Referer: 'https://www.garantibbvaportfoy.com.tr/' });
+  let x = r.t.slice(0, 160); try { const j = JSON.parse(JSON.parse(r.t)); x = JSON.stringify(j.data?.[0]?.detail); } catch {}
+  console.log(`### Garanti TGT Date=${d} Rollback=${rb} ${r.s} ${x}`);
+}
+const t = await post('https://www.tefas.gov.tr/api/funds/fonFiyatBilgiGetir', { fonKodu: 'YVD', dil: 'TR', periyod: 1 });
+try { console.log('### TEFAS YVD son', JSON.stringify(JSON.parse(t.t).resultList.slice(-2).map((x) => [x.tarih, x.fiyat]))); } catch { console.log('TEFAS', t.s); }
+const t2 = await post('https://www.tefas.gov.tr/api/funds/fonFiyatBilgiGetir', { fonKodu: 'TGT', dil: 'TR', periyod: 1 });
+try { console.log('### TEFAS TGT son', JSON.stringify(JSON.parse(t2.t).resultList.slice(-2).map((x) => [x.tarih, x.fiyat]))); } catch { console.log('TEFAS', t2.s); }

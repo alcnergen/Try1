@@ -9,5 +9,4 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: 22 }
-      - run: npm i --no-save playwright@1.56.1 && npx playwright install --with-deps chromium
-      - run: node probe/browser.mjs
+      - run: node probe/probe.mjs
