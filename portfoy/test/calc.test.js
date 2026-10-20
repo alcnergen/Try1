@@ -184,10 +184,13 @@ test('kurucu sitelerinden erken (ertesi gün) fiyat', () => {
   assert.deepEqual(ykbEarly({ BankSellsPrice: 4.684, BankBuysPrice: 4.680003 }, '2026-10-20', 4.680003), [['2026-10-21', 4.684]]);
   assert.deepEqual(ykbEarly({ BankSellsPrice: 4.680003, BankBuysPrice: 4.675786 }, '2026-10-20', 4.680003), []); // henüz yeni fiyat yok
   assert.deepEqual(ykbEarly({ BankSellsPrice: 4.69, BankBuysPrice: 4.685 }, '2026-10-20', 4.680003), []); // eşleşmiyor → tarih belirsiz
-  // Garanti: endeks serisi TEFAS'taki son güne göre ölçeklenir; son gün için kesin birim fiyat
+  // Garanti: seri hesap günüyle tarihli (TEFAS'ta ertesi iş günü); TEFAS'taki son iki fiyatın oranıyla eşleştirilir
   const ts = (d) => Date.parse(d + 'T00:00:00Z') - 3 * 3600e3;
-  const ser = [[ts('2026-10-19'), 1000], [ts('2026-10-20'), 1000.946], [ts('2026-10-21'), 1001.9]];
-  assert.deepEqual(garantiEarly(ser, '2026-10-20', 0.126931, 0.127052), [['2026-10-21', 0.127052]]);
-  assert.deepEqual(garantiEarly(ser, '2026-10-20', 0.126931, 0.126931), [['2026-10-21', Math.round(0.126931 * 1001.9 / 1000.946 * 1e6) / 1e6]]);
-  assert.deepEqual(garantiEarly(ser.slice(0, 2), '2026-10-20', 0.126931, 0.126931), []);
+  const tefasPts = [['2026-10-19', 0.126811], ['2026-10-20', 0.126931]];
+  const ser = [[ts('2026-10-15'), 1001.51262], [ts('2026-10-16'), 1004.276516], [ts('2026-10-19'), 1005.226853], [ts('2026-10-20'), 1006.2]];
+  const est = Math.round(0.126931 * 1006.2 / 1005.226853 * 1e6) / 1e6;
+  assert.deepEqual(garantiEarly(ser, tefasPts, 0.126931), [['2026-10-21', est]]);
+  assert.deepEqual(garantiEarly(ser, tefasPts, est + 1e-6), [['2026-10-21', est + 1e-6]]); // kesin birim fiyat
+  assert.deepEqual(garantiEarly(ser.slice(0, 3), tefasPts, 0.126931), []); // henüz yeni gün yok
+  assert.deepEqual(garantiEarly(ser, [['2026-10-19', 0.126811], ['2026-10-20', 0.127]], 0), []); // oran tutmuyor
 });
