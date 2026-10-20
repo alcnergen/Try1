@@ -1,5 +1,5 @@
 {
- "guncelleme": "2026-10-20T10:08:26.070Z",
+ "guncelleme": "2026-10-20T14:54:04.824Z",
  "seriler": {
   "TGT": {
    "ad": "GARANTİ PORTFÖY KISA VADELİ BORÇLANMA ARAÇLARI FONU",
@@ -29,7 +29,8 @@
    "ilk": "2022-07-04",
    "son": "2026-10-20",
    "deger": 4.680003,
-   "adet": 1080
+   "adet": 1080,
+   "hata": "tefas:YVD → fetch failed"
   },
   "USDTRY": {
    "ad": "Dolar/TL",
@@ -38,7 +39,7 @@
    "kaynak": "tv:FX_IDC:USDTRY",
    "ilk": "2010-01-04",
    "son": "2026-10-20",
-   "deger": 49.5727,
+   "deger": 49.5717,
    "adet": 4382
   },
   "EURTRY": {
@@ -48,7 +49,7 @@
    "kaynak": "tv:FX_IDC:EURTRY",
    "ilk": "2010-01-04",
    "son": "2026-10-20",
-   "deger": 55.65087,
+   "deger": 55.76636,
    "adet": 4382
   },
   "JPYTRY": {
@@ -58,7 +59,7 @@
    "kaynak": "tv:FX_IDC:JPYTRY",
    "ilk": "2009-12-31",
    "son": "2026-10-20",
-   "deger": 0.313479,
+   "deger": 0.313718,
    "adet": 4382
   },
   "GOLD": {
@@ -68,7 +69,7 @@
    "kaynak": "tv:TVC:GOLD",
    "ilk": "2009-05-27",
    "son": "2026-10-20",
-   "deger": 4111.77,
+   "deger": 4140.061,
    "adet": 4382
   },
   "XU100": {
@@ -78,7 +79,7 @@
    "kaynak": "tv:BIST:XU100",
    "ilk": "2009-05-06",
    "son": "2026-10-20",
-   "deger": 11569.4,
+   "deger": 11774.42,
    "adet": 4382
   },
   "SPX": {
@@ -87,9 +88,9 @@
    "pb": "TRY",
    "kaynak": "tv:SP:SPX",
    "ilk": "2016-07-01",
-   "son": "2026-10-19",
-   "deger": 7690.73,
-   "adet": 2589
+   "son": "2026-10-20",
+   "deger": 7741.32,
+   "adet": 2590
   },
   "NDX": {
    "ad": "Nasdaq 100",
@@ -97,9 +98,9 @@
    "pb": "TRY",
    "kaynak": "tv:NASDAQ:NDX",
    "ilk": "2009-05-20",
-   "son": "2026-10-19",
-   "deger": 29529.3445,
-   "adet": 4381
+   "son": "2026-10-20",
+   "deger": 29647.4419,
+   "adet": 4382
   },
   "DAX": {
    "ad": "DAX",
@@ -108,7 +109,7 @@
    "kaynak": "tv:XETR:DAX",
    "ilk": "2009-07-21",
    "son": "2026-10-20",
-   "deger": 25088.09,
+   "deger": 25375.24,
    "adet": 4382
   },
   "N225": {
@@ -127,9 +128,9 @@
    "pb": "TRY",
    "kaynak": "tv:AMEX:URTH",
    "ilk": "2012-01-12",
-   "son": "2026-10-19",
-   "deger": 206.65,
-   "adet": 3516
+   "son": "2026-10-20",
+   "deger": 208.19,
+   "adet": 3517
   },
   "TUFE": {
    "ad": "TÜFE (aylık endeks)",
