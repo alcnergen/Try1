@@ -1,5 +1,5 @@
 {
- "guncelleme": "2026-10-20T14:54:04.824Z",
+ "guncelleme": "2026-10-20T15:25:47.666Z",
  "seriler": {
   "TGT": {
    "ad": "GARANTİ PORTFÖY KISA VADELİ BORÇLANMA ARAÇLARI FONU",
@@ -29,8 +29,7 @@
    "ilk": "2022-07-04",
    "son": "2026-10-20",
    "deger": 4.680003,
-   "adet": 1080,
-   "hata": "tefas:YVD → fetch failed"
+   "adet": 1080
   },
   "USDTRY": {
    "ad": "Dolar/TL",
@@ -39,7 +38,7 @@
    "kaynak": "tv:FX_IDC:USDTRY",
    "ilk": "2010-01-04",
    "son": "2026-10-20",
-   "deger": 49.5717,
+   "deger": 49.5712,
    "adet": 4382
   },
   "EURTRY": {
@@ -49,7 +48,7 @@
    "kaynak": "tv:FX_IDC:EURTRY",
    "ilk": "2010-01-04",
    "son": "2026-10-20",
-   "deger": 55.76636,
+   "deger": 55.71487,
    "adet": 4382
   },
   "JPYTRY": {
@@ -59,7 +58,7 @@
    "kaynak": "tv:FX_IDC:JPYTRY",
    "ilk": "2009-12-31",
    "son": "2026-10-20",
-   "deger": 0.313718,
+   "deger": 0.313395,
    "adet": 4382
   },
   "GOLD": {
@@ -69,7 +68,7 @@
    "kaynak": "tv:TVC:GOLD",
    "ilk": "2009-05-27",
    "son": "2026-10-20",
-   "deger": 4140.061,
+   "deger": 4134.115,
    "adet": 4382
   },
   "XU100": {
@@ -79,7 +78,7 @@
    "kaynak": "tv:BIST:XU100",
    "ilk": "2009-05-06",
    "son": "2026-10-20",
-   "deger": 11774.42,
+   "deger": 11797.7,
    "adet": 4382
   },
   "SPX": {
@@ -89,7 +88,7 @@
    "kaynak": "tv:SP:SPX",
    "ilk": "2016-07-01",
    "son": "2026-10-20",
-   "deger": 7741.32,
+   "deger": 7719.48,
    "adet": 2590
   },
   "NDX": {
@@ -99,7 +98,7 @@
    "kaynak": "tv:NASDAQ:NDX",
    "ilk": "2009-05-20",
    "son": "2026-10-20",
-   "deger": 29647.4419,
+   "deger": 29650.8242,
    "adet": 4382
   },
   "DAX": {
@@ -109,7 +108,7 @@
    "kaynak": "tv:XETR:DAX",
    "ilk": "2009-07-21",
    "son": "2026-10-20",
-   "deger": 25375.24,
+   "deger": 25359.61,
    "adet": 4382
   },
   "N225": {
@@ -129,7 +128,7 @@
    "kaynak": "tv:AMEX:URTH",
    "ilk": "2012-01-12",
    "son": "2026-10-20",
-   "deger": 208.19,
+   "deger": 207.5,
    "adet": 3517
   },
   "TUFE": {
