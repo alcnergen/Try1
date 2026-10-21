@@ -8,7 +8,7 @@ import {
 } from './calc.js';
 import { lineChart, legend } from './chart.js';
 
-export const APP_VERSION = '2026.10.21-j';
+export const APP_VERSION = '2026.10.21-k';
 
 // ---------- Durum ----------
 let S = store.load();
@@ -233,7 +233,7 @@ function ozet(root) {
     <div class="row between"><span class="label">Portföy değeri</span>
       <div class="seg" role="group" aria-label="Para birimi"><button data-ccy="TRY" class="${ccy === 'TRY' ? 'on' : ''}">₺</button><button data-ccy="USD" class="${ccy === 'USD' ? 'on' : ''}">$</button></div></div>
     <div class="big">${money(val, ccy)}</div>
-    ${C.ahead ? `<div class="tag">${dTR(C.ahead).slice(0, 5)} fiyatlarıyla · erken, kurucu sitesinden</div>` : ''}
+    ${C.ahead ? `<div class="tag">${dTR(C.ahead).slice(0, 5)} fiyatlarıyla · erken fiyat, TEFAS onayı bekleniyor</div>` : ''}
     <div class="muted small">Stopaj sonrası: ${ccy === 'USD' ? money((L.cost + L.net) / (L.usd || 1), 'USD') : money(L.cost + L.net)}</div>
     <div class="sub ${cls(dayChg)}">${arrow(dayChg)} ${signMoney(dayChg, 'TRY')} (${pct(dayPct)}) <span class="muted">${P ? 'son fiyat gününe göre' : ''}</span></div>
     <div class="kpis">
@@ -980,9 +980,13 @@ function trackTokenSheet(intro, onSaved) {
 }
 
 function manualPrice(id, label) {
+  // Fonlarda 18:00'den sonra bankada görünen fiyat ertesi iş gününün fiyatıdır; tarih ona göre önerilir
+  const fund = assetKind(id) === 'fon';
+  const next = nextBusinessDay(C.today);
+  const def = fund && new Date().getHours() >= 18 ? next : C.today;
   const body = h(`<form class="form" id="mp">
-    <p class="muted small">Otomatik veri gelmediğinde ya da gecikmeli olduğunda kullan. Aynı gün için otomatik veri gelse bile elle girdiğin değer geçerli olur.</p>
-    <label>Tarih<input name="date" type="date" value="${C.today}" max="${C.today}"></label>
+    <p class="muted small">Otomatik veri gelmediğinde ya da gecikmeli olduğunda kullan. O gün için otomatik fiyat gelince o geçerli olur, elle girdiğin kendiliğinden devre dışı kalır.${fund ? ` <b>Fonlarda 18:00'den sonra bankada görünen fiyat ertesi iş gününün (${dTR(next)}) fiyatıdır;</b> tarihi ona göre seç.` : ''}</p>
+    <label>Tarih<input name="date" type="date" value="${def}" max="${fund ? next : C.today}"></label>
     <label>${esc(label || 'Birim fiyat (₺)')}<input name="v" inputmode="decimal" required></label>
     <button class="btn full" type="submit">Kaydet</button>
     ${Object.keys(S.manual[id] || {}).length ? `<h3>Elle girilenler</h3><div class="tbl-wrap"><table class="tbl"><tbody>${Object.entries(S.manual[id]).sort().reverse().map(([d, v]) => `<tr><td>${dTR(d)}</td><td>${num(v, 6)}${d <= (M.raw[id]?.[M.raw[id].length - 1]?.[0] || '') ? ' <span class="muted small">(otomatik fiyat geçerli)</span>' : ''}</td><td><button type="button" class="link" data-d="${d}">Sil</button></td></tr>`).join('')}</tbody></table></div>` : ''}
