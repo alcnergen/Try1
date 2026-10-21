@@ -66,9 +66,13 @@ export async function loadOne(market, code) {
 }
 
 // El ile girilen fiyatlar/kurlar veri ile birleşir (aynı günde el ile girilen kazanır)
+// Elle girilen fiyatlar yalnızca otomatik verinin henüz ulaşmadığı günler için kullanılır; resmi fiyat gelince
+// (ya da elle girilen gün resmi serinin içinde kalıyorsa, ör. hafta sonu) resmi seri geçerlidir.
 export function series(market, manual, id) {
-  const m = manual?.[id] ? Object.entries(manual[id]) : [];
-  return mergePoints(market.raw[id] || [], m);
+  const raw = market.raw[id] || [];
+  const lastRaw = raw[raw.length - 1]?.[0] || '';
+  const m = manual?.[id] ? Object.entries(manual[id]).filter(([d]) => d > lastRaw) : [];
+  return mergePoints(raw, m);
 }
 
 // Mevduat: her gün o günkü yıllık faizin stopaj sonrası kısmıyla büyüyen sentetik seri.

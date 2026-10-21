@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { valueAt, positionAt, fundState, portfolioHistory, replicate, periodReturn, projectScenario, monthsToTarget, combine, cpiDaily, findCashDuplicates, removeCashDuplicates, nextBusinessDay, applyValuationPatch } from '../js/calc.js';
 import { addToConfig, isTracked, repoInfo } from '../js/track.js';
-import { depositSeries } from '../js/data.js';
+import { depositSeries, series } from '../js/data.js';
 import { parseTefas, parseTvMessage, tvDate, parseCanli, mergePoints, pickTvSymbol, assetEntry, ykbEarly, garantiEarly, nextBizDay } from '../scripts/veri-cek.mjs';
 
 const close = (a, b, eps = 1e-6) => assert.ok(Math.abs(a - b) < eps, `${a} ≈ ${b}`);
@@ -193,4 +193,11 @@ test('kurucu sitelerinden erken (ertesi gün) fiyat', () => {
   assert.deepEqual(garantiEarly(ser, tefasPts, est + 1e-6), [['2026-10-21', est + 1e-6]]); // kesin birim fiyat
   assert.deepEqual(garantiEarly(ser.slice(0, 3), tefasPts, 0.126931), []); // henüz yeni gün yok
   assert.deepEqual(garantiEarly(ser, [['2026-10-19', 0.126811], ['2026-10-20', 0.127]], 0), []); // oran tutmuyor
+});
+
+test('elle girilen fiyat yalnızca otomatik verinin ulaşmadığı günlerde geçerli', () => {
+  const market = { raw: { TGT: [['2026-10-16', 0.126462], ['2026-10-19', 0.126811], ['2026-10-20', 0.126931]] } };
+  const manual = { TGT: { '2026-10-18': 0.126811, '2026-10-19': 0.126931, '2026-10-21': 0.127056 } };
+  assert.deepEqual(series(market, manual, 'TGT'), [['2026-10-16', 0.126462], ['2026-10-19', 0.126811], ['2026-10-20', 0.126931], ['2026-10-21', 0.127056]]);
+  assert.deepEqual(series({ raw: {} }, manual, 'TGT').length, 3); // otomatik veri yoksa hepsi kullanılır
 });

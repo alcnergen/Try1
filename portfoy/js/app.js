@@ -8,7 +8,7 @@ import {
 } from './calc.js';
 import { lineChart, legend } from './chart.js';
 
-export const APP_VERSION = '2026.10.20-a';
+export const APP_VERSION = '2026.10.21-a';
 
 // ---------- Durum ----------
 let S = store.load();
@@ -934,7 +934,7 @@ function manualPrice(id, label) {
     <label>Tarih<input name="date" type="date" value="${C.today}" max="${C.today}"></label>
     <label>${esc(label || 'Birim fiyat (₺)')}<input name="v" inputmode="decimal" required></label>
     <button class="btn full" type="submit">Kaydet</button>
-    ${Object.keys(S.manual[id] || {}).length ? `<h3>Elle girilenler</h3><div class="tbl-wrap"><table class="tbl"><tbody>${Object.entries(S.manual[id]).sort().reverse().map(([d, v]) => `<tr><td>${dTR(d)}</td><td>${num(v, 6)}</td><td><button type="button" class="link" data-d="${d}">Sil</button></td></tr>`).join('')}</tbody></table></div>` : ''}
+    ${Object.keys(S.manual[id] || {}).length ? `<h3>Elle girilenler</h3><div class="tbl-wrap"><table class="tbl"><tbody>${Object.entries(S.manual[id]).sort().reverse().map(([d, v]) => `<tr><td>${dTR(d)}</td><td>${num(v, 6)}${d <= (M.raw[id]?.[M.raw[id].length - 1]?.[0] || '') ? ' <span class="muted small">(otomatik fiyat geçerli)</span>' : ''}</td><td><button type="button" class="link" data-d="${d}">Sil</button></td></tr>`).join('')}</tbody></table></div>` : ''}
   </form>`);
   const dlg = sheet(`${id} — elle değer`, body);
   const form = dlg.querySelector('#mp');
