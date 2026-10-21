@@ -47,11 +47,15 @@ export function addToConfig(cfg, code, kind) {
   return true;
 }
 
-// Anahtarın depoya yazabildiğini doğrular (değişiklik yapmadan)
+const WRITE_ERR = 'GitHub anahtarının bu depoya yazma izni yok (Contents: Read and write gerekli)';
+const writeErr = (e) => (e.code === 'perm' ? Object.assign(new Error(WRITE_ERR), { code: 'write' }) : e);
+
+// Anahtarın depoya yazabildiğini doğrular. Depo bilgisindeki "permissions" hesabın iznini gösterir, anahtarınkini
+// değil; bu yüzden gerçek bir yazma denenir: küçük istek dosyası (bir veri çekimini de başlatır, zararsız).
 export async function verify(token) {
   const { owner, repo } = repoInfo();
-  const r = await gh(token, `/repos/${owner}/${repo}`);
-  if (!r?.permissions?.push) throw Object.assign(new Error('GitHub anahtarının bu depoya yazma izni yok'), { code: 'perm' });
+  await gh(token, `/repos/${owner}/${repo}`);
+  await requestFetch(token);
   return true;
 }
 
@@ -68,7 +72,7 @@ export async function track(token, code, kind) {
       });
       return 'eklendi';
     } catch (e) {
-      if (e.code !== 'conflict') throw e; // veri iş akışı aynı anda yazdıysa tekrar dene
+      if (e.code !== 'conflict') throw writeErr(e); // veri iş akışı aynı anda yazdıysa tekrar dene
     }
   }
   throw new Error('Takip listesi güncellenemedi, biraz sonra tekrar dene');
@@ -83,5 +87,5 @@ export async function requestFetch(token) {
   await gh(token, `/repos/${owner}/${repo}/contents/${path}`, {
     method: 'PUT',
     body: JSON.stringify({ message: 'Fiyat çekimi isteği', content: enc(JSON.stringify({ istek: new Date().toISOString() }) + '\n'), branch: 'master', ...(sha ? { sha } : {}) }),
-  });
+  }).catch((e) => { throw writeErr(e); });
 }
