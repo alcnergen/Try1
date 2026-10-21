@@ -1,10 +1,12 @@
-const opt = (body, h) => ({ method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json', ...h }, body: JSON.stringify(body) });
-console.log('now', new Date().toISOString());
-for (const code of ['YFBL1', 'YFBL7']) {
-  try { const r = await fetch('https://www.yapikredi.com.tr/yatirimci-kosesi/fon-detay.aspx/FundRiskData', opt({ fundCode: code }, { 'X-Requested-With': 'XMLHttpRequest', Origin: 'https://www.yapikredi.com.tr', Referer: `https://www.yapikredi.com.tr/yatirimci-kosesi/fon-bilgileri/${code}` })); const t = await r.text(); console.log('YKB', code, r.status, t.slice(0, 1500)); } catch (e) { console.log('YKB err', code, e.message); }
+import { tvHistory } from './vc.mjs';
+for (const q of ['NASA', 'DRAM', 'IGV', 'SMH', 'NVDA', 'BTCUSD', 'XRPUSD', 'SILVER', 'XAGUSD']) {
+  try {
+    const r = await fetch(`https://symbol-search.tradingview.com/symbol_search/v3/?text=${q}&hl=0&exchange=&lang=en&search_type=undefined&domain=production`, { headers: { Origin: 'https://www.tradingview.com', Referer: 'https://www.tradingview.com/' } });
+    const j = await r.json();
+    console.log('==', q); for (const s of (j.symbols || []).slice(0, 6)) console.log('  ', `${s.source_id || s.exchange}:${s.symbol}`.replace(/<\/?em>/g, ''), '|', s.type, '|', s.description?.replace(/<\/?em>/g, ''), '|', s.currency_code, '|', s.country);
+  } catch (e) { console.log(q, 'err', e.message); }
 }
-const G = { Origin: 'https://www.garantibbvaportfoy.com.tr', Referer: 'https://www.garantibbvaportfoy.com.tr/' };
-try { const r = await fetch('https://www.garantibbvaportfoy.com.tr/webservice/fundsinddailyds', opt({ lang: 'tr', code: 'TGT', firstDate: '2026-10-15', lastDate: '2026-10-30', rollBack: 'T', value: 1000 }, G)); let t = await r.json(); if (typeof t === 'string') t = JSON.parse(t); console.log('GARser', JSON.stringify(t).slice(0, 300)); console.log('GARlast', JSON.stringify((t.data?.[0]?.Data || []).slice(-3).map(([a, v]) => [new Date(a + 3 * 3600e3).toISOString(), v]))); } catch (e) { console.log('GAR err', e.message); }
-for (const d of ['2026-10-20', '2026-10-21', '2026-10-30']) {
-  try { const r = await fetch('https://www.garantibbvaportfoy.com.tr/webservice/fundgroupvalues', opt({ Code: 'TGT', Date: d, Rollback: 'T', lang: 'tr' }, G)); let t = await r.json(); if (typeof t === 'string') t = JSON.parse(t); console.log('GARunit', d, JSON.stringify(t).slice(0, 600)); } catch (e) { console.log('GARu err', e.message); }
+for (const sym of ['BITSTAMP:BTCUSD', 'BITSTAMP:XRPUSD', 'TVC:SILVER', 'NASDAQ:SMH', 'NASDAQ:NVDA', 'NASDAQ:IGV', 'AMEX:IGV', 'CBOE:IGV', 'NASDAQ:DRAM', 'AMEX:DRAM', 'NASDAQ:NASA', 'AMEX:NASA', 'CBOE:NASA']) {
+  try { const p = await tvHistory(sym, 30, 15000); const i = p.info || {}; console.log('H', sym, p.length, JSON.stringify(p.slice(-1)), JSON.stringify(i), p.length ? 'ilk ' + p[0][0] : ''); } catch (e) { console.log('H', sym, 'err', e.message); }
 }
+const all = await tvHistory('NASDAQ:SMH', 4500, 25000); console.log('SMH uzun', all.length, all[0]);
