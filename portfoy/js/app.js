@@ -8,7 +8,7 @@ import {
 } from './calc.js';
 import { lineChart, legend } from './chart.js';
 
-export const APP_VERSION = '2026.10.21-h';
+export const APP_VERSION = '2026.10.21-i';
 
 // ---------- Durum ----------
 let S = store.load();
@@ -535,7 +535,9 @@ function kiyas(root) {
     } else if (g.teknik != null) left = tech();
     const r = g.rsi;
     const zone = r == null ? '' : r >= 70 ? 'hot' : r <= 30 ? 'cold' : '';
-    const rsi = r == null ? '' : `<span class="rsi ${zone}" title="RSI (14 gün)">RSI ${num(r, 0)}${zone === 'hot' ? ' · aşırı alım' : zone === 'cold' ? ' · aşırı satım' : ''}</span>`;
+    // Kriptoda güncel fiyat dolar olarak (kendi piyasasındaki fiyat)
+    const px = ['BTC', 'XRP'].includes(id) && g.fiyat > 0 ? `<span class="muted">${num(g.fiyat, g.fiyat >= 100 ? 0 : 4)} $ · </span>` : '';
+    const rsi = r == null ? '' : `<span class="rsi ${zone}" title="RSI (14 gün)">${px}RSI ${num(r, 0)}${zone === 'hot' ? ' · aşırı alım' : zone === 'cold' ? ' · aşırı satım' : ''}</span>`;
     return `<div class="k-view">${left ? `<span class="k-view-l">${left}</span>` : '<span></span>'}${rsi}</div>`;
   };
   const gorusTarih = M.gorus?.guncelleme ? new Date(M.gorus.guncelleme) : null;
