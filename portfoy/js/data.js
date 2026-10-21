@@ -123,8 +123,8 @@ export function benchSeries(market, manual, settings = {}) {
 export const SCAN_COLS = ['close', 'RSI', 'Recommend.All', 'recommendation_buy', 'recommendation_over', 'recommendation_hold', 'recommendation_under', 'recommendation_sell', 'recommendation_total', 'price_target_average'];
 export function parseScanRow(d) {
   const [close, rsi, teknik, buy, over, hold, under, sell, total, hedef] = d;
-  const out = { rsi: Number.isFinite(rsi) ? Math.round(rsi * 10) / 10 : null, teknik: Number.isFinite(teknik) ? Math.round(teknik * 1000) / 1000 : null };
-  if (total > 0) out.analist = { al: (buy || 0) + (over || 0), tut: hold || 0, sat: (under || 0) + (sell || 0), toplam: total, ...(hedef > 0 && close > 0 ? { hedef: Math.round((hedef / close - 1) * 1000) / 1000 } : {}) };
+  const out = { rsi: Number.isFinite(rsi) ? Math.round(rsi * 10) / 10 : null, teknik: Number.isFinite(teknik) ? Math.round(teknik * 1000) / 1000 : null, ...(close > 0 ? { fiyat: close } : {}) };
+  if (total > 0) out.analist = { al: (buy || 0) + (over || 0), tut: hold || 0, sat: (under || 0) + (sell || 0), toplam: total, ...(hedef > 0 && close > 0 ? { hedef: Math.round((hedef / close - 1) * 1000) / 1000, hedefFiyat: hedef } : {}) };
   return out;
 }
 

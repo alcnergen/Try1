@@ -204,9 +204,9 @@ test('elle girilen fiyat yalnızca otomatik verinin ulaşmadığı günlerde ge�
 
 test('piyasa görüşü satırı (TradingView tarayıcısı)', () => {
   // NVDA: analist dağılımı + hedef fiyat
-  assert.deepEqual(parseScanRow([216.47, 40.903, -0.0879, 62, 7, 2, 0, 1, 72, 334.45]), { rsi: 40.9, teknik: -0.088, analist: { al: 69, tut: 2, sat: 1, toplam: 72, hedef: 0.545 } });
+  assert.deepEqual(parseScanRow([216.47, 40.903, -0.0879, 62, 7, 2, 0, 1, 72, 334.45]), { rsi: 40.9, teknik: -0.088, fiyat: 216.47, analist: { al: 69, tut: 2, sat: 1, toplam: 72, hedef: 0.545, hedefFiyat: 334.45 } });
   // endeks: analist yok
-  assert.deepEqual(parseScanRow([7712.57, 49.43, -0.0242, null, null, null, null, null, null, null]), { rsi: 49.4, teknik: -0.024 });
+  assert.deepEqual(parseScanRow([7712.57, 49.43, -0.0242, null, null, null, null, null, null, null]), { rsi: 49.4, teknik: -0.024, fiyat: 7712.57 });
 });
 
 test('içerik bazlı analist görüşü (ağırlıklı)', () => {
