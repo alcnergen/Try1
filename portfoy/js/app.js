@@ -8,7 +8,7 @@ import {
 } from './calc.js';
 import { lineChart, legend } from './chart.js';
 
-export const APP_VERSION = '2026.10.21-b';
+export const APP_VERSION = '2026.10.21-c';
 
 // ---------- Durum ----------
 let S = store.load();
@@ -496,10 +496,14 @@ function kiyas(root) {
   const rows = all.filter((r) => r.ret != null).sort((a, b) => b.ret - a.ret);
   const missing = all.filter((r) => r.ret == null);
   const beat = rows.filter((r) => portRet >= r.ret).length;
+  // Ölçek senin getirine göre (en az ±%2, en çok en uç değer): çok uçtaki piyasalar çubuğun ucunda kesilir
+  // (soluk uç), böylece sana yakın olanların farkı okunur
   const maxAbs = Math.max(Math.abs(portRet || 0), ...rows.map((r) => Math.abs(r.ret)), 0.0001);
+  const scale = Math.min(maxAbs, Math.max(3 * Math.abs(portRet || 0), 0.02));
   const bar = (r) => {
-    const w = (Math.abs(r) / maxAbs) * 50;
-    return `<span class="bar"><span class="${r >= 0 ? 'pos' : 'neg'}" style="width:${w.toFixed(1)}%;${r >= 0 ? 'left:50%' : `left:${(50 - w).toFixed(1)}%`}"></span><span class="mark" style="left:${(50 + (portRet / maxAbs) * 50).toFixed(1)}%"></span></span>`;
+    const clip = Math.abs(r) > scale;
+    const w = (Math.min(Math.abs(r), scale) / scale) * 50;
+    return `<span class="bar"><span class="zero"></span><span class="${r >= 0 ? 'pos' : 'neg'}${clip ? ' clip' : ''}" style="width:${w.toFixed(1)}%;${r >= 0 ? 'left:50%' : `left:${(50 - w).toFixed(1)}%`}"></span><span class="mark" style="left:${(50 + (Math.max(-scale, Math.min(scale, portRet)) / scale) * 50).toFixed(1)}%"></span></span>`;
   };
 
   root.append(h(`
@@ -529,7 +533,7 @@ function kiyas(root) {
           </div>`;
         }).join('')}
       </div>
-      <p class="muted small">Her alışın tutarı aynı gün o piyasaya yatırılmış gibi hesaplanır. Çubuktaki dikey çizgi senin getirin. Yabancı borsalar TL'ye çevrilmiş haliyle (kur etkisi dahil) karşılaştırılır.${C.cpiEst && C.cpiEst < C.today ? ` Enflasyonun ${dTR(C.cpiEst).slice(3)} sonrası, son 3 ayın ortalamasıyla tahmin edilir.` : ''}${net ? ' Portföyün stopaj sonrası, kıyaslar vergisiz alınmıştır.' : ''}</p>` : '<p>Kıyas verisi henüz yok. Veriler her gün otomatik çekilir; ilk çekimden sonra burada görünür.</p>'}
+      <p class="muted small">Her alışın tutarı aynı gün o piyasaya yatırılmış gibi hesaplanır. Çubuktaki mavi çizgi senin getirin, ince gri çizgi sıfır; ucu soluk çubuklar ölçeğe sığmayacak kadar uçta. Yabancı borsalar TL'ye çevrilmiş haliyle (kur etkisi dahil) karşılaştırılır.${C.cpiEst && C.cpiEst < C.today ? ` Enflasyonun ${dTR(C.cpiEst).slice(3)} sonrası, son 3 ayın ortalamasıyla tahmin edilir.` : ''}${net ? ' Portföyün stopaj sonrası, kıyaslar vergisiz alınmıştır.' : ''}</p>` : '<p>Kıyas verisi henüz yok. Veriler her gün otomatik çekilir; ilk çekimden sonra burada görünür.</p>'}
       ${missing.length ? `<p class="muted small">Verisi olmayan: ${missing.map((r) => esc(r.name)).join(', ')}</p>` : ''}
     </section>
     <section class="card"><h2>Zaman içinde karşılaştırma</h2><p class="muted small">Grafikte en çok 3 kıyas gösterilir</p><div id="pick"></div><div id="ch2" class="chart"></div><div id="lg2"></div></section>
