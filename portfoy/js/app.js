@@ -3,12 +3,12 @@ import * as backup from './backup.js';
 import * as track from './track.js';
 import { loadMarket, loadOne, series, benchSeries, BENCHES, liveViews, withHoldings } from './data.js';
 import {
-  todayISO, addDays, daysBetween, valueAt, valueAtOrFirst, sortTx, fundState, portfolioHistory,
+  todayISO, addDays, daysBetween, valueAt, valueAtOrFirst, sortTx, fundState, portfolioHistory, positionAt,
   replicate, periodReturn, periodStart, annualize, dailyRate, projectScenario, monthsToTarget, combine, cpiDaily, findCashDuplicates, removeCashDuplicates, nextBusinessDay, applyValuationPatch,
 } from './calc.js';
 import { lineChart, legend } from './chart.js';
 
-export const APP_VERSION = '2026.10.21-i';
+export const APP_VERSION = '2026.10.21-j';
 
 // ---------- Durum ----------
 let S = store.load();
@@ -119,10 +119,14 @@ function compute() {
   const funds = S.funds.map((f) => toTRY(f, fx));
   const pmap = Object.fromEntries(funds.map((f) => [f.code, f.pts]));
   const benches = benchSeries(M, S.manual, S.settings);
-  // Kurucular ertesi günün fiyatını 18:00'den sonra yayınlar; o fiyat geldiyse portföy o günün değeriyle gösterilir
+  // Kurucular ertesi günün fiyatını 18:00'den sonra yayınlar. Portföy o günün değeriyle ancak elde tutulan
+  // bütün fonların o günkü fiyatı gelince gösterilir; yoksa bazı fonlar bugünün, bazıları yarının fiyatıyla
+  // karışır ve günlük değişim yanlış (çok küçük) çıkar.
   const priceDates = funds.map((f) => f.native[f.native.length - 1]?.[0]).filter(Boolean).sort();
   const latest = priceDates[priceDates.length - 1];
-  const end = latest > today ? latest : today;
+  const heldLast = funds.filter((f) => positionAt(sortTx(f.txs || []), today).qty > 0).map((f) => f.native[f.native.length - 1]?.[0] || '').sort();
+  const common = heldLast.length ? heldLast[0] : latest;
+  const end = common > today ? common : today;
   const hist = portfolioHistory(funds, pmap, usd, { taxRate: S.settings.tax, end });
   const last = hist[hist.length - 1] || null;
   // Bir önceki "fiyat günü" (bugünün satırı yalnızca son fiyatın tekrarıysa onu atla)
