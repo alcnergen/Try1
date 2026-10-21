@@ -1,14 +1,14 @@
 import * as store from './store.js';
 import * as backup from './backup.js';
 import * as track from './track.js';
-import { loadMarket, loadOne, series, benchSeries, BENCHES } from './data.js';
+import { loadMarket, loadOne, series, benchSeries, BENCHES, liveViews } from './data.js';
 import {
   todayISO, addDays, daysBetween, valueAt, valueAtOrFirst, sortTx, fundState, portfolioHistory,
   replicate, periodReturn, periodStart, annualize, dailyRate, projectScenario, monthsToTarget, combine, cpiDaily, findCashDuplicates, removeCashDuplicates, nextBusinessDay, applyValuationPatch,
 } from './calc.js';
 import { lineChart, legend } from './chart.js';
 
-export const APP_VERSION = '2026.10.21-d';
+export const APP_VERSION = '2026.10.21-e';
 
 // ---------- Durum ----------
 let S = store.load();
@@ -556,7 +556,7 @@ function kiyas(root) {
         }).join('')}
       </div>
       <p class="muted small">Her alışın tutarı aynı gün o piyasaya yatırılmış gibi hesaplanır. Çubuktaki mavi çizgi senin getirin, ince gri çizgi sıfır; ucu soluk çubuklar ölçeğe sığmayacak kadar uçta. Yabancı borsalar TL'ye çevrilmiş haliyle (kur etkisi dahil) karşılaştırılır.${C.cpiEst && C.cpiEst < C.today ? ` Enflasyonun ${dTR(C.cpiEst).slice(3)} sonrası, son 3 ayın ortalamasıyla tahmin edilir.` : ''}${net ? ' Portföyün stopaj sonrası, kıyaslar vergisiz alınmıştır.' : ''}</p>
-      ${gorusTarih ? `<p class="muted small">Görüş satırları: analist al/tut/sat dağılımı yalnızca tek tek hisselerde vardır (hedef = ortalama hedef fiyatın bugünkü fiyata göre farkı). Diğerlerinde TradingView'in teknik gösterge özeti (hareketli ortalamalar ve osilatörler, günlük) gösterilir. RSI 14 günlüktür: 70 üstü aşırı alım, 30 altı aşırı satım bölgesi sayılır. Göstergeler varlığın kendi piyasasındaki fiyata göredir (ör. altında ons $). Kısa vadeli sinyallerdir, yatırım tavsiyesi değildir. Güncelleme: ${dTR(gorusTarih.toISOString().slice(0, 10))} ${hhmm(gorusTarih)}.</p>` : ''}` : '<p>Kıyas verisi henüz yok. Veriler her gün otomatik çekilir; ilk çekimden sonra burada görünür.</p>'}
+      ${gorusTarih ? `<p class="muted small">Görüş satırları: analist al/tut/sat dağılımı yalnızca tek tek hisselerde vardır (hedef = ortalama hedef fiyatın bugünkü fiyata göre farkı). Diğerlerinde TradingView'in teknik gösterge özeti (hareketli ortalamalar ve osilatörler, günlük) gösterilir. RSI 14 günlüktür: 70 üstü aşırı alım, 30 altı aşırı satım bölgesi sayılır. Göstergeler varlığın kendi piyasasındaki fiyata göredir (ör. altında ons $). Kısa vadeli sinyallerdir, yatırım tavsiyesi değildir. Güncelleme: ${dTR(gorusTarih.toISOString().slice(0, 10))} ${hhmm(gorusTarih)}. <button type="button" class="link" id="gyenile">↻ Görüşleri yenile</button></p>` : ''}` : '<p>Kıyas verisi henüz yok. Veriler her gün otomatik çekilir; ilk çekimden sonra burada görünür.</p>'}
       ${missing.length ? `<p class="muted small">Verisi olmayan: ${missing.map((r) => esc(r.name)).join(', ')}</p>` : ''}
     </section>
     <section class="card"><h2>Zaman içinde karşılaştırma</h2><p class="muted small">Grafikte en çok 3 kıyas gösterilir</p><div id="pick"></div><div id="ch2" class="chart"></div><div id="lg2"></div></section>
@@ -567,6 +567,10 @@ function kiyas(root) {
   root.querySelectorAll('[data-c]').forEach((b) => (b.onclick = () => { ui.cmpCcy = b.dataset.c; render(); }));
   // Kıyas seçimi
   const pick = root.querySelector('#pick');
+  const gy = root.querySelector('#gyenile');
+  if (gy) gy.onclick = () => refreshViews(gy);
+  // 30 dakikadan eskiyse Kıyas açılınca kendiliğinden yenilenir
+  if (gorusTarih && Date.now() - gorusTarih > 30 * 60e3 && !ui.viewsTried) { ui.viewsTried = true; refreshViews(gy, true); }
   const sel = S.settings.compare;
   const wrap = document.createElement('div'); wrap.className = 'chips';
   for (const b of BENCHES) {
@@ -1182,6 +1186,20 @@ function importFromHash() {
 
 // Veri eskiyse (ör. banka yarının fiyatını açıkladı ama uygulamada yok) GitHub'da veri çekimini hemen başlatır
 let fetchWatch = null;
+async function refreshViews(btn, quiet = false) {
+  if (btn) { btn.disabled = true; btn.textContent = 'Yenileniyor…'; }
+  try {
+    const g = await liveViews();
+    M.gorus = g;
+    try { localStorage.setItem('portfoy.gorus', JSON.stringify(g)); } catch { /* yok */ }
+    if (tab === 'kiyas') { const y = main().scrollTop; render(); main().scrollTop = y; }
+    if (!quiet) toast('Analist, teknik ve RSI verileri güncellendi ✓');
+  } catch (e) {
+    if (btn) { btn.disabled = false; btn.textContent = '↻ Görüşleri yenile'; }
+    if (!quiet) toast(`Görüşler alınamadı (${e.message}); bağlantıyı kontrol et.`, 5000);
+  }
+}
+
 async function maybeRequestFetch({ force = false } = {}) {
   const token = track.loadToken();
   const upd = M.index?.guncelleme ? Date.parse(M.index.guncelleme) : 0;

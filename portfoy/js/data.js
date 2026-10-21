@@ -39,6 +39,8 @@ export async function loadMarket(fundCodes) {
   const market = { index: null, raw: {}, names: {}, meta: {}, errors: [], tefasSon: null };
   try { market.index = await getJSON('data/index.json'); } catch (e) { market.errors.push('Veri dizini yok (Actions henüz çalışmamış olabilir)'); }
   try { market.gorus = await getJSON('data/gorus.json'); } catch { market.gorus = null; }
+  // telefonda anlık çekilmiş daha yeni görüş varsa o kullanılır
+  try { const c = JSON.parse(localStorage.getItem('portfoy.gorus')); if (c?.guncelleme > (market.gorus?.guncelleme || '')) market.gorus = c; } catch { /* yok */ }
   const ids = new Set([...fundCodes, ...BENCH_SERIES, 'EURTRY', 'JPYTRY', 'MEVFAIZ']);
   await Promise.all([...ids].map(async (id) => {
     try {
@@ -115,4 +117,32 @@ export function benchSeries(market, manual, settings = {}) {
   out.MEVDUAT = dep.points;
   out.depositInfo = dep;
   return out;
+}
+
+// ---------- Piyasa görüşü: analist dağılımı (yalnızca hisselerde), teknik özet ve RSI (TradingView tarayıcısı) ----------
+export const SCAN_COLS = ['close', 'RSI', 'Recommend.All', 'recommendation_buy', 'recommendation_over', 'recommendation_hold', 'recommendation_under', 'recommendation_sell', 'recommendation_total', 'price_target_average'];
+export function parseScanRow(d) {
+  const [close, rsi, teknik, buy, over, hold, under, sell, total, hedef] = d;
+  const out = { rsi: Number.isFinite(rsi) ? Math.round(rsi * 10) / 10 : null, teknik: Number.isFinite(teknik) ? Math.round(teknik * 1000) / 1000 : null };
+  if (total > 0) out.analist = { al: (buy || 0) + (over || 0), tut: hold || 0, sat: (under || 0) + (sell || 0), toplam: total, ...(hedef > 0 && close > 0 ? { hedef: Math.round((hedef / close - 1) * 1000) / 1000 } : {}) };
+  return out;
+}
+
+// Görüşleri telefondan anlık çeker (TradingView tarayıcısı CORS'a izin veriyor; text/plain ile ön istek gerekmez)
+export async function liveViews() {
+  const cfg = await getJSON('data/config.json');
+  const groups = {};
+  for (const b of cfg.kiyaslar || []) if (b.tarama) (groups[b.tarama] ||= []).push([b.id, b.taramaSembol || b.tv]);
+  const varliklar = {};
+  await Promise.all(Object.entries(groups).map(async ([market, list]) => {
+    const res = await fetch(`https://scanner.tradingview.com/${market}/scan`, {
+      method: 'POST', headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ symbols: { tickers: list.map((x) => x[1]), query: { types: [] } }, columns: SCAN_COLS }),
+    });
+    if (!res.ok) throw new Error(`${market}: ${res.status}`);
+    const rows = Object.fromEntries(((await res.json())?.data || []).map((r) => [r.s, r.d]));
+    for (const [id, sym] of list) if (rows[sym]) varliklar[id] = parseScanRow(rows[sym]);
+  }));
+  if (!Object.keys(varliklar).length) throw new Error('veri gelmedi');
+  return { guncelleme: new Date().toISOString(), varliklar, anlik: true };
 }
