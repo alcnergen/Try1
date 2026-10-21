@@ -20,6 +20,10 @@ Telefonda ana ekrana eklenen, yalnızca kişisel kullanım için fon portföyü 
 - Sonuçlar `data/series/*.json` olarak depoya kaydedilir; böylece uygulama hiç açılmasa da fiyat geçmişi gün gün birikir.
 - Yeni bir fonu otomatik takibe almak için `data/config.json` içindeki `fonlar` listesine kodunu ekle.
 
+## Piyasa görüşü
+
+Kıyas karnesinde her piyasanın altında ince bir satır: hisselerde analist al/tut/sat dağılımı ve ortalama hedef fiyat farkı, diğerlerinde TradingView teknik gösterge özeti (Güçlü sat … Güçlü al), sağda 14 günlük RSI (70 üstü aşırı alım, 30 altı aşırı satım). Veri `data/gorus.json`, her veri çekiminde TradingView tarayıcısından güncellenir; `config.json`daki `tarama` alanı pazarı belirtir. Yatırım tavsiyesi değildir.
+
 ## Otomatik yedek
 
 Ayarlar → *Otomatik yedek*: veri telefonda kullanıcının parolasıyla şifrelenir (AES-GCM-256, PBKDF2-SHA256 310.000 tur) ve GitHub hesabındaki gizli bir Gist'e (`portfoyum-yedek.json`) yazılır. Her değişiklikten birkaç saniye sonra yeniden yedeklenir; eski sürümler Gist geçmişinde kalır. Yeni cihazda *GitHub yedeğinden geri yükle* ile anahtar + parola girilerek geri alınır. Parola cihazdan çıkmaz; unutulursa yedek açılamaz.

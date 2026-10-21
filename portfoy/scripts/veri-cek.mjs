@@ -346,6 +346,34 @@ async function updateBench(b, years) {
   return prev ? { ...prev, hata: errs.join(' | ') } : { id: b.id, ad: b.ad, tur: 'kiyas', points: [], hata: errs.join(' | ') };
 }
 
+// ---------- Piyasa görüşü: analist dağılımı (yalnızca hisselerde), teknik özet ve RSI (TradingView tarayıcısı) ----------
+const SCAN_COLS = ['close', 'RSI', 'Recommend.All', 'recommendation_buy', 'recommendation_over', 'recommendation_hold', 'recommendation_under', 'recommendation_sell', 'recommendation_total', 'price_target_average'];
+export function parseScanRow(d) {
+  const [close, rsi, teknik, buy, over, hold, under, sell, total, hedef] = d;
+  const out = { rsi: Number.isFinite(rsi) ? Math.round(rsi * 10) / 10 : null, teknik: Number.isFinite(teknik) ? Math.round(teknik * 1000) / 1000 : null };
+  if (total > 0) out.analist = { al: (buy || 0) + (over || 0), tut: hold || 0, sat: (under || 0) + (sell || 0), toplam: total, ...(hedef > 0 && close > 0 ? { hedef: Math.round((hedef / close - 1) * 1000) / 1000 } : {}) };
+  return out;
+}
+async function updateViews(cfg) {
+  const groups = {};
+  for (const b of cfg.kiyaslar || []) if (b.tarama) (groups[b.tarama] ||= []).push([b.id, b.taramaSembol || b.tv]);
+  const varliklar = {};
+  for (const [market, list] of Object.entries(groups)) {
+    try {
+      const res = await fetchRetry(`https://scanner.tradingview.com/${market}/scan`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Origin: 'https://www.tradingview.com', Referer: 'https://www.tradingview.com/' },
+        body: JSON.stringify({ symbols: { tickers: list.map((x) => x[1]), query: { types: [] } }, columns: SCAN_COLS }),
+      });
+      const rows = Object.fromEntries(((await res.json())?.data || []).map((r) => [r.s, r.d]));
+      for (const [id, sym] of list) if (rows[sym]) varliklar[id] = parseScanRow(rows[sym]); else log(`görüş: ${sym} bulunamadı`);
+    } catch (e) { log(`görüş (${market}) alınamadı: ${e.message}`); }
+  }
+  if (!Object.keys(varliklar).length) return;
+  await writeFile(path.join(DATA, 'gorus.json'), JSON.stringify({ guncelleme: new Date().toISOString(), varliklar }, null, 1));
+  log(`görüş: ${Object.keys(varliklar).length} varlık`);
+}
+
 async function main() {
   await mkdir(SERIES, { recursive: true });
   const cfg = JSON.parse(await readFile(path.join(DATA, 'config.json'), 'utf8'));
@@ -361,6 +389,7 @@ async function main() {
   }
   for (const b of cfg.kiyaslar || []) put(await updateBench(b, cfg.gecmisYil || 10));
   await writeFile(path.join(DATA, 'index.json'), JSON.stringify(index, null, 1));
+  await updateViews(cfg);
   const errs = Object.entries(index.seriler).filter(([, v]) => v.hata);
   log(`bitti. ${Object.keys(index.seriler).length} seri, ${errs.length} hatalı${errs.length ? ': ' + errs.map(([k]) => k).join(', ') : ''}`);
 }

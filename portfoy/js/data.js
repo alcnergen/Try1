@@ -38,6 +38,7 @@ async function getJSON(url) {
 export async function loadMarket(fundCodes) {
   const market = { index: null, raw: {}, names: {}, meta: {}, errors: [], tefasSon: null };
   try { market.index = await getJSON('data/index.json'); } catch (e) { market.errors.push('Veri dizini yok (Actions henüz çalışmamış olabilir)'); }
+  try { market.gorus = await getJSON('data/gorus.json'); } catch { market.gorus = null; }
   const ids = new Set([...fundCodes, ...BENCH_SERIES, 'EURTRY', 'JPYTRY', 'MEVFAIZ']);
   await Promise.all([...ids].map(async (id) => {
     try {

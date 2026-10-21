@@ -8,7 +8,7 @@ import {
 } from './calc.js';
 import { lineChart, legend } from './chart.js';
 
-export const APP_VERSION = '2026.10.21-c';
+export const APP_VERSION = '2026.10.21-d';
 
 // ---------- Durum ----------
 let S = store.load();
@@ -506,6 +506,27 @@ function kiyas(root) {
     return `<span class="bar"><span class="zero"></span><span class="${r >= 0 ? 'pos' : 'neg'}${clip ? ' clip' : ''}" style="width:${w.toFixed(1)}%;${r >= 0 ? 'left:50%' : `left:${(50 - w).toFixed(1)}%`}"></span><span class="mark" style="left:${(50 + (Math.max(-scale, Math.min(scale, portRet)) / scale) * 50).toFixed(1)}%"></span></span>`;
   };
 
+  // Piyasa görüşü: hisselerde analist dağılımı, diğerlerinde teknik gösterge özeti; RSI (14 gün)
+  const view = (id) => {
+    const g = M.gorus?.varliklar?.[BENCHES.find((b) => b.id === id)?.need?.[0]];
+    if (!g || (g.rsi == null && g.teknik == null && !g.analist)) return '';
+    let left = '';
+    if (g.analist) {
+      const a = g.analist, t = a.al + a.tut + a.sat || 1;
+      left = `<span class="mix" aria-hidden="true"><i class="al" style="width:${(a.al / t) * 100}%"></i><i class="tut" style="width:${(a.tut / t) * 100}%"></i><i class="sat" style="width:${(a.sat / t) * 100}%"></i></span>
+        <span>Analist: <b class="up">${a.al} al</b> · ${a.tut} tut · <b class="${a.sat ? 'down' : ''}">${a.sat} sat</b>${a.hedef != null ? ` · hedef ${a.hedef >= 0 ? '+' : '−'}%${num(Math.abs(a.hedef) * 100, 0)}` : ''}</span>`;
+    } else if (g.teknik != null) {
+      const k = g.teknik, i = k >= 0.5 ? 4 : k >= 0.1 ? 3 : k > -0.1 ? 2 : k > -0.5 ? 1 : 0;
+      const lbl = ['Güçlü sat', 'Sat', 'Nötr', 'Al', 'Güçlü al'][i];
+      left = `<span class="gauge" aria-hidden="true">${[0, 1, 2, 3, 4].map((j) => `<i class="${j === i ? 'on g' + i : ''}"></i>`).join('')}</span><span>Teknik: <b class="${i > 2 ? 'up' : i < 2 ? 'down' : ''}">${lbl}</b></span>`;
+    }
+    const r = g.rsi;
+    const zone = r == null ? '' : r >= 70 ? 'hot' : r <= 30 ? 'cold' : '';
+    const rsi = r == null ? '' : `<span class="rsi ${zone}" title="RSI (14 gün)">RSI ${num(r, 0)}${zone === 'hot' ? ' · aşırı alım' : zone === 'cold' ? ' · aşırı satım' : ''}</span>`;
+    return `<div class="k-view">${left ? `<span class="k-view-l">${left}</span>` : '<span></span>'}${rsi}</div>`;
+  };
+  const gorusTarih = M.gorus?.guncelleme ? new Date(M.gorus.guncelleme) : null;
+
   root.append(h(`
     <section class="card">
       <div class="row between wrap"><h2>${dTR(start)} – ${dTR(C.asOf)}</h2>
@@ -530,10 +551,12 @@ function kiyas(root) {
             <span class="${cls(r.ret)}">${pct(r.ret)}</span>
             <span class="k-res ${ahead ? 'up' : 'down'}"><b>${ahead ? '✓ Önde' : '✗ Geride'}</b><small>${num(Math.abs(d) * 100, 2)} puan · ${money(Math.abs(tl), ccy, 0)}</small></span>
             ${bar(r.ret)}
+            ${view(r.id)}
           </div>`;
         }).join('')}
       </div>
-      <p class="muted small">Her alışın tutarı aynı gün o piyasaya yatırılmış gibi hesaplanır. Çubuktaki mavi çizgi senin getirin, ince gri çizgi sıfır; ucu soluk çubuklar ölçeğe sığmayacak kadar uçta. Yabancı borsalar TL'ye çevrilmiş haliyle (kur etkisi dahil) karşılaştırılır.${C.cpiEst && C.cpiEst < C.today ? ` Enflasyonun ${dTR(C.cpiEst).slice(3)} sonrası, son 3 ayın ortalamasıyla tahmin edilir.` : ''}${net ? ' Portföyün stopaj sonrası, kıyaslar vergisiz alınmıştır.' : ''}</p>` : '<p>Kıyas verisi henüz yok. Veriler her gün otomatik çekilir; ilk çekimden sonra burada görünür.</p>'}
+      <p class="muted small">Her alışın tutarı aynı gün o piyasaya yatırılmış gibi hesaplanır. Çubuktaki mavi çizgi senin getirin, ince gri çizgi sıfır; ucu soluk çubuklar ölçeğe sığmayacak kadar uçta. Yabancı borsalar TL'ye çevrilmiş haliyle (kur etkisi dahil) karşılaştırılır.${C.cpiEst && C.cpiEst < C.today ? ` Enflasyonun ${dTR(C.cpiEst).slice(3)} sonrası, son 3 ayın ortalamasıyla tahmin edilir.` : ''}${net ? ' Portföyün stopaj sonrası, kıyaslar vergisiz alınmıştır.' : ''}</p>
+      ${gorusTarih ? `<p class="muted small">Görüş satırları: analist al/tut/sat dağılımı yalnızca tek tek hisselerde vardır (hedef = ortalama hedef fiyatın bugünkü fiyata göre farkı). Diğerlerinde TradingView'in teknik gösterge özeti (hareketli ortalamalar ve osilatörler, günlük) gösterilir. RSI 14 günlüktür: 70 üstü aşırı alım, 30 altı aşırı satım bölgesi sayılır. Göstergeler varlığın kendi piyasasındaki fiyata göredir (ör. altında ons $). Kısa vadeli sinyallerdir, yatırım tavsiyesi değildir. Güncelleme: ${dTR(gorusTarih.toISOString().slice(0, 10))} ${hhmm(gorusTarih)}.</p>` : ''}` : '<p>Kıyas verisi henüz yok. Veriler her gün otomatik çekilir; ilk çekimden sonra burada görünür.</p>'}
       ${missing.length ? `<p class="muted small">Verisi olmayan: ${missing.map((r) => esc(r.name)).join(', ')}</p>` : ''}
     </section>
     <section class="card"><h2>Zaman içinde karşılaştırma</h2><p class="muted small">Grafikte en çok 3 kıyas gösterilir</p><div id="pick"></div><div id="ch2" class="chart"></div><div id="lg2"></div></section>
