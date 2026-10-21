@@ -1,13 +1,10 @@
 {
- "guncelleme": "2026-10-20T22:56:34.781Z",
+ "guncelleme": "2026-10-21T08:28:31.602Z",
  "seriler": {
   "TGT": {
    "ad": "GARANTİ PORTFÖY KISA VADELİ BORÇLANMA ARAÇLARI FONU",
    "tur": "fon",
    "pb": "TRY",
-   "erken": [
-    "2026-10-21"
-   ],
    "kaynak": "tefas:TGT",
    "ilk": "2021-10-18",
    "son": "2026-10-21",
@@ -18,9 +15,6 @@
    "ad": "YAPI KREDİ PORTFÖY PARA PİYASASI FONU",
    "tur": "fon",
    "pb": "TRY",
-   "erken": [
-    "2026-10-21"
-   ],
    "kaynak": "tefas:YLB",
    "ilk": "2021-10-18",
    "son": "2026-10-21",
@@ -31,9 +25,6 @@
    "ad": "YAPI KREDİ PORTFÖY İKİNCİ PARA PİYASASI (TL) FONU",
    "tur": "fon",
    "pb": "TRY",
-   "erken": [
-    "2026-10-21"
-   ],
    "kaynak": "tefas:YVD",
    "ilk": "2022-07-04",
    "son": "2026-10-21",
@@ -47,7 +38,7 @@
    "kaynak": "tv:FX_IDC:USDTRY",
    "ilk": "2010-01-04",
    "son": "2026-10-21",
-   "deger": 49.5741,
+   "deger": 49.59806,
    "adet": 4383
   },
   "EURTRY": {
@@ -57,7 +48,7 @@
    "kaynak": "tv:FX_IDC:EURTRY",
    "ilk": "2010-01-04",
    "son": "2026-10-21",
-   "deger": 55.68353,
+   "deger": 55.68511,
    "adet": 4383
   },
   "JPYTRY": {
@@ -67,7 +58,7 @@
    "kaynak": "tv:FX_IDC:JPYTRY",
    "ilk": "2009-12-31",
    "son": "2026-10-21",
-   "deger": 0.31315,
+   "deger": 0.313558,
    "adet": 4383
   },
   "GOLD": {
@@ -77,7 +68,7 @@
    "kaynak": "tv:TVC:GOLD",
    "ilk": "2009-05-27",
    "son": "2026-10-21",
-   "deger": 4120.99,
+   "deger": 4122.486,
    "adet": 4383
   },
   "XU100": {
@@ -86,9 +77,9 @@
    "pb": "TRY",
    "kaynak": "tv:BIST:XU100",
    "ilk": "2009-05-06",
-   "son": "2026-10-20",
-   "deger": 11797.7,
-   "adet": 4382
+   "son": "2026-10-21",
+   "deger": 11697.12,
+   "adet": 4383
   },
   "SPX": {
    "ad": "S&P 500",
@@ -116,9 +107,9 @@
    "pb": "TRY",
    "kaynak": "tv:XETR:DAX",
    "ilk": "2009-07-21",
-   "son": "2026-10-20",
-   "deger": 25304.42,
-   "adet": 4382
+   "son": "2026-10-21",
+   "deger": 25343.2,
+   "adet": 4383
   },
   "N225": {
    "ad": "Nikkei 225",
@@ -126,9 +117,9 @@
    "pb": "TRY",
    "kaynak": "tv:TVC:NI225",
    "ilk": "2008-11-12",
-   "son": "2026-10-20",
-   "deger": 64075.35,
-   "adet": 4382
+   "son": "2026-10-21",
+   "deger": 64621.02,
+   "adet": 4383
   },
   "MSCIW": {
    "ad": "MSCI Dünya (URTH)",
