@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { valueAt, positionAt, fundState, portfolioHistory, replicate, periodReturn, projectScenario, monthsToTarget, combine, cpiDaily, findCashDuplicates, removeCashDuplicates, nextBusinessDay, applyValuationPatch } from '../js/calc.js';
 import { addToConfig, isTracked, repoInfo } from '../js/track.js';
 import { depositSeries, series } from '../js/data.js';
-import { parseTefas, parseTvMessage, tvDate, parseCanli, mergePoints, pickTvSymbol, assetEntry, ykbEarly, garantiEarly, nextBizDay, parseScanRow } from '../scripts/veri-cek.mjs';
+import { parseTefas, parseTvMessage, tvDate, parseCanli, mergePoints, pickTvSymbol, assetEntry, ykbEarly, garantiEarly, nextBizDay, parseScanRow, aggregate } from '../scripts/veri-cek.mjs';
 
 const close = (a, b, eps = 1e-6) => assert.ok(Math.abs(a - b) < eps, `${a} ≈ ${b}`);
 
@@ -207,4 +207,18 @@ test('piyasa görüşü satırı (TradingView tarayıcısı)', () => {
   assert.deepEqual(parseScanRow([216.47, 40.903, -0.0879, 62, 7, 2, 0, 1, 72, 334.45]), { rsi: 40.9, teknik: -0.088, analist: { al: 69, tut: 2, sat: 1, toplam: 72, hedef: 0.545 } });
   // endeks: analist yok
   assert.deepEqual(parseScanRow([7712.57, 49.43, -0.0242, null, null, null, null, null, null, null]), { rsi: 49.4, teknik: -0.024 });
+});
+
+test('içerik bazlı analist görüşü (ağırlıklı)', () => {
+  const rows = [
+    { w: 3, total: 10, buy: 8, over: 0, hold: 2, under: 0, sell: 0, hedef: 120, close: 100 }, // %80 al, hedef +%20
+    { w: 1, total: 4, buy: 0, over: 0, hold: 2, under: 1, sell: 1, hedef: 90, close: 100 }, // %50 tut %50 sat, hedef −%10
+    { w: 1, total: null }, // analist yok → kapsam dışı
+  ];
+  const a = aggregate(rows);
+  assert.equal(a.hisse, 2); assert.equal(a.gorus, 14); assert.equal(a.kapsam, 0.8);
+  assert.equal(a.al, 0.6); assert.equal(a.tut, 0.275); assert.equal(a.sat, 0.125); assert.equal(a.hedef, 0.125);
+  // tavan: tek hisse en fazla %50
+  const t = aggregate([{ w: 9, total: 1, buy: 1 }, { w: 1, total: 1, sell: 1 }], { tavan: 0.5 });
+  assert.equal(t.al, 0.5); assert.equal(t.sat, 0.5);
 });
