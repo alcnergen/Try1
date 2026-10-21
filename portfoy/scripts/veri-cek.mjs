@@ -457,6 +457,9 @@ async function updateViews(cfg) {
     if (!b.icerik) continue;
     try {
       const ic = await composite(b.icerik);
+      // ima edilen hedef fiyat: bugünkü fiyat × (1 + içerikteki hisselerin ağırlıklı hedef farkı)
+      const px = varliklar[b.id]?.fiyat;
+      if (ic && ic.hedef != null && px > 0) ic.hedefFiyat = Math.round(px * (1 + ic.hedef) * 100) / 100;
       if (ic) { (varliklar[b.id] ||= {}).icerik = ic; log(`görüş: ${b.id} içerik bazlı ${ic.hisse} hisse, ${ic.gorus} görüş, kapsam %${Math.round(ic.kapsam * 100)}`); }
     } catch (e) { log(`görüş: ${b.id} içerik alınamadı: ${e.message}`); }
   }

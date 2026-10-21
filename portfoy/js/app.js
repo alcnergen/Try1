@@ -8,7 +8,7 @@ import {
 } from './calc.js';
 import { lineChart, legend } from './chart.js';
 
-export const APP_VERSION = '2026.10.21-f';
+export const APP_VERSION = '2026.10.21-g';
 
 // ---------- Durum ----------
 let S = store.load();
@@ -516,18 +516,22 @@ function kiyas(root) {
       const k = g.teknik, i = k >= 0.5 ? 4 : k >= 0.1 ? 3 : k > -0.1 ? 2 : k > -0.5 ? 1 : 0;
       return `<span class="gauge" aria-hidden="true">${[0, 1, 2, 3, 4].map((j) => `<i class="${j === i ? 'on g' + i : ''}"></i>`).join('')}</span><span>Teknik: <b class="${i > 2 ? 'up' : i < 2 ? 'down' : ''}">${['Güçlü sat', 'Sat', 'Nötr', 'Al', 'Güçlü al'][i]}</b></span>`;
     };
-    const hd = (x) => (x != null ? ` · hedef ${x >= 0 ? '+' : '−'}%${num(Math.abs(x) * 100, 0)}` : '');
+    // Hedef fiyat: hisse/ETF'de para birimiyle, endekste puan olarak; yüzde fark ipucunda
+    const bd = BENCHES.find((b) => b.id === id), sid = bd?.need?.[0];
+    const unit = sid?.startsWith('K_') ? (bd.need.includes('USDTRY') ? ' $' : bd.need.includes('EURTRY') ? ' €' : ' ₺') : '';
+    const tp = (v, pctv, approx) => (v > 0 ? `<span class="tp" title="Analistlerin ortalama 12 aylık hedef fiyatı (bugünkü fiyata göre ${pctv >= 0 ? '+' : '−'}%${num(Math.abs(pctv) * 100, 0)})">hedef ${approx ? '≈' : ''}${num(v, v >= 1000 ? 0 : 2)}${unit}</span>` : '');
+    const hd = (a) => (a.hedefFiyat ? ` · ${tp(a.hedefFiyat, a.hedef)}` : a.hedef != null ? ` · hedef ${a.hedef >= 0 ? '+' : '−'}%${num(Math.abs(a.hedef) * 100, 0)}` : '');
     if (!g.analist && g.icerik) {
       // ETF/endeks: içindeki hisselerin analist dağılımı (ağırlıklı); teknik özet ikinci satırda
       const c = g.icerik, p = (x) => `%${num(x * 100, 0)}`;
       const line1 = `${mix(c.al, c.tut, c.sat)}<span>Analist · ${c.hisse} hisse${c.kapsam < 0.9 ? '*' : ''}: <b class="up">${p(c.al)} al</b> · ${p(c.tut)} tut · <b class="${c.sat >= 0.05 ? 'down' : ''}">${p(c.sat)} sat</b></span>`;
       const r = g.rsi, zone = r == null ? '' : r >= 70 ? 'hot' : r <= 30 ? 'cold' : '';
       return `<div class="k-view"><span class="k-view-l">${line1}</span></div>
-        <div class="k-view">${g.teknik != null ? `<span class="k-view-l">${tech()}</span>` : '<span></span>'}${r == null && c.hedef == null ? '' : `<span class="rsi ${zone}" title="Hedef: analistlerin ortalama 12 aylık hedef fiyatı · RSI (14 gün)">${c.hedef != null ? `<span class="muted">hedef ${c.hedef >= 0 ? '+' : '−'}%${num(Math.abs(c.hedef) * 100, 0)} · </span>` : ''}${r == null ? '' : 'RSI ' + num(r, 0)}${zone === 'hot' ? ' · aşırı alım' : zone === 'cold' ? ' · aşırı satım' : ''}</span>`}</div>`;
+        <div class="k-view">${g.teknik != null ? `<span class="k-view-l">${tech()}</span>` : '<span></span>'}${r == null && c.hedef == null ? '' : `<span class="rsi ${zone}" title="Hedef: analistlerin ortalama 12 aylık hedef fiyatı · RSI (14 gün)">${c.hedefFiyat ? `<span class="muted">${tp(c.hedefFiyat, c.hedef, true)} · </span>` : c.hedef != null ? `<span class="muted">hedef ${c.hedef >= 0 ? '+' : '−'}%${num(Math.abs(c.hedef) * 100, 0)} · </span>` : ''}${r == null ? '' : 'RSI ' + num(r, 0)}${zone === 'hot' ? ' · aşırı alım' : zone === 'cold' ? ' · aşırı satım' : ''}</span>`}</div>`;
     }
     if (g.analist) {
       const a = g.analist, t = a.al + a.tut + a.sat || 1;
-      left = `${mix(a.al / t, a.tut / t, a.sat / t)}<span>Analist · ${a.toplam} görüş: <b class="up">${a.al} al</b> · ${a.tut} tut · <b class="${a.sat ? 'down' : ''}">${a.sat} sat</b>${hd(a.hedef)}</span>`;
+      left = `${mix(a.al / t, a.tut / t, a.sat / t)}<span>Analist · ${a.toplam} görüş: <b class="up">${a.al} al</b> · ${a.tut} tut · <b class="${a.sat ? 'down' : ''}">${a.sat} sat</b>${hd(a)}</span>`;
     } else if (g.teknik != null) left = tech();
     const r = g.rsi;
     const zone = r == null ? '' : r >= 70 ? 'hot' : r <= 30 ? 'cold' : '';
@@ -565,7 +569,7 @@ function kiyas(root) {
         }).join('')}
       </div>
       <p class="muted small">Her alışın tutarı aynı gün o piyasaya yatırılmış gibi hesaplanır. Çubuktaki mavi çizgi senin getirin, ince gri çizgi sıfır; ucu soluk çubuklar ölçeğe sığmayacak kadar uçta. Yabancı borsalar TL'ye çevrilmiş haliyle (kur etkisi dahil) karşılaştırılır.${C.cpiEst && C.cpiEst < C.today ? ` Enflasyonun ${dTR(C.cpiEst).slice(3)} sonrası, son 3 ayın ortalamasıyla tahmin edilir.` : ''}${net ? ' Portföyün stopaj sonrası, kıyaslar vergisiz alınmıştır.' : ''}</p>
-      ${gorusTarih ? `<p class="muted small">Görüş satırları: NVIDIA'da analistlerin kendisi için verdiği al/tut/sat sayıları; endeks ve ETF'lerde içindeki hisselerin analist dağılımlarının ağırlıklı ortalaması (S&P 500, Nasdaq 100, DAX, Nikkei, BIST 100: üyeler, piyasa değeri ağırlıklı; SMH: SOX yarı iletken endeksi; IGV: ABD'nin en büyük 40 yazılım şirketi; DRAM: Micron, Samsung, SK Hynix, Seagate eşit ağırlık; NASA: fonun günlük içerik listesindeki ABD hisseleri). Hedef = ortalama hedef fiyatın bugünkü fiyata göre farkı (12 ay). Analistler genelde "al"a yatkındır; asıl bilgi zaman içindeki değişimdedir. ${(() => { const low = rows.map((r) => [r, M.gorus?.varliklar?.[BENCHES.find((b) => b.id === r.id)?.need?.[0]]?.icerik]).filter(([, c]) => c && c.kapsam < 0.9); return low.length ? ` * Analist görüşü olan hisseler fonun yalnızca bir kısmını oluşturuyor: ${low.map(([r, c]) => `${esc(r.name)} %${num(c.kapsam * 100, 0)}`).join(', ')}.` : ''; })()} Döviz, emtia ve kriptoda analist dağılımı yoktur; teknik özet TradingView'in günlük gösterge özetidir (hareketli ortalamalar ve osilatörler, uzman görüşü değildir). RSI 14 günlüktür: 70 üstü aşırı alım, 30 altı aşırı satım bölgesi sayılır. Göstergeler varlığın kendi piyasasındaki fiyata göredir (ör. altında ons $). Kısa vadeli sinyallerdir, yatırım tavsiyesi değildir. Güncelleme: ${dTR(gorusTarih.toISOString().slice(0, 10))} ${hhmm(gorusTarih)}. <button type="button" class="link" id="gyenile">↻ Görüşleri yenile</button></p>` : ''}` : '<p>Kıyas verisi henüz yok. Veriler her gün otomatik çekilir; ilk çekimden sonra burada görünür.</p>'}
+      ${gorusTarih ? `<p class="muted small">Görüş satırları: NVIDIA'da analistlerin kendisi için verdiği al/tut/sat sayıları; endeks ve ETF'lerde içindeki hisselerin analist dağılımlarının ağırlıklı ortalaması (S&P 500, Nasdaq 100, DAX, Nikkei, BIST 100: üyeler, piyasa değeri ağırlıklı; SMH: SOX yarı iletken endeksi; IGV: ABD'nin en büyük 40 yazılım şirketi; DRAM: Micron, Samsung, SK Hynix, Seagate eşit ağırlık; NASA: fonun günlük içerik listesindeki ABD hisseleri). Hedef: analistlerin 12 aylık ortalama hedef fiyatı; endeks ve ETF'lerde (≈) içindeki hisselerin hedeflerinden çıkan ağırlıklı farkın bugünkü fiyata uygulanmasıyla bulunur (endekslerde puan). Yüzde farkı görmek için hedefe dokunun. Analistler genelde "al"a yatkındır; asıl bilgi zaman içindeki değişimdedir. ${(() => { const low = rows.map((r) => [r, M.gorus?.varliklar?.[BENCHES.find((b) => b.id === r.id)?.need?.[0]]?.icerik]).filter(([, c]) => c && c.kapsam < 0.9); return low.length ? ` * Analist görüşü olan hisseler fonun yalnızca bir kısmını oluşturuyor: ${low.map(([r, c]) => `${esc(r.name)} %${num(c.kapsam * 100, 0)}`).join(', ')}.` : ''; })()} Döviz, emtia ve kriptoda analist dağılımı yoktur; teknik özet TradingView'in günlük gösterge özetidir (hareketli ortalamalar ve osilatörler, uzman görüşü değildir). RSI 14 günlüktür: 70 üstü aşırı alım, 30 altı aşırı satım bölgesi sayılır. Göstergeler varlığın kendi piyasasındaki fiyata göredir (ör. altında ons $). Kısa vadeli sinyallerdir, yatırım tavsiyesi değildir. Güncelleme: ${dTR(gorusTarih.toISOString().slice(0, 10))} ${hhmm(gorusTarih)}. <button type="button" class="link" id="gyenile">↻ Görüşleri yenile</button></p>` : ''}` : '<p>Kıyas verisi henüz yok. Veriler her gün otomatik çekilir; ilk çekimden sonra burada görünür.</p>'}
       ${missing.length ? `<p class="muted small">Verisi olmayan: ${missing.map((r) => esc(r.name)).join(', ')}</p>` : ''}
     </section>
     <section class="card"><h2>Zaman içinde karşılaştırma</h2><p class="muted small">Grafikte en çok 3 kıyas gösterilir</p><div id="pick"></div><div id="ch2" class="chart"></div><div id="lg2"></div></section>
@@ -576,6 +580,7 @@ function kiyas(root) {
   root.querySelectorAll('[data-c]').forEach((b) => (b.onclick = () => { ui.cmpCcy = b.dataset.c; render(); }));
   // Kıyas seçimi
   const pick = root.querySelector('#pick');
+  root.querySelectorAll('.tp').forEach((el) => (el.onclick = () => toast(el.title, 4000)));
   const gy = root.querySelector('#gyenile');
   if (gy) gy.onclick = () => refreshViews(gy);
   // 30 dakikadan eskiyse Kıyas açılınca kendiliğinden yenilenir
