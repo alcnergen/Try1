@@ -12,6 +12,9 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { SCAN_COLS, parseScanRow } from '../js/data.js';
+export { parseScanRow };
+
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DATA = path.join(ROOT, 'data');
 const SERIES = path.join(DATA, 'series');
@@ -347,17 +350,11 @@ async function updateBench(b, years) {
 }
 
 // ---------- Piyasa görüşü: analist dağılımı (yalnızca hisselerde), teknik özet ve RSI (TradingView tarayıcısı) ----------
-const SCAN_COLS = ['close', 'RSI', 'Recommend.All', 'recommendation_buy', 'recommendation_over', 'recommendation_hold', 'recommendation_under', 'recommendation_sell', 'recommendation_total', 'price_target_average'];
-export function parseScanRow(d) {
-  const [close, rsi, teknik, buy, over, hold, under, sell, total, hedef] = d;
-  const out = { rsi: Number.isFinite(rsi) ? Math.round(rsi * 10) / 10 : null, teknik: Number.isFinite(teknik) ? Math.round(teknik * 1000) / 1000 : null };
-  if (total > 0) out.analist = { al: (buy || 0) + (over || 0), tut: hold || 0, sat: (under || 0) + (sell || 0), toplam: total, ...(hedef > 0 && close > 0 ? { hedef: Math.round((hedef / close - 1) * 1000) / 1000 } : {}) };
-  return out;
-}
 async function updateViews(cfg) {
   const groups = {};
   for (const b of cfg.kiyaslar || []) if (b.tarama) (groups[b.tarama] ||= []).push([b.id, b.taramaSembol || b.tv]);
   const varliklar = {};
+  // Not: aynı istek uygulamada tarayıcıdan da yapılır (js/data.js liveViews)
   for (const [market, list] of Object.entries(groups)) {
     try {
       const res = await fetchRetry(`https://scanner.tradingview.com/${market}/scan`, {
