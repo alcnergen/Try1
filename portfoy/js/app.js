@@ -8,7 +8,7 @@ import {
 } from './calc.js';
 import { lineChart, legend } from './chart.js';
 
-export const APP_VERSION = '2026.10.21-k';
+export const APP_VERSION = '2026.10.21-l';
 
 // ---------- Durum ----------
 let S = store.load();
@@ -984,12 +984,20 @@ function manualPrice(id, label) {
   const fund = assetKind(id) === 'fon';
   const next = nextBusinessDay(C.today);
   const def = fund && new Date().getHours() >= 18 ? next : C.today;
+  const lastRaw = M.raw[id]?.[M.raw[id].length - 1]?.[0] || '';
+  const rawOn = (d) => M.raw[id]?.find((p) => p[0] === d)?.[1];
   const body = h(`<form class="form" id="mp">
     <p class="muted small">Otomatik veri gelmediğinde ya da gecikmeli olduğunda kullan. O gün için otomatik fiyat gelince o geçerli olur, elle girdiğin kendiliğinden devre dışı kalır.${fund ? ` <b>Fonlarda 18:00'den sonra bankada görünen fiyat ertesi iş gününün (${dTR(next)}) fiyatıdır;</b> tarihi ona göre seç.` : ''}</p>
     <label>Tarih<input name="date" type="date" value="${def}" max="${fund ? next : C.today}"></label>
+    <p class="small warn" id="mpw" hidden></p>
     <label>${esc(label || 'Birim fiyat (₺)')}<input name="v" inputmode="decimal" required></label>
     <button class="btn full" type="submit">Kaydet</button>
-    ${Object.keys(S.manual[id] || {}).length ? `<h3>Elle girilenler</h3><div class="tbl-wrap"><table class="tbl"><tbody>${Object.entries(S.manual[id]).sort().reverse().map(([d, v]) => `<tr><td>${dTR(d)}</td><td>${num(v, 6)}${d <= (M.raw[id]?.[M.raw[id].length - 1]?.[0] || '') ? ' <span class="muted small">(otomatik fiyat geçerli)</span>' : ''}</td><td><button type="button" class="link" data-d="${d}">Sil</button></td></tr>`).join('')}</tbody></table></div>` : ''}
+    ${Object.keys(S.manual[id] || {}).length ? `<h3>Elle girilenler</h3><div class="tbl-wrap"><table class="tbl"><tbody>${Object.entries(S.manual[id]).sort().reverse().map(([d, v]) => {
+      const off = d <= lastRaw;
+      // Sık hata: bankada 18:00'den sonra görünen (ertesi günün) fiyatı bugünün tarihiyle girmek → tek dokunuşla taşı
+      const canMove = fund && off && nextBusinessDay(d) > lastRaw && !S.manual[id][nextBusinessDay(d)];
+      return `<tr><td>${dTR(d)}</td><td>${num(v, 6)}${off ? ` <span class="muted small">(otomatik fiyat geçerli${rawOn(d) ? `: ${num(rawOn(d), 6)}` : ''})</span>` : ''}</td><td>${canMove ? `<button type="button" class="link" data-mv="${d}">${dTR(nextBusinessDay(d)).slice(0, 5)} tarihine taşı</button> ` : ''}<button type="button" class="link" data-d="${d}">Sil</button></td></tr>`;
+    }).join('')}</tbody></table></div>` : ''}
   </form>`);
   const dlg = sheet(`${id} — elle değer`, body);
   const form = dlg.querySelector('#mp');
@@ -1001,6 +1009,14 @@ function manualPrice(id, label) {
     persist(); dlg.close(); render();
   };
   dlg.querySelectorAll('[data-d]').forEach((b) => (b.onclick = () => { delete S.manual[id][b.dataset.d]; persist(); dlg.close(); render(); manualPrice(id, label); }));
+  dlg.querySelectorAll('[data-mv]').forEach((b) => (b.onclick = () => {
+    const d = b.dataset.mv, to = nextBusinessDay(d);
+    S.manual[id][to] = S.manual[id][d]; delete S.manual[id][d];
+    persist(); dlg.close(); render(); toast(`${id} fiyatı ${dTR(to)} tarihine taşındı ✓`);
+  }));
+  // seçilen gün için otomatik fiyat zaten varsa uyar
+  const warn = () => { const w = dlg.querySelector('#mpw'), d = form.date.value; w.hidden = !(d && d <= lastRaw); if (!w.hidden) w.textContent = `Bu gün için otomatik fiyat var${rawOn(d) ? ` (${num(rawOn(d), 6)})` : ''}; elle gireceğin kullanılmaz.${fund ? ` Bankada 18:00'den sonra gördüğün fiyatsa tarihi ${dTR(nextBusinessDay(lastRaw))} seç.` : ''}`; };
+  form.date.addEventListener('input', warn); warn();
 }
 
 function settings() {
