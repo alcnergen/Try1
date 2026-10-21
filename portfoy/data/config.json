@@ -18,6 +18,14 @@
     { "id": "DAX", "ad": "DAX", "tv": "XETR:DAX" },
     { "id": "N225", "ad": "Nikkei 225", "tv": "TVC:NI225" },
     { "id": "MSCIW", "ad": "MSCI Dünya (URTH)", "tv": "AMEX:URTH" },
+    { "id": "BTCUSD", "ad": "Bitcoin ($)", "tv": "BITSTAMP:BTCUSD" },
+    { "id": "XRPUSD", "ad": "Ripple XRP ($)", "tv": "BITSTAMP:XRPUSD" },
+    { "id": "SILVER", "ad": "Gümüş (ons, $)", "tv": "TVC:SILVER" },
+    { "id": "K_SMH", "ad": "VanEck Semiconductor ETF (SMH)", "tv": "NASDAQ:SMH" },
+    { "id": "K_NVDA", "ad": "NVIDIA (NVDA)", "tv": "NASDAQ:NVDA" },
+    { "id": "K_IGV", "ad": "iShares Expanded Tech-Software ETF (IGV)", "tv": "AMEX:IGV" },
+    { "id": "K_DRAM", "ad": "Roundhill Memory ETF (DRAM)", "tv": "AMEX:DRAM" },
+    { "id": "K_NASA", "ad": "Tema Space Innovators ETF (NASA)", "tv": "AMEX:NASA" },
     { "id": "TUFE", "ad": "TÜFE (aylık endeks)", "tv": "ECONOMICS:TRCPI", "tf": "1M" },
     { "id": "MEVFAIZ", "ad": "Mevduat faizi (TCMB, yıllık %)", "tv": "ECONOMICS:TRDIR", "tf": "1M" }
   ]

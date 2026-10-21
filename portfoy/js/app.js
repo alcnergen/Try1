@@ -8,7 +8,7 @@ import {
 } from './calc.js';
 import { lineChart, legend } from './chart.js';
 
-export const APP_VERSION = '2026.10.21-a';
+export const APP_VERSION = '2026.10.21-b';
 
 // ---------- Durum ----------
 let S = store.load();
@@ -47,7 +47,7 @@ export function parseNum(s) {
   else if ((s.match(/\./g) || []).length > 1) s = s.replace(/\./g, '');
   return Number(s);
 }
-const COLORS = { PORT: 'var(--s1)', USD: 'var(--s2)', XU100: 'var(--s3)', ALTIN: 'var(--s4)', NDX: 'var(--s5)', DAX: 'var(--s6)', SPX: 'var(--s7)', EUR: 'var(--s8)', N225: 'var(--s9)', MSCIW: 'var(--s10)', MEVDUAT: 'var(--s11)', TUFE: 'var(--s12)', COST: 'var(--muted)' };
+const COLORS = { PORT: 'var(--s1)', USD: 'var(--s2)', XU100: 'var(--s3)', ALTIN: 'var(--s4)', NDX: 'var(--s5)', DAX: 'var(--s6)', SPX: 'var(--s7)', EUR: 'var(--s8)', N225: 'var(--s9)', MSCIW: 'var(--s10)', MEVDUAT: 'var(--s11)', TUFE: 'var(--s12)', BTC: 'var(--s13)', XRP: 'var(--s14)', GUMUS: 'var(--s15)', SMH: 'var(--s16)', NVDA: 'var(--s17)', IGV: 'var(--s18)', DRAM: 'var(--s19)', NASA: 'var(--s20)', COST: 'var(--muted)' };
 const FUND_COLORS = ['var(--s1)', 'var(--s7)', 'var(--s3)', 'var(--s5)', 'var(--s6)', 'var(--s8)'];
 const benchName = (id) => {
   if (id !== 'MEVDUAT') return BENCHES.find((b) => b.id === id)?.ad || id;

@@ -14,9 +14,20 @@ export const BENCHES = [
   { id: 'DAX', ad: 'DAX', renk: 6, need: ['DAX', 'EURTRY'], tl: (s) => combine(s.DAX, s.EURTRY, (a, b) => a * b) },
   { id: 'N225', ad: 'Nikkei 225', renk: 9, need: ['N225', 'JPYTRY'], tl: (s) => combine(s.N225, s.JPYTRY, (a, b) => a * b) },
   { id: 'MSCIW', ad: 'MSCI Dünya', renk: 10, need: ['MSCIW', 'USDTRY'], tl: (s) => combine(s.MSCIW, s.USDTRY, (a, b) => a * b) },
+  { id: 'BTC', ad: 'Bitcoin', renk: 13, need: ['BTCUSD', 'USDTRY'], tl: (s) => combine(s.BTCUSD, s.USDTRY, (a, b) => a * b) },
+  { id: 'XRP', ad: 'Ripple (XRP)', renk: 14, need: ['XRPUSD', 'USDTRY'], tl: (s) => combine(s.XRPUSD, s.USDTRY, (a, b) => a * b) },
+  { id: 'GUMUS', ad: 'Gram gümüş', renk: 15, need: ['SILVER', 'USDTRY'], tl: (s) => combine(s.SILVER, s.USDTRY, (g, k) => (g * k) / OZ) },
+  { id: 'SMH', ad: 'SMH (yarı iletken ETF)', renk: 16, need: ['K_SMH', 'USDTRY'], tl: (s) => combine(s.K_SMH, s.USDTRY, (a, b) => a * b) },
+  { id: 'NVDA', ad: 'Nvidia', renk: 17, need: ['K_NVDA', 'USDTRY'], tl: (s) => combine(s.K_NVDA, s.USDTRY, (a, b) => a * b) },
+  { id: 'IGV', ad: 'IGV (yazılım ETF)', renk: 18, need: ['K_IGV', 'USDTRY'], tl: (s) => combine(s.K_IGV, s.USDTRY, (a, b) => a * b) },
+  { id: 'DRAM', ad: 'DRAM (bellek ETF)', renk: 19, need: ['K_DRAM', 'USDTRY'], tl: (s) => combine(s.K_DRAM, s.USDTRY, (a, b) => a * b) },
+  { id: 'NASA', ad: 'NASA (uzay ETF)', renk: 20, need: ['K_NASA', 'USDTRY'], tl: (s) => combine(s.K_NASA, s.USDTRY, (a, b) => a * b) },
   { id: 'TUFE', ad: 'Enflasyon (TÜFE)', renk: 12, need: ['TUFE'], tl: (s) => cpiDaily(s.TUFE).points },
   { id: 'MEVDUAT', ad: 'Mevduat', renk: 11, need: [], tl: null },
 ];
+
+// Kıyasların ihtiyaç duyduğu ham seriler (data/series altındaki dosya adları)
+const BENCH_SERIES = [...new Set(BENCHES.flatMap((b) => b.need))];
 
 async function getJSON(url) {
   const res = await fetch(url, { cache: 'no-cache' });
@@ -27,7 +38,7 @@ async function getJSON(url) {
 export async function loadMarket(fundCodes) {
   const market = { index: null, raw: {}, names: {}, meta: {}, errors: [], tefasSon: null };
   try { market.index = await getJSON('data/index.json'); } catch (e) { market.errors.push('Veri dizini yok (Actions henüz çalışmamış olabilir)'); }
-  const ids = new Set([...fundCodes, 'USDTRY', 'EURTRY', 'JPYTRY', 'GOLD', 'XU100', 'SPX', 'NDX', 'DAX', 'N225', 'MSCIW', 'TUFE', 'MEVFAIZ']);
+  const ids = new Set([...fundCodes, ...BENCH_SERIES, 'EURTRY', 'JPYTRY', 'MEVFAIZ']);
   await Promise.all([...ids].map(async (id) => {
     try {
       const s = await getJSON(`data/series/${encodeURIComponent(id)}.json`);
@@ -93,7 +104,7 @@ export function depositSeries(rates, { auto = true, tax = 0.175, manualRate = 0.
 
 export function benchSeries(market, manual, settings = {}) {
   const s = {};
-  for (const id of ['USDTRY', 'EURTRY', 'JPYTRY', 'GOLD', 'XU100', 'SPX', 'NDX', 'DAX', 'N225', 'MSCIW', 'TUFE']) s[id] = series(market, manual, id);
+  for (const id of BENCH_SERIES) s[id] = series(market, manual, id);
   const out = {};
   for (const b of BENCHES) {
     if (b.id === 'MEVDUAT') continue;

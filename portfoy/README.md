@@ -8,7 +8,7 @@ Telefonda ana ekrana eklenen, yalnızca kişisel kullanım için fon portföyü 
 |---|---|
 | **Özet** | Toplam değer (₺/$), günlük değişim, brüt ve net (stopaj sonrası) kâr, dolar bazında getiri, günlük ortalama ve yıllık karşılığı, değer grafiği, gün gün kayıt tablosu |
 | **Fonlar** | Fon başına adet, ortalama maliyet, kâr; alış/satış işlemleri; elle fiyat girişi; fon başına stopaj oranı; fon grafiği ve kıyaslar |
-| **Kıyas** | "Aynı parayı aynı günlerde dolara / altına / BIST 100 / S&P 500 / Nasdaq / DAX / Nikkei / MSCI Dünya / mevduata yatırsaydım" tablosu ve grafiği; 1 ay–5 yıl ve tüm zamanlar dönemsel getiri tablosu (TL veya USD bazında) |
+| **Kıyas** | "Aynı parayı aynı günlerde dolara / euroya / gram altına / gram gümüşe / Bitcoin / XRP / BIST 100 / S&P 500 / Nasdaq / DAX / Nikkei / MSCI Dünya / SMH / NVIDIA / IGV / DRAM / NASA ETF'lerine / mevduata / enflasyona yatırsaydım" tablosu ve grafiği; 1 ay–5 yıl ve tüm zamanlar dönemsel getiri tablosu (TL veya USD bazında) |
 | **Senaryo** | Fon bazında beklenen yıllık getiri, kötümser/baz/iyimser senaryolar, aylık ek yatırım, dönem sonu kur, hedef değere ulaşma süresi |
 | **Diğer** | Gayrimenkul, arsa, araç, BES, nakit: tarih tarih değerleme, TL/USD toplam, tarihlere göre izlence tablosu |
 
