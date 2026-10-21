@@ -8,7 +8,7 @@ import {
 } from './calc.js';
 import { lineChart, legend } from './chart.js';
 
-export const APP_VERSION = '2026.10.21-g';
+export const APP_VERSION = '2026.10.21-h';
 
 // ---------- Durum ----------
 let S = store.load();
@@ -963,7 +963,7 @@ function trackTokenSheet(intro, onSaved) {
     e.preventDefault();
     const token = form.token.value.trim();
     const btn = form.querySelector('button[type=submit]');
-    btn.disabled = true; msg.textContent = `${owner}/${repo} erişimi kontrol ediliyor…`;
+    btn.disabled = true; msg.textContent = `${owner}/${repo} yazma izni deneniyor (bir veri çekimi başlatır)…`;
     try {
       await track.verify(token);
       track.saveToken(token);
@@ -1220,9 +1220,13 @@ async function maybeRequestFetch({ force = false } = {}) {
   if (!token) { if (force) toast('Şimdi çekmek için Ayarlar → Otomatik takip anahtarı gerekli'); return; }
   if (!force && Date.now() - upd < 30 * 60e3) return;
   let last = 0; try { last = Number(localStorage.getItem('portfoy.istek')) || 0; } catch { /* yok */ }
-  if (Date.now() - last < 10 * 60e3) { toast('Fiyat çekimi zaten istendi; birkaç dakika içinde gelir.'); return; }
+  if (Date.now() - last < 10 * 60e3) { if (force) toast('Fiyat çekimi zaten istendi; birkaç dakika içinde gelir.'); return; }
+  // izin hatası bir kez gösterilir; ↻ ile her seferinde tekrar uyarmaz (Ayarlar → Şimdi çek her zaman dener)
+  let denied = false; try { denied = localStorage.getItem('portfoy.istekIzin') === token.slice(-8); } catch { /* yok */ }
+  if (denied && !force) return;
   try {
     await track.requestFetch(token);
+    try { localStorage.removeItem('portfoy.istekIzin'); } catch { /* yok */ }
     try { localStorage.setItem('portfoy.istek', String(Date.now())); } catch { /* yok */ }
     toast('Güncel fiyatlar çekiliyor; 3-5 dakika içinde gelir.', 6000);
     clearInterval(fetchWatch);
@@ -1234,7 +1238,31 @@ async function maybeRequestFetch({ force = false } = {}) {
         if (Date.parse(idx.guncelleme) > upd) { clearInterval(fetchWatch); await refresh(); toast('Fiyatlar güncellendi ✓'); }
       } catch { /* sonra tekrar */ }
     }, 30000);
-  } catch (e) { toast('⚠︎ Fiyat çekimi başlatılamadı: ' + e.message, 7000); }
+  } catch (e) {
+    if (e.code === 'write' || e.code === 'auth') {
+      try { localStorage.setItem('portfoy.istekIzin', token.slice(-8)); } catch { /* yok */ }
+      tokenHelp(e);
+    } else toast('⚠︎ Fiyat çekimi başlatılamadı: ' + e.message, 7000);
+  }
+}
+
+// Anahtarın izni eksikse ne yapılacağını adım adım gösterir; aynı anahtar düzenlenince uygulamada değişiklik gerekmez
+function tokenHelp(e) {
+  const { repo } = track.repoInfo();
+  const body = h(`<div class="form">
+    <p class="small">${e.code === 'auth' ? 'GitHub anahtarının süresi dolmuş ya da silinmiş. Yeni bir anahtar oluşturup Ayarlar → Otomatik takip → Anahtarı değiştir ile kaydet.' : `Uygulamadaki GitHub anahtarı depoyu okuyabiliyor ama yazamıyor. Bu yüzden "şimdi çek" isteği ve yeni fon takibi çalışmıyor; fiyatlar yine de zamanlanmış çekimlerle gelir.`}</p>
+    ${e.code === 'auth' ? '' : `<p class="small"><b>Düzeltmek için (aynı anahtar, yeniden girmeye gerek yok):</b></p>
+    <ol class="small steps">
+      <li><a href="https://github.com/settings/personal-access-tokens" target="_blank" rel="noopener">GitHub → Fine-grained tokens</a> sayfasını aç, uygulamaya girdiğin anahtara (ör. <b>Portföyüm</b>) dokun → <b>Edit</b>.</li>
+      <li><b>Repository access</b> → <b>Only select repositories</b> → <b>${esc(repo)}</b> seçili olsun.</li>
+      <li><b>Repository permissions</b> → <b>Contents</b> → <b>Read and write</b>.</li>
+      <li>Yedek için <b>Account permissions → Gists: Read and write</b> açık kalsın.</li>
+      <li>En altta <b>Update</b>. Sonra aşağıdaki düğmeyle dene.</li>
+    </ol>
+    <p class="muted small">Klasik anahtar (ghp_…) kullanıyorsan <b>repo</b> ve <b>gist</b> kutularının işaretli olması gerekir.</p>`}
+    <button class="btn full" type="button" id="thr">Tekrar dene</button></div>`);
+  const dlg = sheet('GitHub anahtarının izni eksik', body);
+  dlg.querySelector('#thr').onclick = () => { dlg.close(); try { localStorage.removeItem('portfoy.istek'); } catch { /* yok */ } maybeRequestFetch({ force: true }); };
 }
 
 // Aktarım (#veri=) ya da değerleme düzeltme (#yama=) bağlantısını yapıştırma
