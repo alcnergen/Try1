@@ -40,7 +40,7 @@ export async function loadMarket(fundCodes) {
   try { market.index = await getJSON('data/index.json'); } catch (e) { market.errors.push('Veri dizini yok (Actions henüz çalışmamış olabilir)'); }
   try { market.gorus = await getJSON('data/gorus.json'); } catch { market.gorus = null; }
   // telefonda anlık çekilmiş daha yeni görüş varsa o kullanılır
-  try { const c = JSON.parse(localStorage.getItem('portfoy.gorus')); if (c?.guncelleme > (market.gorus?.guncelleme || '')) market.gorus = c; } catch { /* yok */ }
+  try { const c = JSON.parse(localStorage.getItem('portfoy.gorus')); if (c?.guncelleme > (market.gorus?.guncelleme || '')) market.gorus = withHoldings(c, market.gorus); } catch { /* yok */ }
   const ids = new Set([...fundCodes, ...BENCH_SERIES, 'EURTRY', 'JPYTRY', 'MEVFAIZ']);
   await Promise.all([...ids].map(async (id) => {
     try {
@@ -145,4 +145,11 @@ export async function liveViews() {
   }));
   if (!Object.keys(varliklar).length) throw new Error('veri gelmedi');
   return { guncelleme: new Date().toISOString(), varliklar, anlik: true };
+}
+
+// Telefondan anlık çekilen görüşte içerik bazlı analist özeti yoktur (sunucuda hesaplanır); öncekinden taşınır
+export function withHoldings(fresh, prev) {
+  const v = { ...fresh.varliklar };
+  for (const [id, x] of Object.entries(prev?.varliklar || {})) if (x.icerik && !v[id]?.icerik) v[id] = { ...v[id], icerik: x.icerik };
+  return { ...fresh, varliklar: v, icerikTarih: fresh.icerikTarih || prev?.icerikTarih || prev?.guncelleme };
 }

@@ -15,7 +15,7 @@
     { "id": "XU100", "ad": "BIST 100", "tv": "BIST:XU100", "isyatirim": "XU100", "tarama": "turkey", "icerik": { "tip": "endeks", "pazar": "turkey", "endeks": "BIST:XU100", "adet": 400, "not": "BIST 100 üyeleri" } },
     { "id": "SPX", "ad": "S&P 500", "tv": "SP:SPX", "tarama": "america", "icerik": { "tip": "endeks", "pazar": "america", "endeks": "SP:SPX", "adet": 2000, "not": "S&P 500 üyeleri" } },
     { "id": "NDX", "ad": "Nasdaq 100", "tv": "NASDAQ:NDX", "tarama": "america", "icerik": { "tip": "endeks", "pazar": "america", "endeks": "NASDAQ:NDX", "adet": 2000, "not": "Nasdaq 100 üyeleri" } },
-    { "id": "DAX", "ad": "DAX", "tv": "XETR:DAX", "tarama": "global", "icerik": { "tip": "endeks", "pazar": "germany", "borsa": "XETR", "endeks": "XETR:DAX", "adet": 400, "not": "DAX üyeleri" } },
+    { "id": "DAX", "ad": "DAX", "tv": "XETR:DAX", "tarama": "global", "icerik": { "tip": "endeks", "pazar": "germany", "borsa": "XETR", "endeks": "XETR:DAX", "adet": 3000, "not": "DAX üyeleri" } },
     { "id": "N225", "ad": "Nikkei 225", "tv": "TVC:NI225", "tarama": "cfd", "icerik": { "tip": "endeks", "pazar": "japan", "endeks": "TVC:NI225", "adet": 1000, "not": "Nikkei 225 üyeleri (piyasa değeri ağırlıklı)" } },
     { "id": "MSCIW", "ad": "MSCI Dünya (URTH)", "tv": "AMEX:URTH", "tarama": "america" },
     { "id": "BTCUSD", "ad": "Bitcoin ($)", "tv": "BITSTAMP:BTCUSD", "tarama": "crypto" },

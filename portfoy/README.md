@@ -22,7 +22,7 @@ Telefonda ana ekrana eklenen, yalnızca kişisel kullanım için fon portföyü 
 
 ## Piyasa görüşü
 
-Kıyas karnesinde her piyasanın altında ince bir satır: hisselerde analist al/tut/sat dağılımı ve ortalama hedef fiyat farkı, diğerlerinde TradingView teknik gösterge özeti (Güçlü sat … Güçlü al), sağda 14 günlük RSI (70 üstü aşırı alım, 30 altı aşırı satım). Veri `data/gorus.json`, her veri çekiminde TradingView tarayıcısından güncellenir; ayrıca Kıyas ekranındaki *↻ Görüşleri yenile* bağlantısı (ve 30 dakikadan eski veriyle Kıyas açılınca kendiliğinden) aynı veriyi telefondan anlık çeker ve telefonda saklar; `config.json`daki `tarama` alanı pazarı belirtir. Yatırım tavsiyesi değildir.
+Kıyas karnesinde her piyasanın altında ince bir satır: hisselerde analist al/tut/sat dağılımı ve ortalama hedef fiyat farkı; endeks ve ETF'lerde içindeki hisselerin analist dağılımlarının ağırlıklı ortalaması (`config.json` → `icerik`: endeks üyeleri, sektör, sabit liste ya da fonun içerik dosyası); diğerlerinde TradingView teknik gösterge özeti (Güçlü sat … Güçlü al), sağda 14 günlük RSI (70 üstü aşırı alım, 30 altı aşırı satım). Veri `data/gorus.json`, her veri çekiminde TradingView tarayıcısından güncellenir; ayrıca Kıyas ekranındaki *↻ Görüşleri yenile* bağlantısı (ve 30 dakikadan eski veriyle Kıyas açılınca kendiliğinden) aynı veriyi telefondan anlık çeker ve telefonda saklar; `config.json`daki `tarama` alanı pazarı belirtir. Yatırım tavsiyesi değildir.
 
 ## Otomatik yedek
 
