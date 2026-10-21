@@ -187,6 +187,21 @@ dialog.sheet::backdrop { background: rgb(0 0 0 / .4); }
 .bar .zero { position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: var(--muted); opacity: .5; }
 .bar .pos.clip { border-radius: 3px 0 0 3px; -webkit-mask-image: linear-gradient(to right, #000 75%, transparent); mask-image: linear-gradient(to right, #000 75%, transparent); }
 .bar .neg.clip { border-radius: 0 3px 3px 0; -webkit-mask-image: linear-gradient(to left, #000 75%, transparent); mask-image: linear-gradient(to left, #000 75%, transparent); }
+.k-view { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+.k-view-l { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.k-view b { font-weight: 600; color: var(--text2); }
+.k-view b.up { color: var(--up); } .k-view b.down { color: var(--down); }
+.mix { display: inline-flex; width: 44px; height: 5px; border-radius: 3px; overflow: hidden; flex: none; background: var(--line); }
+.mix i { display: block; height: 100%; }
+.mix .al { background: var(--up); } .mix .tut { background: var(--muted); opacity: .6; } .mix .sat { background: var(--down); }
+.gauge { display: inline-flex; gap: 2px; flex: none; }
+.gauge i { display: block; width: 8px; height: 5px; border-radius: 2px; background: var(--line); }
+.gauge i.on.g0, .gauge i.on.g1 { background: var(--down); }
+.gauge i.on.g2 { background: var(--muted); }
+.gauge i.on.g3, .gauge i.on.g4 { background: var(--up); }
+.rsi { flex: none; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.rsi.hot { color: var(--warn); font-weight: 600; }
+.rsi.cold { color: var(--accent); font-weight: 600; }
 .bar .mark { position: absolute; top: -3px; bottom: -3px; width: 2px; margin-left: -1px; background: var(--s1); border-radius: 1px; }
 .tag { font-size: 10px; font-weight: 600; color: var(--text2); border: 1px solid var(--line); border-radius: 6px; padding: 1px 5px; margin-left: 4px; vertical-align: 2px; letter-spacing: .02em; }
 .notice { border-color: color-mix(in srgb, var(--warn) 45%, var(--line)); background: color-mix(in srgb, var(--warn) 7%, var(--card)); }

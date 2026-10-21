@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { valueAt, positionAt, fundState, portfolioHistory, replicate, periodReturn, projectScenario, monthsToTarget, combine, cpiDaily, findCashDuplicates, removeCashDuplicates, nextBusinessDay, applyValuationPatch } from '../js/calc.js';
 import { addToConfig, isTracked, repoInfo } from '../js/track.js';
 import { depositSeries, series } from '../js/data.js';
-import { parseTefas, parseTvMessage, tvDate, parseCanli, mergePoints, pickTvSymbol, assetEntry, ykbEarly, garantiEarly, nextBizDay } from '../scripts/veri-cek.mjs';
+import { parseTefas, parseTvMessage, tvDate, parseCanli, mergePoints, pickTvSymbol, assetEntry, ykbEarly, garantiEarly, nextBizDay, parseScanRow } from '../scripts/veri-cek.mjs';
 
 const close = (a, b, eps = 1e-6) => assert.ok(Math.abs(a - b) < eps, `${a} ≈ ${b}`);
 
@@ -200,4 +200,11 @@ test('elle girilen fiyat yalnızca otomatik verinin ulaşmadığı günlerde ge�
   const manual = { TGT: { '2026-10-18': 0.126811, '2026-10-19': 0.126931, '2026-10-21': 0.127056 } };
   assert.deepEqual(series(market, manual, 'TGT'), [['2026-10-16', 0.126462], ['2026-10-19', 0.126811], ['2026-10-20', 0.126931], ['2026-10-21', 0.127056]]);
   assert.deepEqual(series({ raw: {} }, manual, 'TGT').length, 3); // otomatik veri yoksa hepsi kullanılır
+});
+
+test('piyasa görüşü satırı (TradingView tarayıcısı)', () => {
+  // NVDA: analist dağılımı + hedef fiyat
+  assert.deepEqual(parseScanRow([216.47, 40.903, -0.0879, 62, 7, 2, 0, 1, 72, 334.45]), { rsi: 40.9, teknik: -0.088, analist: { al: 69, tut: 2, sat: 1, toplam: 72, hedef: 0.545 } });
+  // endeks: analist yok
+  assert.deepEqual(parseScanRow([7712.57, 49.43, -0.0242, null, null, null, null, null, null, null]), { rsi: 49.4, teknik: -0.024 });
 });
