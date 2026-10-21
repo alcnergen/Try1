@@ -202,6 +202,7 @@ dialog.sheet::backdrop { background: rgb(0 0 0 / .4); }
 .rsi { flex: none; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .rsi.hot { color: var(--warn); font-weight: 600; }
 .rsi.cold { color: var(--accent); font-weight: 600; }
+.rsi .muted { font-weight: 400; }
 .bar .mark { position: absolute; top: -3px; bottom: -3px; width: 2px; margin-left: -1px; background: var(--s1); border-radius: 1px; }
 .tag { font-size: 10px; font-weight: 600; color: var(--text2); border: 1px solid var(--line); border-radius: 6px; padding: 1px 5px; margin-left: 4px; vertical-align: 2px; letter-spacing: .02em; }
 .notice { border-color: color-mix(in srgb, var(--warn) 45%, var(--line)); background: color-mix(in srgb, var(--warn) 7%, var(--card)); }

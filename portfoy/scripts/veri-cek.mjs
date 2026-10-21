@@ -349,6 +349,92 @@ async function updateBench(b, years) {
   return prev ? { ...prev, hata: errs.join(' | ') } : { id: b.id, ad: b.ad, tur: 'kiyas', points: [], hata: errs.join(' | ') };
 }
 
+// ---------- İçerik bazlı analist görüşü (ETF ve endeksler için: içindeki hisselerin ağırlıklı dağılımı) ----------
+// rows: [{ w, total, buy, over, hold, under, sell, hedef, close }] — w: ağırlık (piyasa değeri ya da fon payı)
+export function aggregate(rows, { tavan = null } = {}) {
+  const all = rows.filter((r) => r.w > 0);
+  const sumAll = all.reduce((a, r) => a + r.w, 0);
+  if (!sumAll) return null;
+  // tek hisse tavanı (ör. SMH %20): fazla ağırlık diğerlerine oranla dağıtılır
+  let w = all.map((r) => r.w / sumAll);
+  if (tavan) for (let k = 0; k < 10; k++) {
+    const over = w.reduce((a, x) => a + Math.max(0, x - tavan), 0);
+    if (over < 1e-9) break;
+    const free = w.reduce((a, x) => a + (x < tavan ? x : 0), 0);
+    w = w.map((x) => (x >= tavan ? tavan : x + (over * x) / free));
+  }
+  let cw = 0, al = 0, tut = 0, sat = 0, hw = 0, hedef = 0, n = 0, gorus = 0;
+  all.forEach((r, i) => {
+    if (!(r.total > 0)) return;
+    const x = w[i];
+    cw += x; n++; gorus += r.total;
+    al += x * ((r.buy || 0) + (r.over || 0)) / r.total;
+    tut += x * (r.hold || 0) / r.total;
+    sat += x * ((r.under || 0) + (r.sell || 0)) / r.total;
+    if (r.hedef > 0 && r.close > 0) { hw += x; hedef += x * (r.hedef / r.close - 1); }
+  });
+  if (!cw) return null;
+  const r3 = (v) => Math.round(v * 1000) / 1000;
+  return { al: r3(al / cw), tut: r3(tut / cw), sat: r3(sat / cw), ...(hw ? { hedef: r3(hedef / hw) } : {}), hisse: n, gorus, kapsam: r3(cw) };
+}
+
+const STOCK_COLS = ['name', 'market_cap_basic', 'recommendation_buy', 'recommendation_over', 'recommendation_hold', 'recommendation_under', 'recommendation_sell', 'recommendation_total', 'price_target_average', 'close', 'indexes'];
+const toRow = (d, w) => ({ w: w ?? d[1], buy: d[2], over: d[3], hold: d[4], under: d[5], sell: d[6], total: d[7], hedef: d[8], close: d[9] });
+async function scanTV(market, body) {
+  const res = await fetchRetry(`https://scanner.tradingview.com/${market}/scan`, { method: 'POST', headers: { 'Content-Type': 'text/plain', Origin: 'https://www.tradingview.com' }, body: JSON.stringify(body) });
+  const j = await res.json();
+  if (!j?.data) throw new Error(j?.error || 'tarayıcı yanıtı boş');
+  return j.data;
+}
+const scanCache = new Map();
+async function scanMarket(pazar, adet, filter = []) {
+  const key = JSON.stringify([pazar, adet, filter]);
+  if (!scanCache.has(key)) scanCache.set(key, scanTV(pazar, { columns: STOCK_COLS, range: [0, adet], sort: { sortBy: 'market_cap_basic', sortOrder: 'desc' }, filter: [{ left: 'type', operation: 'equal', right: 'stock' }, ...filter] }));
+  return scanCache.get(key);
+}
+
+async function composite(spec) {
+  if (spec.tip === 'endeks') {
+    // endeks üyeleri, piyasa değeri ağırlıklı
+    const data = await scanMarket(spec.pazar, spec.adet || 1000, spec.borsa ? [{ left: 'exchange', operation: 'equal', right: spec.borsa }] : []);
+    const rows = data.filter((r) => (r.d[10] || []).some((i) => i.proname === spec.endeks)).map((r) => toRow(r.d));
+    return rows.length ? { ...aggregate(rows, spec), kaynak: spec.not || 'endeks üyeleri' } : null;
+  }
+  if (spec.tip === 'sanayi') {
+    const data = await scanMarket(spec.pazar, spec.adet || 40, [{ left: 'industry', operation: 'equal', right: spec.sanayi }]);
+    const rows = data.map((r) => toRow(r.d));
+    return rows.length ? { ...aggregate(rows, spec), kaynak: spec.not || spec.sanayi } : null;
+  }
+  if (spec.tip === 'liste') {
+    // sabit hisse listesi (eşit ağırlık); semboller pazara göre gruplanır
+    const by = {};
+    for (const [m, sym] of spec.semboller) (by[m] ||= []).push(sym);
+    const rows = [];
+    for (const [m, syms] of Object.entries(by)) for (const r of await scanTV(m, { symbols: { tickers: syms }, columns: STOCK_COLS })) rows.push(toRow(r.d, 1));
+    return rows.length ? { ...aggregate(rows, spec), kaynak: spec.not || 'ana hisseler' } : null;
+  }
+  if (spec.tip === 'tema') {
+    // Tema ETF: sitedeki günlük içerik dosyası (CSV); ABD'de işlem gören hisseler eşleştirilir, kalan kısım kapsam dışı sayılır
+    const page = await (await fetchRetry(spec.url, { headers: { 'User-Agent': 'Mozilla/5.0' } })).text();
+    const url = page.match(/https:[^"'()\s]*holdings[^"'()\s]*\.csv[^"'()\s]*/i)?.[0];
+    if (!url) throw new Error('içerik dosyası bulunamadı');
+    const lines = (await (await fetchRetry(url, { headers: { 'User-Agent': 'Mozilla/5.0' } })).text()).trim().split(/\r?\n/);
+    const head = lines.shift().split(',');
+    const iT = head.indexOf('ticker'), iP = head.indexOf('percent_of_nav'), iC = head.indexOf('is_cash');
+    const hold = lines.map((l) => l.split(',')).filter((c) => c[iC] !== '1' && /^[A-Z.]{1,6}$/.test(c[iT])).map((c) => [c[iT], Number(c[iP])]);
+    const data = await scanTV('america', { columns: STOCK_COLS, filter: [{ left: 'name', operation: 'in_range', right: hold.map((h) => h[0]) }, { left: 'type', operation: 'equal', right: 'stock' }] });
+    const best = {};
+    for (const r of data) if (!best[r.d[0]] || r.d[1] > best[r.d[0]].d[1]) best[r.d[0]] = r;
+    const rows = hold.filter(([t]) => best[t]).map(([t, p]) => toRow(best[t].d, p));
+    const agg = aggregate(rows, spec);
+    if (!agg) return null;
+    // kapsam: fonun tamamına göre (ABD dışı ve halka açık olmayanlar dahil değil)
+    const covered = rows.filter((r) => r.total > 0).reduce((a, r) => a + r.w, 0);
+    return { ...agg, kapsam: Math.round(covered * 1000) / 1000, kaynak: spec.not || 'fonun günlük içerik listesi' };
+  }
+  return null;
+}
+
 // ---------- Piyasa görüşü: analist dağılımı (yalnızca hisselerde), teknik özet ve RSI (TradingView tarayıcısı) ----------
 async function updateViews(cfg) {
   const groups = {};
@@ -367,6 +453,13 @@ async function updateViews(cfg) {
     } catch (e) { log(`görüş (${market}) alınamadı: ${e.message}`); }
   }
   if (!Object.keys(varliklar).length) return;
+  for (const b of cfg.kiyaslar || []) {
+    if (!b.icerik) continue;
+    try {
+      const ic = await composite(b.icerik);
+      if (ic) { (varliklar[b.id] ||= {}).icerik = ic; log(`görüş: ${b.id} içerik bazlı ${ic.hisse} hisse, ${ic.gorus} görüş, kapsam %${Math.round(ic.kapsam * 100)}`); }
+    } catch (e) { log(`görüş: ${b.id} içerik alınamadı: ${e.message}`); }
+  }
   await writeFile(path.join(DATA, 'gorus.json'), JSON.stringify({ guncelleme: new Date().toISOString(), varliklar }, null, 1));
   log(`görüş: ${Object.keys(varliklar).length} varlık`);
 }

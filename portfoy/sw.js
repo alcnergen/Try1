@@ -1,5 +1,5 @@
 // Uygulama dosyaları önbellekten (çevrimdışı açılır); veri dosyaları önce ağdan, olmazsa önbellekten.
-const VER = 'portfoy-v16';
+const VER = 'portfoy-v17';
 const SHELL = ['./', 'index.html', 'app.css', 'js/app.js', 'js/calc.js', 'js/data.js', 'js/store.js', 'js/chart.js', 'js/backup.js', 'js/track.js', 'manifest.webmanifest', 'icons/icon.svg', 'icons/icon-180.png'];
 
 self.addEventListener('install', (e) => {
