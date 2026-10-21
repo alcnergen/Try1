@@ -1,5 +1,5 @@
 {
- "guncelleme": "2026-10-21T18:27:41.560Z",
+ "guncelleme": "2026-10-21T18:29:09.168Z",
  "seriler": {
   "TGT": {
    "ad": "GARANTİ PORTFÖY KISA VADELİ BORÇLANMA ARAÇLARI FONU",
@@ -44,7 +44,7 @@
    "kaynak": "tv:FX_IDC:USDTRY",
    "ilk": "2010-01-04",
    "son": "2026-10-21",
-   "deger": 49.5967,
+   "deger": 49.5961,
    "adet": 4383
   },
   "EURTRY": {
@@ -54,7 +54,7 @@
    "kaynak": "tv:FX_IDC:EURTRY",
    "ilk": "2010-01-04",
    "son": "2026-10-21",
-   "deger": 55.75412,
+   "deger": 55.73182,
    "adet": 4383
   },
   "JPYTRY": {
@@ -74,7 +74,7 @@
    "kaynak": "tv:TVC:GOLD",
    "ilk": "2009-05-27",
    "son": "2026-10-21",
-   "deger": 4139.59,
+   "deger": 4139.61,
    "adet": 4383
   },
   "XU100": {
@@ -94,7 +94,7 @@
    "kaynak": "tv:SP:SPX",
    "ilk": "2016-07-01",
    "son": "2026-10-21",
-   "deger": 7769.64,
+   "deger": 7769.1,
    "adet": 2591
   },
   "NDX": {
@@ -104,7 +104,7 @@
    "kaynak": "tv:NASDAQ:NDX",
    "ilk": "2009-05-20",
    "son": "2026-10-21",
-   "deger": 29871.3997,
+   "deger": 29870.1145,
    "adet": 4383
   },
   "DAX": {
@@ -144,7 +144,7 @@
    "kaynak": "tv:BITSTAMP:BTCUSD",
    "ilk": "2014-10-22",
    "son": "2026-10-21",
-   "deger": 84711.95,
+   "deger": 84690.08,
    "adet": 4380
   },
   "XRPUSD": {
@@ -154,7 +154,7 @@
    "kaynak": "tv:BITSTAMP:XRPUSD",
    "ilk": "2014-09-28",
    "son": "2026-10-21",
-   "deger": 1.39607,
+   "deger": 1.39488,
    "adet": 4380
   },
   "SILVER": {
@@ -164,7 +164,7 @@
    "kaynak": "tv:TVC:SILVER",
    "ilk": "2009-05-29",
    "son": "2026-10-21",
-   "deger": 57.71,
+   "deger": 57.705,
    "adet": 4380
   },
   "K_SMH": {
@@ -174,7 +174,7 @@
    "kaynak": "tv:NASDAQ:SMH",
    "ilk": "2009-05-22",
    "son": "2026-10-21",
-   "deger": 558.13,
+   "deger": 558,
    "adet": 4381
   },
   "K_NVDA": {
@@ -194,7 +194,7 @@
    "kaynak": "tv:AMEX:IGV",
    "ilk": "2009-05-22",
    "son": "2026-10-21",
-   "deger": 109.295,
+   "deger": 109.3,
    "adet": 4381
   },
   "K_DRAM": {
@@ -214,7 +214,7 @@
    "kaynak": "tv:AMEX:NASA",
    "ilk": "2026-03-31",
    "son": "2026-10-21",
-   "deger": 21.435,
+   "deger": 21.445,
    "adet": 142
   },
   "TUFE": {
