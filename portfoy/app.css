@@ -184,6 +184,9 @@ dialog.sheet::backdrop { background: rgb(0 0 0 / .4); }
 .bar .pos, .bar .neg { position: absolute; top: 0; bottom: 0; border-radius: 3px; }
 .bar .pos { background: var(--up); opacity: .55; }
 .bar .neg { background: var(--down); opacity: .55; }
+.bar .zero { position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: var(--muted); opacity: .5; }
+.bar .pos.clip { border-radius: 3px 0 0 3px; -webkit-mask-image: linear-gradient(to right, #000 75%, transparent); mask-image: linear-gradient(to right, #000 75%, transparent); }
+.bar .neg.clip { border-radius: 0 3px 3px 0; -webkit-mask-image: linear-gradient(to left, #000 75%, transparent); mask-image: linear-gradient(to left, #000 75%, transparent); }
 .bar .mark { position: absolute; top: -3px; bottom: -3px; width: 2px; margin-left: -1px; background: var(--s1); border-radius: 1px; }
 .tag { font-size: 10px; font-weight: 600; color: var(--text2); border: 1px solid var(--line); border-radius: 6px; padding: 1px 5px; margin-left: 4px; vertical-align: 2px; letter-spacing: .02em; }
 .notice { border-color: color-mix(in srgb, var(--warn) 45%, var(--line)); background: color-mix(in srgb, var(--warn) 7%, var(--card)); }
