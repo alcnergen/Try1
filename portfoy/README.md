@@ -28,6 +28,8 @@ Kıyas karnesinde her piyasanın altında ince bir satır: hisselerde analist al
 
 Ayarlar → *Otomatik yedek*: veri telefonda kullanıcının parolasıyla şifrelenir (AES-GCM-256, PBKDF2-SHA256 310.000 tur) ve GitHub hesabındaki gizli bir Gist'e (`portfoyum-yedek.json`) yazılır. Her değişiklikten birkaç saniye sonra yeniden yedeklenir; eski sürümler Gist geçmişinde kalır. Yeni cihazda *GitHub yedeğinden geri yükle* ile anahtar + parola girilerek geri alınır. Parola cihazdan çıkmaz; unutulursa yedek açılamaz.
 
+Birden fazla cihaz (ör. telefon ve iPad) aynı yedeği kullanır: uygulama açılınca ve uygulamaya dönülünce diğer cihazın yazdığı daha yeni yedek alınır; bir cihaz, son eşitlemesinden sonra yazılmış bir yedeğin üzerine yazmaz. İki cihazda da eşitlenmemiş değişiklik varsa hangisinin kalacağı sorulur. Günlük kayıtlar birleştirilir.
+
 ## Otomatik takip
 
 Ayarlar → *Otomatik takip* için depoya yazma izni olan bir GitHub anahtarı (fine-grained token, yalnızca bu depo, *Contents: Read and write*) girilir. Uygulamada verisi olmayan yeni bir kod eklenince uygulama kodu `data/config.json`'daki `fonlar` ya da `hisseler` listesine yazar; bu push veri iş akışını tetikler ve fiyat geçmişi birkaç dakika içinde gelir. Uygulama bu sürede yeni seriyi kendisi kontrol eder.
