@@ -1,20 +1,20 @@
 {
- "guncelleme": "2026-10-22T20:55:42.262Z",
+ "guncelleme": "2026-10-22T22:22:13.133Z",
  "varliklar": {
   "USDTRY": {
    "rsi": 89.6,
-   "teknik": 0.393,
-   "fiyat": 49.6196
+   "teknik": 0.438,
+   "fiyat": 49.6787
   },
   "EURTRY": {
-   "rsi": 55,
-   "teknik": 0.276,
-   "fiyat": 55.72232
+   "rsi": 57.8,
+   "teknik": 0.484,
+   "fiyat": 55.829
   },
   "GOLD": {
-   "rsi": 34.8,
-   "teknik": -0.646,
-   "fiyat": 4024.317
+   "rsi": 35.4,
+   "teknik": -0.555,
+   "fiyat": 4028.521
   },
   "N225": {
    "rsi": 36.6,
@@ -26,16 +26,16 @@
     "sat": 0.036,
     "hedef": 0.295,
     "hisse": 225,
-    "gorus": 2635,
+    "gorus": 2638,
     "kapsam": 1,
     "kaynak": "Nikkei 225 üyeleri (piyasa değeri ağırlıklı)",
     "hedefFiyat": 81465.65
    }
   },
   "SILVER": {
-   "rsi": 32.9,
+   "rsi": 33,
    "teknik": -0.601,
-   "fiyat": 54.5787
+   "fiyat": 54.608
   },
   "XU100": {
    "rsi": 28.3,
@@ -63,7 +63,7 @@
     "sat": 0.035,
     "hedef": 0.224,
     "hisse": 501,
-    "gorus": 13256,
+    "gorus": 13258,
     "kapsam": 1,
     "kaynak": "S&P 500 üyeleri",
     "hedefFiyat": 9380.04
@@ -79,7 +79,7 @@
     "sat": 0.03,
     "hedef": 0.306,
     "hisse": 98,
-    "gorus": 3505,
+    "gorus": 3507,
     "kapsam": 1,
     "kaynak": "Nasdaq 100 üyeleri",
     "hedefFiyat": 37820.05
@@ -95,12 +95,12 @@
    "teknik": -0.379,
    "fiyat": 523.35,
    "icerik": {
-    "al": 0.838,
+    "al": 0.839,
     "tut": 0.15,
     "sat": 0.012,
     "hedef": 0.562,
     "hisse": 27,
-    "gorus": 879,
+    "gorus": 880,
     "kapsam": 1,
     "kaynak": "SOX yarı iletken endeksi üyeleri (SMH'ye yakın)",
     "hedefFiyat": 817.47
@@ -161,7 +161,7 @@
     "sat": 0.037,
     "hedef": 0.995,
     "hisse": 22,
-    "gorus": 284,
+    "gorus": 285,
     "kapsam": 0.545,
     "kaynak": "fonun günlük içerik listesi",
     "hedefFiyat": 40.04
@@ -175,23 +175,23 @@
     "al": 0.634,
     "tut": 0.288,
     "sat": 0.078,
-    "hedef": 0.209,
+    "hedef": 0.21,
     "hisse": 40,
     "gorus": 874,
     "kapsam": 1,
     "kaynak": "DAX üyeleri",
-    "hedefFiyat": 30674.45
+    "hedefFiyat": 30699.82
    }
   },
   "BTCUSD": {
-   "rsi": 45.4,
+   "rsi": 45.8,
    "teknik": -0.224,
-   "fiyat": 81109.49
+   "fiyat": 81239.44
   },
   "XRPUSD": {
-   "rsi": 39.2,
+   "rsi": 40.2,
    "teknik": -0.379,
-   "fiyat": 1.2959
+   "fiyat": 1.30559
   }
  }
 }
