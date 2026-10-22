@@ -1,20 +1,20 @@
 {
- "guncelleme": "2026-10-22T20:46:24.239Z",
+ "guncelleme": "2026-10-22T20:55:42.262Z",
  "varliklar": {
   "USDTRY": {
    "rsi": 89.6,
    "teknik": 0.393,
-   "fiyat": 49.6187
+   "fiyat": 49.6196
   },
   "EURTRY": {
-   "rsi": 54,
+   "rsi": 55,
    "teknik": 0.276,
-   "fiyat": 55.68824
+   "fiyat": 55.72232
   },
   "GOLD": {
-   "rsi": 34.9,
+   "rsi": 34.8,
    "teknik": -0.646,
-   "fiyat": 4024.548
+   "fiyat": 4024.317
   },
   "N225": {
    "rsi": 36.6,
@@ -35,7 +35,7 @@
   "SILVER": {
    "rsi": 32.9,
    "teknik": -0.601,
-   "fiyat": 54.576
+   "fiyat": 54.5787
   },
   "XU100": {
    "rsi": 28.3,
@@ -184,14 +184,14 @@
    }
   },
   "BTCUSD": {
-   "rsi": 45.6,
+   "rsi": 45.4,
    "teknik": -0.224,
-   "fiyat": 81170
+   "fiyat": 81109.49
   },
   "XRPUSD": {
-   "rsi": 39.3,
+   "rsi": 39.2,
    "teknik": -0.379,
-   "fiyat": 1.2967
+   "fiyat": 1.2959
   }
  }
 }
