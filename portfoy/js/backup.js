@@ -40,6 +40,19 @@ export async function decrypt(box, pass) {
   }
 }
 
+// Kayıtlı anahtarla çözer (parola gerekmez; anahtar ilk kurulum/geri yüklemede paroladan türetilip saklandı)
+async function decryptWithKey(box, keyB64) {
+  try {
+    const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: unb64(box.iv) }, await aesKey(unb64(keyB64)), unb64(box.data));
+    return JSON.parse(new TextDecoder().decode(plain));
+  } catch {
+    throw Object.assign(new Error('Diğer cihazdaki yedek farklı bir parolayla alınmış; bu cihazda "Geri yükle" ile yeni parolayı gir'), { code: 'key' });
+  }
+}
+
+// Senkron için "içerik": günlük kayıtlar (snapshots) her cihazda ayrıca oluştuğu için hariç
+export const contentHash = (state) => { const { snapshots, migrations, ...rest } = state || {}; return hash(rest); };
+
 async function gh(token, path, opts = {}) {
   const res = await fetch(API + path, {
     ...opts,
@@ -101,6 +114,11 @@ export async function backupNow(state, { force = false } = {}) {
   const h = await hash(state);
   if (!force && h === c.lastHash) return { skipped: 'değişiklik yok' };
   try {
+    // Başka cihaz bu cihazın son eşitlemesinden sonra yazdıysa onun üzerine yazma; önce o değişiklikler alınmalı
+    if (!force && c.gistId && c.last) {
+      const remote = await readGist(c.token, c.gistId).catch(() => null);
+      if (remote?.tarih && remote.tarih > c.last) return { conflict: true, tarih: remote.tarih };
+    }
     const box = await encrypt(state, c.key, c.salt);
     const body = JSON.stringify({ description: DESC, files: { [FILE]: { content: JSON.stringify(box) } } });
     let g;
@@ -109,7 +127,7 @@ export async function backupNow(state, { force = false } = {}) {
       catch (e) { if (!/izni yok/.test(e.message)) throw e; c.gistId = null; }
     }
     if (!c.gistId) g = await gh(c.token, '/gists', { method: 'POST', body: JSON.stringify({ ...JSON.parse(body), public: false }) });
-    saveCfg({ ...c, gistId: g.id, last: new Date().toISOString(), lastHash: h, error: null });
+    saveCfg({ ...c, gistId: g.id, last: box.tarih, lastHash: h, syncedHash: await contentHash(state), error: null });
     return { ok: true };
   } catch (e) {
     saveCfg({ ...c, error: e.message, errorAt: new Date().toISOString() });
@@ -123,8 +141,24 @@ export async function restore({ token, pass }) {
   if (!g) throw new Error('Bu GitHub hesabında Portföyüm yedeği bulunamadı');
   const box = await readGist(token, g.id);
   const { obj, keyB64 } = await decrypt(box, pass);
-  saveCfg({ token, salt: box.salt, key: keyB64, gistId: g.id, last: box.tarih, lastHash: await hash(obj), error: null });
+  saveCfg({ token, salt: box.salt, key: keyB64, gistId: g.id, last: box.tarih, lastHash: await hash(obj), syncedHash: await contentHash(obj), error: null });
   return { state: obj, tarih: box.tarih };
+}
+
+// Diğer cihazın yazdığı daha yeni yedeği getirir (yoksa null). local: bu cihazda eşitlenmemiş değişiklik var mı
+export async function pull(state) {
+  const c = loadCfg();
+  if (!c?.gistId || !c.key) return null;
+  const box = await readGist(c.token, c.gistId);
+  if (!box?.tarih || (c.last && box.tarih <= c.last)) return null;
+  const remote = await decryptWithKey(box, c.key);
+  const localChanged = c.syncedHash ? (await contentHash(state)) !== c.syncedHash : false;
+  return { state: remote, tarih: box.tarih, localChanged };
+}
+// Alınan yedeği eşitlenmiş say (üzerine yazma kontrolü bu tarihe göre yapılır)
+export async function markSynced(state, tarih) {
+  const c = loadCfg();
+  if (c) saveCfg({ ...c, last: tarih, lastHash: await hash(state), syncedHash: await contentHash(state), error: null });
 }
 
 let timer = null;

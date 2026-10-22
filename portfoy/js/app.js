@@ -8,7 +8,7 @@ import {
 } from './calc.js';
 import { lineChart, legend } from './chart.js';
 
-export const APP_VERSION = '2026.10.21-l';
+export const APP_VERSION = '2026.10.22-a';
 
 // ---------- Durum ----------
 let S = store.load();
@@ -16,7 +16,7 @@ let M = { raw: {}, names: {}, index: null, errors: [] };
 let C = null; // hesaplanmış değerler
 let tab = location.hash.match(/^#(ozet|fonlar|kiyas|senaryo|diger)$/)?.[1] || 'ozet';
 const ui = { ozetRange: 'ALL', fundRange: '1Y', cmpRange: '1Y', cmpCcy: null, histAll: false, otherDate: null, otherCcy: 'TRY' };
-const persist = () => { store.save(S); backup.schedule(() => S, () => updateStatus()); };
+const persist = () => { store.save(S); backup.schedule(() => S, (r) => { updateStatus(); if (r?.conflict) syncFromBackup(); }); };
 
 // ---------- Biçimlendirme ----------
 const nf = (d) => new Intl.NumberFormat('tr-TR', { minimumFractionDigits: d, maximumFractionDigits: d });
@@ -1160,6 +1160,33 @@ function backupRestore() {
   };
 }
 
+// Cihazlar arası eşitleme: açılışta ve uygulamaya dönüldüğünde yedekte diğer cihazın yazdığı daha yeni veri
+// varsa alınır. Bu cihazda da eşitlenmemiş değişiklik varsa hangisinin kalacağı sorulur.
+let syncing = false;
+async function syncFromBackup() {
+  if (syncing || !backup.loadCfg()) return;
+  syncing = true;
+  try {
+    const r = await backup.pull(S);
+    if (!r) return;
+    const when = new Date(r.tarih).toLocaleString('tr-TR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+    if (r.localChanged && !confirm(`Diğer cihazda ${when} tarihli daha yeni bir değişiklik var, bu cihazda da kaydedilmemiş değişiklik var.\n\nTamam: diğer cihazdakini al (bu cihazdaki son değişiklik kaybolur)\nİptal: bu cihazdakini koru ve yedeğe yaz`)) {
+      await backup.markSynced(S, r.tarih);
+      await backup.backupNow(S, { force: true });
+      updateStatus();
+      return;
+    }
+    const snaps = { ...(r.state.snapshots || {}), ...(S.snapshots || {}) }; // günlük kayıtlar birleştirilir
+    S = store.normalize({ ...r.state, snapshots: snaps });
+    store.save(S);
+    await backup.markSynced(r.state, r.tarih);
+    await refresh();
+    toast(`Diğer cihazdaki değişiklikler alındı (${when}) ✓`);
+  } catch (e) {
+    if (e.code === 'key') toast('⚠︎ ' + e.message, 7000);
+  } finally { syncing = false; }
+}
+
 function exportFile() {
   const blob = new Blob([JSON.stringify(S, null, 1)], { type: 'application/json' });
   const a = document.createElement('a');
@@ -1322,14 +1349,19 @@ export async function init() {
   $('#settings').onclick = settings;
   $('#reload').onclick = async () => {
     try { await (await navigator.serviceWorker?.getRegistration())?.update(); } catch { /* yok */ }
-    await refresh(); maybeRequestFetch();
+    await refresh(); maybeRequestFetch(); syncFromBackup();
   };
   try { await navigator.storage?.persist?.(); } catch { /* yok */ }
   render();
   await refresh();
+  syncFromBackup();
   let w = innerWidth;
   addEventListener('resize', () => { if (Math.abs(innerWidth - w) > 40) { w = innerWidth; render(); } });
-  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && C.today !== todayISO()) refresh(); });
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState !== 'visible') return;
+    if (C.today !== todayISO()) refresh();
+    syncFromBackup();
+  });
   if ('serviceWorker' in navigator) {
     // Yeni sürüm yüklenince sayfayı bir kez yenile ki yeni kod hemen çalışsın
     const had = !!navigator.serviceWorker.controller;
