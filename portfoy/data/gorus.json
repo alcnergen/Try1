@@ -1,20 +1,20 @@
 {
- "guncelleme": "2026-10-23T16:25:42.380Z",
+ "guncelleme": "2026-10-23T16:36:17.757Z",
  "varliklar": {
   "USDTRY": {
    "rsi": 91.2,
    "teknik": 0.646,
-   "fiyat": 49.732
+   "fiyat": 49.7318
   },
   "EURTRY": {
-   "rsi": 54.5,
+   "rsi": 53.9,
    "teknik": 0.321,
-   "fiyat": 55.7075
+   "fiyat": 55.68843
   },
   "GOLD": {
-   "rsi": 33.5,
+   "rsi": 33.4,
    "teknik": -0.555,
-   "fiyat": 4002.11
+   "fiyat": 4000.39
   },
   "N225": {
    "rsi": 35.9,
@@ -35,7 +35,7 @@
   "SILVER": {
    "rsi": 31.9,
    "teknik": -0.601,
-   "fiyat": 54.089
+   "fiyat": 54.0731
   },
   "XU100": {
    "rsi": 27.3,
@@ -54,117 +54,117 @@
    }
   },
   "SPX": {
-   "rsi": 44,
-   "teknik": -0.245,
-   "fiyat": 7648.63,
+   "rsi": 43.5,
+   "teknik": -0.291,
+   "fiyat": 7641.71,
    "icerik": {
     "al": 0.728,
     "tut": 0.237,
     "sat": 0.035,
-    "hedef": 0.226,
+    "hedef": 0.227,
     "hisse": 501,
     "gorus": 13276,
     "kapsam": 1,
     "kaynak": "S&P 500 üyeleri",
-    "hedefFiyat": 9377.22
+    "hedefFiyat": 9376.38
    }
   },
   "NDX": {
-   "rsi": 39.2,
-   "teknik": -0.288,
-   "fiyat": 29116.4502,
+   "rsi": 38.5,
+   "teknik": -0.379,
+   "fiyat": 29075.1253,
    "icerik": {
     "al": 0.804,
     "tut": 0.167,
     "sat": 0.03,
-    "hedef": 0.303,
+    "hedef": 0.305,
     "hisse": 98,
     "gorus": 3512,
     "kapsam": 1,
     "kaynak": "Nasdaq 100 üyeleri",
-    "hedefFiyat": 37938.73
+    "hedefFiyat": 37943.04
    }
   },
   "MSCIW": {
-   "rsi": 43.8,
+   "rsi": 43.5,
    "teknik": -0.291,
-   "fiyat": 205.87
+   "fiyat": 205.745
   },
   "K_SMH": {
-   "rsi": 35.3,
-   "teknik": -0.242,
-   "fiyat": 531.4,
+   "rsi": 34.6,
+   "teknik": -0.288,
+   "fiyat": 529.78,
    "icerik": {
     "al": 0.84,
     "tut": 0.149,
     "sat": 0.012,
-    "hedef": 0.538,
+    "hedef": 0.543,
     "hisse": 27,
     "gorus": 882,
     "kapsam": 1,
     "kaynak": "SOX yarı iletken endeksi üyeleri (SMH'ye yakın)",
-    "hedefFiyat": 817.29
+    "hedefFiyat": 817.45
    }
   },
   "K_NVDA": {
-   "rsi": 39.7,
+   "rsi": 38.9,
    "teknik": -0.288,
-   "fiyat": 212.74,
+   "fiyat": 212.045,
    "analist": {
     "al": 69,
     "tut": 2,
     "sat": 1,
     "toplam": 72,
-    "hedef": 0.572,
+    "hedef": 0.577,
     "hedefFiyat": 334.448911
    }
   },
   "K_IGV": {
-   "rsi": 56.3,
+   "rsi": 56.1,
    "teknik": 0.376,
-   "fiyat": 110.325,
+   "fiyat": 110.225,
    "icerik": {
     "al": 0.769,
     "tut": 0.196,
     "sat": 0.036,
-    "hedef": 0.272,
+    "hedef": 0.273,
     "hisse": 39,
     "gorus": 1416,
     "kapsam": 0.925,
     "kaynak": "ABD'nin en büyük 40 yazılım şirketi (IGV'ye yakın)",
-    "hedefFiyat": 140.33
+    "hedefFiyat": 140.32
    }
   },
   "K_DRAM": {
-   "rsi": 36.6,
+   "rsi": 36.2,
    "teknik": -0.385,
-   "fiyat": 47.635,
+   "fiyat": 47.46,
    "icerik": {
     "al": 0.923,
     "tut": 0.073,
     "sat": 0.004,
-    "hedef": 1.089,
+    "hedef": 1.093,
     "hisse": 4,
     "gorus": 169,
     "kapsam": 1,
     "kaynak": "fonun ana hisseleri: Micron, Samsung, SK Hynix, Seagate (eşit ağırlık)",
-    "hedefFiyat": 99.51
+    "hedefFiyat": 99.33
    }
   },
   "K_NASA": {
-   "rsi": 34,
+   "rsi": 33.8,
    "teknik": -0.416,
-   "fiyat": 20.26,
+   "fiyat": 20.24,
    "icerik": {
     "al": 0.778,
     "tut": 0.188,
     "sat": 0.034,
-    "hedef": 0.981,
+    "hedef": 0.982,
     "hisse": 22,
     "gorus": 285,
     "kapsam": 0.549,
     "kaynak": "fonun günlük içerik listesi",
-    "hedefFiyat": 40.14
+    "hedefFiyat": 40.12
    }
   },
   "DAX": {
@@ -184,14 +184,14 @@
    }
   },
   "BTCUSD": {
-   "rsi": 46.5,
+   "rsi": 47.3,
    "teknik": -0.179,
-   "fiyat": 81423.41
+   "fiyat": 81629.2
   },
   "XRPUSD": {
-   "rsi": 40.3,
+   "rsi": 41.1,
    "teknik": -0.424,
-   "fiyat": 1.30627
+   "fiyat": 1.31183
   }
  }
 }
