@@ -1,20 +1,20 @@
 {
- "guncelleme": "2026-10-23T18:35:45.018Z",
+ "guncelleme": "2026-10-23T18:45:47.790Z",
  "varliklar": {
   "USDTRY": {
    "rsi": 91.3,
    "teknik": 0.646,
-   "fiyat": 49.7322
+   "fiyat": 49.7329
   },
   "EURTRY": {
-   "rsi": 54.5,
+   "rsi": 54.7,
    "teknik": 0.321,
-   "fiyat": 55.70837
+   "fiyat": 55.712
   },
   "GOLD": {
-   "rsi": 33.4,
+   "rsi": 33.2,
    "teknik": -0.555,
-   "fiyat": 4001.02
+   "fiyat": 3996.73
   },
   "N225": {
    "rsi": 35.9,
@@ -24,18 +24,18 @@
     "al": 0.702,
     "tut": 0.261,
     "sat": 0.037,
-    "hedef": 0.297,
+    "hedef": 0.298,
     "hisse": 225,
     "gorus": 2644,
     "kapsam": 1,
     "kaynak": "Nikkei 225 üyeleri (piyasa değeri ağırlıklı)",
-    "hedefFiyat": 81312.74
+    "hedefFiyat": 81375.44
    }
   },
   "SILVER": {
-   "rsi": 31.8,
+   "rsi": 31.7,
    "teknik": -0.601,
-   "fiyat": 54.0562
+   "fiyat": 53.965
   },
   "XU100": {
    "rsi": 27.3,
@@ -54,25 +54,25 @@
    }
   },
   "SPX": {
-   "rsi": 42.8,
+   "rsi": 43,
    "teknik": -0.291,
-   "fiyat": 7632.57,
+   "fiyat": 7634.76,
    "icerik": {
     "al": 0.728,
     "tut": 0.237,
     "sat": 0.035,
-    "hedef": 0.229,
+    "hedef": 0.23,
     "hisse": 501,
-    "gorus": 13276,
+    "gorus": 13277,
     "kapsam": 1,
     "kaynak": "S&P 500 üyeleri",
-    "hedefFiyat": 9380.43
+    "hedefFiyat": 9390.75
    }
   },
   "NDX": {
    "rsi": 37.7,
    "teknik": -0.379,
-   "fiyat": 29019.2923,
+   "fiyat": 29019.7627,
    "icerik": {
     "al": 0.804,
     "tut": 0.167,
@@ -82,89 +82,89 @@
     "gorus": 3512,
     "kapsam": 1,
     "kaynak": "Nasdaq 100 üyeleri",
-    "hedefFiyat": 37957.23
+    "hedefFiyat": 37957.85
    }
   },
   "MSCIW": {
-   "rsi": 42.4,
-   "teknik": -0.312,
-   "fiyat": 205.36
+   "rsi": 42.1,
+   "teknik": -0.358,
+   "fiyat": 205.265
   },
   "K_SMH": {
-   "rsi": 34,
+   "rsi": 34.2,
    "teknik": -0.288,
-   "fiyat": 528.55,
+   "fiyat": 529.075,
    "icerik": {
     "al": 0.839,
     "tut": 0.149,
     "sat": 0.012,
-    "hedef": 0.546,
+    "hedef": 0.545,
     "hisse": 27,
     "gorus": 882,
     "kapsam": 1,
     "kaynak": "SOX yarı iletken endeksi üyeleri (SMH'ye yakın)",
-    "hedefFiyat": 817.14
+    "hedefFiyat": 817.42
    }
   },
   "K_NVDA": {
-   "rsi": 38.7,
-   "teknik": -0.333,
-   "fiyat": 211.79,
+   "rsi": 38.9,
+   "teknik": -0.288,
+   "fiyat": 212.02,
    "analist": {
     "al": 69,
     "tut": 2,
     "sat": 1,
     "toplam": 72,
-    "hedef": 0.579,
+    "hedef": 0.577,
     "hedefFiyat": 334.448911
    }
   },
   "K_IGV": {
-   "rsi": 57,
+   "rsi": 56.8,
    "teknik": 0.376,
-   "fiyat": 110.68,
+   "fiyat": 110.575,
    "icerik": {
     "al": 0.769,
     "tut": 0.196,
-    "sat": 0.035,
-    "hedef": 0.276,
+    "sat": 0.036,
+    "hedef": 0.271,
     "hisse": 39,
-    "gorus": 1406,
+    "gorus": 1416,
     "kapsam": 0.925,
     "kaynak": "ABD'nin en büyük 40 yazılım şirketi (IGV'ye yakın)",
-    "hedefFiyat": 141.23
+    "hedefFiyat": 140.54
    }
   },
   "K_DRAM": {
    "rsi": 35.6,
    "teknik": -0.385,
-   "fiyat": 47.255,
+   "fiyat": 47.25,
    "icerik": {
     "al": 0.923,
     "tut": 0.073,
     "sat": 0.004,
-    "hedef": 1.1,
+    "hedef": 1.101,
     "hisse": 4,
     "gorus": 169,
     "kapsam": 1,
     "kaynak": "fonun ana hisseleri: Micron, Samsung, SK Hynix, Seagate (eşit ağırlık)",
-    "hedefFiyat": 99.24
+    "hedefFiyat": 99.27
    }
   },
   "K_NASA": {
-   "rsi": 34.8,
+   "rsi": 35,
    "teknik": -0.416,
-   "fiyat": 20.3599,
+   "fiyat": 20.385,
    "icerik": {
-    "al": 0.778,
-    "tut": 0.188,
+    "al": 0.784,
+    "tut": 0.182,
     "sat": 0.034,
-    "hedef": 0.955,
+    "hedef": 0.953,
     "hisse": 22,
     "gorus": 285,
     "kapsam": 0.549,
     "kaynak": "fonun günlük içerik listesi",
-    "hedefFiyat": 39.8
+    "hedefFiyat": 39.81
    }
   },
   "DAX": {
@@ -184,14 +184,14 @@
    }
   },
   "BTCUSD": {
-   "rsi": 46.4,
+   "rsi": 46.3,
    "teknik": -0.179,
-   "fiyat": 81418.06
+   "fiyat": 81375.27
   },
   "XRPUSD": {
    "rsi": 40.7,
    "teknik": -0.424,
-   "fiyat": 1.30945
+   "fiyat": 1.30944
   }
  }
 }
