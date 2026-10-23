@@ -1,5 +1,5 @@
 {
- "guncelleme": "2026-10-23T15:55:18.425Z",
+ "guncelleme": "2026-10-23T16:05:18.820Z",
  "seriler": {
   "TGT": {
    "ad": "GARANTİ PORTFÖY KISA VADELİ BORÇLANMA ARAÇLARI FONU",
@@ -38,7 +38,7 @@
    "kaynak": "tv:FX_IDC:USDTRY",
    "ilk": "2010-01-04",
    "son": "2026-10-23",
-   "deger": 49.7339,
+   "deger": 49.7333,
    "adet": 4385
   },
   "EURTRY": {
@@ -48,7 +48,7 @@
    "kaynak": "tv:FX_IDC:EURTRY",
    "ilk": "2010-01-04",
    "son": "2026-10-23",
-   "deger": 55.7041,
+   "deger": 55.71768,
    "adet": 4385
   },
   "JPYTRY": {
@@ -58,7 +58,7 @@
    "kaynak": "tv:FX_IDC:JPYTRY",
    "ilk": "2009-12-31",
    "son": "2026-10-23",
-   "deger": 0.316942,
+   "deger": 0.316971,
    "adet": 4385
   },
   "GOLD": {
@@ -68,7 +68,7 @@
    "kaynak": "tv:TVC:GOLD",
    "ilk": "2009-05-27",
    "son": "2026-10-23",
-   "deger": 4002.74,
+   "deger": 4003.97,
    "adet": 4385
   },
   "XU100": {
@@ -88,7 +88,7 @@
    "kaynak": "tv:SP:SPX",
    "ilk": "2016-07-01",
    "son": "2026-10-23",
-   "deger": 7647.36,
+   "deger": 7650.68,
    "adet": 2593
   },
   "NDX": {
@@ -98,7 +98,7 @@
    "kaynak": "tv:NASDAQ:NDX",
    "ilk": "2009-05-20",
    "son": "2026-10-23",
-   "deger": 29097.6553,
+   "deger": 29110.0761,
    "adet": 4385
   },
   "DAX": {
@@ -128,7 +128,7 @@
    "kaynak": "tv:AMEX:URTH",
    "ilk": "2012-01-12",
    "son": "2026-10-23",
-   "deger": 205.74,
+   "deger": 205.86,
    "adet": 3520
   },
   "BTCUSD": {
@@ -138,7 +138,7 @@
    "kaynak": "tv:BITSTAMP:BTCUSD",
    "ilk": "2014-10-22",
    "son": "2026-10-23",
-   "deger": 81472.59,
+   "deger": 81584.65,
    "adet": 4382
   },
   "XRPUSD": {
@@ -148,7 +148,7 @@
    "kaynak": "tv:BITSTAMP:XRPUSD",
    "ilk": "2014-09-28",
    "son": "2026-10-23",
-   "deger": 1.30941,
+   "deger": 1.31109,
    "adet": 4382
   },
   "SILVER": {
@@ -158,7 +158,7 @@
    "kaynak": "tv:TVC:SILVER",
    "ilk": "2009-05-29",
    "son": "2026-10-23",
-   "deger": 54.192,
+   "deger": 54.1461,
    "adet": 4382
   },
   "K_SMH": {
@@ -168,7 +168,7 @@
    "kaynak": "tv:NASDAQ:SMH",
    "ilk": "2009-05-22",
    "son": "2026-10-23",
-   "deger": 530.78,
+   "deger": 531.99,
    "adet": 4383
   },
   "K_NVDA": {
@@ -178,7 +178,7 @@
    "kaynak": "tv:NASDAQ:NVDA",
    "ilk": "2009-05-22",
    "son": "2026-10-23",
-   "deger": 212.46,
+   "deger": 212.91,
    "adet": 4383
   },
   "K_IGV": {
@@ -188,7 +188,7 @@
    "kaynak": "tv:AMEX:IGV",
    "ilk": "2009-05-22",
    "son": "2026-10-23",
-   "deger": 110.25,
+   "deger": 110.27,
    "adet": 4383
   },
   "K_DRAM": {
@@ -198,7 +198,7 @@
    "kaynak": "tv:AMEX:DRAM",
    "ilk": "2026-04-06",
    "son": "2026-10-23",
-   "deger": 47.51,
+   "deger": 47.74,
    "adet": 141
   },
   "K_NASA": {
@@ -208,7 +208,7 @@
    "kaynak": "tv:AMEX:NASA",
    "ilk": "2026-03-31",
    "son": "2026-10-23",
-   "deger": 20.24,
+   "deger": 20.29,
    "adet": 144
   },
   "TUFE": {
