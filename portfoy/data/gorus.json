@@ -1,5 +1,5 @@
 {
- "guncelleme": "2026-10-23T22:03:18.512Z",
+ "guncelleme": "2026-10-24T00:31:18.464Z",
  "varliklar": {
   "USDTRY": {
    "rsi": 90.7,
@@ -156,15 +156,15 @@
    "teknik": -0.416,
    "fiyat": 20.39,
    "icerik": {
-    "al": 0.784,
-    "tut": 0.182,
+    "al": 0.783,
+    "tut": 0.183,
     "sat": 0.034,
-    "hedef": 0.952,
+    "hedef": 0.953,
     "hisse": 22,
     "gorus": 285,
-    "kapsam": 0.549,
+    "kapsam": 0.554,
     "kaynak": "fonun günlük içerik listesi",
-    "hedefFiyat": 39.8
+    "hedefFiyat": 39.82
    }
   },
   "DAX": {
@@ -184,14 +184,14 @@
    }
   },
   "BTCUSD": {
-   "rsi": 46,
-   "teknik": -0.179,
-   "fiyat": 81310.06
+   "rsi": 44,
+   "teknik": -0.2,
+   "fiyat": 80721.17
   },
   "XRPUSD": {
-   "rsi": 40.4,
-   "teknik": -0.424,
-   "fiyat": 1.30717
+   "rsi": 38.1,
+   "teknik": -0.445,
+   "fiyat": 1.2863
   }
  }
 }
