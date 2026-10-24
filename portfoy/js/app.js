@@ -8,7 +8,7 @@ import {
 } from './calc.js';
 import { lineChart, legend } from './chart.js';
 
-export const APP_VERSION = '2026.10.22-a';
+export const APP_VERSION = '2026.10.24-a';
 
 // ---------- Durum ----------
 let S = store.load();
@@ -560,7 +560,7 @@ function kiyas(root) {
         ${rows.length ? `<div class="score"><b>${beat}/${rows.length}</b><span>piyasayı<br>geçiyorsun</span></div>` : ''}
       </div>
       ${rows.length ? `<div class="karne" role="table" aria-label="Piyasalara göre karşılaştırma">
-        <div class="k-row k-head" role="row"><span>Piyasa</span><span>Getirisi</span><span>Sen</span></div>
+        <div class="k-row k-head" role="row"><span>Piyasa</span><span>Getirisi</span><span>Senin farkın</span></div>
         ${rows.map((r) => {
           const d = portRet - r.ret;
           const ahead = d >= 0;
@@ -568,13 +568,13 @@ function kiyas(root) {
           return `<div class="k-row" role="row">
             <span class="k-name"><span class="sw" style="background:${COLORS[r.id]}"></span>${esc(r.name)}</span>
             <span class="${cls(r.ret)}">${pct(r.ret)}</span>
-            <span class="k-res ${ahead ? 'up' : 'down'}"><b>${ahead ? '✓ Önde' : '✗ Geride'}</b><small>${num(Math.abs(d) * 100, 2)} puan · ${money(Math.abs(tl), ccy, 0)}</small></span>
+            <span class="k-res ${ahead ? 'up' : 'down'}"><b>${ahead ? '✓ Önde' : '✗ Geride'}</b><small>${money(Math.abs(tl), ccy, 0)} ${ahead ? 'fazla' : 'eksik'}</small><small>${num(Math.abs(d) * 100, 2)} puan</small></span>
             ${bar(r.ret)}
             ${view(r.id)}
           </div>`;
         }).join('')}
       </div>
-      <p class="muted small">Her alışın tutarı aynı gün o piyasaya yatırılmış gibi hesaplanır. Çubuktaki mavi çizgi senin getirin, ince gri çizgi sıfır; ucu soluk çubuklar ölçeğe sığmayacak kadar uçta. Yabancı borsalar TL'ye çevrilmiş haliyle (kur etkisi dahil) karşılaştırılır.${C.cpiEst && C.cpiEst < C.today ? ` Enflasyonun ${dTR(C.cpiEst).slice(3)} sonrası, son 3 ayın ortalamasıyla tahmin edilir.` : ''}${net ? ' Portföyün stopaj sonrası, kıyaslar vergisiz alınmıştır.' : ''}</p>
+      <p class="muted small">Her alışın tutarı aynı gün o piyasaya yatırılmış gibi hesaplanır. Sağdaki tutar, paranı o piyasaya yatırsaydın bugün olacak değere göre portföyünün kaç TL fazla ya da eksik olduğudur (fiyat değil). Çubuktaki mavi çizgi senin getirin, ince gri çizgi sıfır; ucu soluk çubuklar ölçeğe sığmayacak kadar uçta. Yabancı borsalar TL'ye çevrilmiş haliyle (kur etkisi dahil) karşılaştırılır.${C.cpiEst && C.cpiEst < C.today ? ` Enflasyonun ${dTR(C.cpiEst).slice(3)} sonrası, son 3 ayın ortalamasıyla tahmin edilir.` : ''}${net ? ' Portföyün stopaj sonrası, kıyaslar vergisiz alınmıştır.' : ''}</p>
       ${gorusTarih ? `<p class="muted small">Görüş satırları: NVIDIA'da analistlerin kendisi için verdiği al/tut/sat sayıları; endeks ve ETF'lerde içindeki hisselerin analist dağılımlarının ağırlıklı ortalaması (S&P 500, Nasdaq 100, DAX, Nikkei, BIST 100: üyeler, piyasa değeri ağırlıklı; SMH: SOX yarı iletken endeksi; IGV: ABD'nin en büyük 40 yazılım şirketi; DRAM: Micron, Samsung, SK Hynix, Seagate eşit ağırlık; NASA: fonun günlük içerik listesindeki ABD hisseleri). Hedef: analistlerin 12 aylık ortalama hedef fiyatı; endeks ve ETF'lerde (≈) içindeki hisselerin hedeflerinden çıkan ağırlıklı farkın bugünkü fiyata uygulanmasıyla bulunur (endekslerde puan). Yüzde farkı görmek için hedefe dokunun. Analistler genelde "al"a yatkındır; asıl bilgi zaman içindeki değişimdedir. ${(() => { const low = rows.map((r) => [r, M.gorus?.varliklar?.[BENCHES.find((b) => b.id === r.id)?.need?.[0]]?.icerik]).filter(([, c]) => c && c.kapsam < 0.9); return low.length ? ` * Analist görüşü olan hisseler fonun yalnızca bir kısmını oluşturuyor: ${low.map(([r, c]) => `${esc(r.name)} %${num(c.kapsam * 100, 0)}`).join(', ')}.` : ''; })()} Döviz, emtia ve kriptoda analist dağılımı yoktur; teknik özet TradingView'in günlük gösterge özetidir (hareketli ortalamalar ve osilatörler, uzman görüşü değildir). RSI 14 günlüktür: 70 üstü aşırı alım, 30 altı aşırı satım bölgesi sayılır. Göstergeler varlığın kendi piyasasındaki fiyata göredir (ör. altında ons $). Kısa vadeli sinyallerdir, yatırım tavsiyesi değildir. Güncelleme: ${dTR(gorusTarih.toISOString().slice(0, 10))} ${hhmm(gorusTarih)}. <button type="button" class="link" id="gyenile">↻ Görüşleri yenile</button></p>` : ''}` : '<p>Kıyas verisi henüz yok. Veriler her gün otomatik çekilir; ilk çekimden sonra burada görünür.</p>'}
       ${missing.length ? `<p class="muted small">Verisi olmayan: ${missing.map((r) => esc(r.name)).join(', ')}</p>` : ''}
     </section>
