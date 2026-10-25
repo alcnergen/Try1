@@ -1,5 +1,5 @@
 {
- "guncelleme": "2026-10-24T09:29:49.310Z",
+ "guncelleme": "2026-10-25T09:47:05.749Z",
  "varliklar": {
   "USDTRY": {
    "rsi": 90.7,
@@ -26,7 +26,7 @@
     "sat": 0.036,
     "hedef": 0.298,
     "hisse": 225,
-    "gorus": 2642,
+    "gorus": 2640,
     "kapsam": 1,
     "kaynak": "Nikkei 225 üyeleri (piyasa değeri ağırlıklı)",
     "hedefFiyat": 81375.44
@@ -129,7 +129,7 @@
     "sat": 0.035,
     "hedef": 0.278,
     "hisse": 39,
-    "gorus": 1405,
+    "gorus": 1406,
     "kapsam": 0.924,
     "kaynak": "ABD'nin en büyük 40 yazılım şirketi (IGV'ye yakın)",
     "hedefFiyat": 141.33
@@ -143,12 +143,12 @@
     "al": 0.923,
     "tut": 0.073,
     "sat": 0.004,
-    "hedef": 1.111,
+    "hedef": 1.106,
     "hisse": 4,
     "gorus": 169,
     "kapsam": 1,
     "kaynak": "fonun ana hisseleri: Micron, Samsung, SK Hynix, Seagate (eşit ağırlık)",
-    "hedefFiyat": 99.34
+    "hedefFiyat": 99.11
    }
   },
   "K_NASA": {
@@ -184,14 +184,14 @@
    }
   },
   "BTCUSD": {
-   "rsi": 43.2,
-   "teknik": -0.2,
-   "fiyat": 80476.46
+   "rsi": 42.1,
+   "teknik": -0.245,
+   "fiyat": 80182.17
   },
   "XRPUSD": {
-   "rsi": 36.9,
-   "teknik": -0.512,
-   "fiyat": 1.27471
+   "rsi": 38.7,
+   "teknik": -0.491,
+   "fiyat": 1.28964
   }
  }
 }
