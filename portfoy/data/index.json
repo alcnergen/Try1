@@ -1,5 +1,5 @@
 {
- "guncelleme": "2026-10-26T13:25:18.945Z",
+ "guncelleme": "2026-10-26T13:35:19.543Z",
  "seriler": {
   "TGT": {
    "ad": "GARANTİ PORTFÖY KISA VADELİ BORÇLANMA ARAÇLARI FONU",
@@ -38,7 +38,7 @@
    "kaynak": "tv:FX_IDC:USDTRY",
    "ilk": "2010-01-04",
    "son": "2026-10-26",
-   "deger": 49.7589,
+   "deger": 49.7577,
    "adet": 4386
   },
   "EURTRY": {
@@ -48,7 +48,7 @@
    "kaynak": "tv:FX_IDC:EURTRY",
    "ilk": "2010-01-04",
    "son": "2026-10-26",
-   "deger": 55.70384,
+   "deger": 55.69134,
    "adet": 4386
   },
   "JPYTRY": {
@@ -58,7 +58,7 @@
    "kaynak": "tv:FX_IDC:JPYTRY",
    "ilk": "2009-12-31",
    "son": "2026-10-26",
-   "deger": 0.316017,
+   "deger": 0.316022,
    "adet": 4386
   },
   "GOLD": {
@@ -68,7 +68,7 @@
    "kaynak": "tv:TVC:GOLD",
    "ilk": "2009-05-27",
    "son": "2026-10-26",
-   "deger": 4009.333,
+   "deger": 4003.2,
    "adet": 4386
   },
   "XU100": {
@@ -78,7 +78,7 @@
    "kaynak": "tv:BIST:XU100",
    "ilk": "2009-05-06",
    "son": "2026-10-26",
-   "deger": 11079.87,
+   "deger": 11072.75,
    "adet": 4386
   },
   "SPX": {
@@ -108,7 +108,7 @@
    "kaynak": "tv:XETR:DAX",
    "ilk": "2009-07-21",
    "son": "2026-10-26",
-   "deger": 25440.94,
+   "deger": 25430.64,
    "adet": 4386
   },
   "N225": {
@@ -127,9 +127,9 @@
    "pb": "TRY",
    "kaynak": "tv:AMEX:URTH",
    "ilk": "2012-01-12",
-   "son": "2026-10-23",
-   "deger": 205.15,
-   "adet": 3520
+   "son": "2026-10-26",
+   "deger": 205.84,
+   "adet": 3521
   },
   "BTCUSD": {
    "ad": "Bitcoin ($)",
@@ -138,7 +138,7 @@
    "kaynak": "tv:BITSTAMP:BTCUSD",
    "ilk": "2014-10-22",
    "son": "2026-10-26",
-   "deger": 79884.54,
+   "deger": 79419.4,
    "adet": 4385
   },
   "XRPUSD": {
@@ -148,7 +148,7 @@
    "kaynak": "tv:BITSTAMP:XRPUSD",
    "ilk": "2014-09-28",
    "son": "2026-10-26",
-   "deger": 1.2902,
+   "deger": 1.28208,
    "adet": 4385
   },
   "SILVER": {
@@ -158,7 +158,7 @@
    "kaynak": "tv:TVC:SILVER",
    "ilk": "2009-05-29",
    "son": "2026-10-26",
-   "deger": 53.7206,
+   "deger": 53.654,
    "adet": 4383
   },
   "K_SMH": {
@@ -167,9 +167,9 @@
    "pb": "TRY",
    "kaynak": "tv:NASDAQ:SMH",
    "ilk": "2009-05-22",
-   "son": "2026-10-23",
-   "deger": 527.2,
-   "adet": 4383
+   "son": "2026-10-26",
+   "deger": 534.18,
+   "adet": 4384
   },
   "K_NVDA": {
    "ad": "NVIDIA (NVDA)",
@@ -177,9 +177,9 @@
    "pb": "TRY",
    "kaynak": "tv:NASDAQ:NVDA",
    "ilk": "2009-05-22",
-   "son": "2026-10-23",
-   "deger": 210.96,
-   "adet": 4383
+   "son": "2026-10-26",
+   "deger": 214.57,
+   "adet": 4384
   },
   "K_IGV": {
    "ad": "iShares Expanded Tech-Software ETF (IGV)",
@@ -187,9 +187,9 @@
    "pb": "TRY",
    "kaynak": "tv:AMEX:IGV",
    "ilk": "2009-05-22",
-   "son": "2026-10-23",
-   "deger": 110.59,
-   "adet": 4383
+   "son": "2026-10-26",
+   "deger": 110.62,
+   "adet": 4384
   },
   "K_DRAM": {
    "ad": "Roundhill Memory ETF (DRAM)",
@@ -197,9 +197,9 @@
    "pb": "TRY",
    "kaynak": "tv:AMEX:DRAM",
    "ilk": "2026-04-06",
-   "son": "2026-10-23",
-   "deger": 47.06,
-   "adet": 141
+   "son": "2026-10-26",
+   "deger": 47.77,
+   "adet": 142
   },
   "K_NASA": {
    "ad": "Tema Space Innovators ETF (NASA)",
@@ -207,9 +207,9 @@
    "pb": "TRY",
    "kaynak": "tv:AMEX:NASA",
    "ilk": "2026-03-31",
-   "son": "2026-10-23",
-   "deger": 20.39,
-   "adet": 144
+   "son": "2026-10-26",
+   "deger": 20.48,
+   "adet": 145
   },
   "TUFE": {
    "ad": "TÜFE (aylık endeks)",
