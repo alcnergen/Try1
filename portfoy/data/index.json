@@ -1,5 +1,5 @@
 {
- "guncelleme": "2026-10-26T20:15:27.552Z",
+ "guncelleme": "2026-10-26T20:25:13.897Z",
  "seriler": {
   "TGT": {
    "ad": "GARANTİ PORTFÖY KISA VADELİ BORÇLANMA ARAÇLARI FONU",
@@ -44,7 +44,7 @@
    "kaynak": "tv:FX_IDC:USDTRY",
    "ilk": "2010-01-04",
    "son": "2026-10-26",
-   "deger": 49.7573,
+   "deger": 49.7564,
    "adet": 4386
   },
   "EURTRY": {
@@ -54,7 +54,7 @@
    "kaynak": "tv:FX_IDC:EURTRY",
    "ilk": "2010-01-04",
    "son": "2026-10-26",
-   "deger": 55.64086,
+   "deger": 55.63817,
    "adet": 4386
   },
   "JPYTRY": {
@@ -64,7 +64,7 @@
    "kaynak": "tv:FX_IDC:JPYTRY",
    "ilk": "2009-12-31",
    "son": "2026-10-26",
-   "deger": 0.315894,
+   "deger": 0.315882,
    "adet": 4386
   },
   "GOLD": {
@@ -74,7 +74,7 @@
    "kaynak": "tv:TVC:GOLD",
    "ilk": "2009-05-27",
    "son": "2026-10-26",
-   "deger": 4012.65,
+   "deger": 4013.93,
    "adet": 4386
   },
   "XU100": {
@@ -144,7 +144,7 @@
    "kaynak": "tv:BITSTAMP:BTCUSD",
    "ilk": "2014-10-22",
    "son": "2026-10-26",
-   "deger": 79801.95,
+   "deger": 79806.26,
    "adet": 4385
   },
   "XRPUSD": {
@@ -154,7 +154,7 @@
    "kaynak": "tv:BITSTAMP:XRPUSD",
    "ilk": "2014-09-28",
    "son": "2026-10-26",
-   "deger": 1.29288,
+   "deger": 1.29285,
    "adet": 4385
   },
   "SILVER": {
@@ -164,7 +164,7 @@
    "kaynak": "tv:TVC:SILVER",
    "ilk": "2009-05-29",
    "son": "2026-10-26",
-   "deger": 53.8632,
+   "deger": 53.9001,
    "adet": 4383
   },
   "K_SMH": {
