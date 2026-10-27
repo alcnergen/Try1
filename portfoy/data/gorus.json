@@ -1,20 +1,20 @@
 {
- "guncelleme": "2026-10-27T20:15:48.167Z",
+ "guncelleme": "2026-10-27T20:25:40.622Z",
  "varliklar": {
   "USDTRY": {
    "rsi": 91.9,
    "teknik": 0.438,
-   "fiyat": 49.7806
+   "fiyat": 49.7827
   },
   "EURTRY": {
-   "rsi": 45.5,
-   "teknik": -0.224,
-   "fiyat": 55.4078
+   "rsi": 47.4,
+   "teknik": -0.036,
+   "fiyat": 55.47629
   },
   "GOLD": {
-   "rsi": 40.8,
+   "rsi": 40.6,
    "teknik": -0.393,
-   "fiyat": 4061.15
+   "fiyat": 4059.48
   },
   "N225": {
    "rsi": 40.3,
@@ -33,9 +33,9 @@
    }
   },
   "SILVER": {
-   "rsi": 34.1,
+   "rsi": 33.9,
    "teknik": -0.393,
-   "fiyat": 54.463
+   "fiyat": 54.426
   },
   "XU100": {
    "rsi": 28.2,
@@ -122,7 +122,7 @@
   "K_IGV": {
    "rsi": 59.2,
    "teknik": 0.491,
-   "fiyat": 111.75,
+   "fiyat": 111.78,
    "icerik": {
     "al": 0.77,
     "tut": 0.194,
@@ -132,7 +132,7 @@
     "gorus": 1410,
     "kapsam": 0.925,
     "kaynak": "ABD'nin en büyük 40 yazılım şirketi (IGV'ye yakın)",
-    "hedefFiyat": 141.25
+    "hedefFiyat": 141.29
    }
   },
   "K_DRAM": {
@@ -159,12 +159,12 @@
     "al": 0.788,
     "tut": 0.183,
     "sat": 0.029,
-    "hedef": 0.808,
+    "hedef": 0.807,
     "hisse": 21,
     "gorus": 279,
     "kapsam": 0.558,
     "kaynak": "fonun günlük içerik listesi",
-    "hedefFiyat": 38.75
+    "hedefFiyat": 38.72
    }
   },
   "DAX": {
@@ -184,14 +184,14 @@
    }
   },
   "BTCUSD": {
-   "rsi": 44.8,
+   "rsi": 44.5,
    "teknik": -0.042,
-   "fiyat": 80659.49
+   "fiyat": 80607.07
   },
   "XRPUSD": {
-   "rsi": 44.6,
+   "rsi": 44.4,
    "teknik": -0.042,
-   "fiyat": 1.323
+   "fiyat": 1.32185
   }
  }
 }
