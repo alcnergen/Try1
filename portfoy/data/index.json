@@ -1,5 +1,5 @@
 {
- "guncelleme": "2026-10-27T07:55:16.805Z",
+ "guncelleme": "2026-10-27T10:05:21.721Z",
  "seriler": {
   "TGT": {
    "ad": "GARANTİ PORTFÖY KISA VADELİ BORÇLANMA ARAÇLARI FONU",
@@ -19,7 +19,8 @@
    "ilk": "2021-10-18",
    "son": "2026-10-27",
    "deger": 1.94125,
-   "adet": 1265
+   "adet": 1265,
+   "hata": "tefas:YLB → fetch failed"
   },
   "YFBL7": {
    "ad": "YAPI KREDİ PORTFÖY İKİNCİ PARA PİYASASI (TL) FONU",
@@ -29,7 +30,8 @@
    "ilk": "2022-07-04",
    "son": "2026-10-27",
    "deger": 4.709356,
-   "adet": 1085
+   "adet": 1085,
+   "hata": "tefas:YVD → fetch failed"
   },
   "USDTRY": {
    "ad": "Dolar/TL",
@@ -38,7 +40,7 @@
    "kaynak": "tv:FX_IDC:USDTRY",
    "ilk": "2010-01-04",
    "son": "2026-10-27",
-   "deger": 49.7787,
+   "deger": 49.7825,
    "adet": 4387
   },
   "EURTRY": {
@@ -48,7 +50,7 @@
    "kaynak": "tv:FX_IDC:EURTRY",
    "ilk": "2010-01-04",
    "son": "2026-10-27",
-   "deger": 55.65046,
+   "deger": 55.55024,
    "adet": 4387
   },
   "JPYTRY": {
@@ -58,7 +60,7 @@
    "kaynak": "tv:FX_IDC:JPYTRY",
    "ilk": "2009-12-31",
    "son": "2026-10-27",
-   "deger": 0.315453,
+   "deger": 0.315583,
    "adet": 4387
   },
   "GOLD": {
@@ -68,7 +70,7 @@
    "kaynak": "tv:TVC:GOLD",
    "ilk": "2009-05-27",
    "son": "2026-10-27",
-   "deger": 4002.225,
+   "deger": 4000.262,
    "adet": 4387
   },
   "XU100": {
@@ -78,7 +80,7 @@
    "kaynak": "tv:BIST:XU100",
    "ilk": "2009-05-06",
    "son": "2026-10-27",
-   "deger": 11113.46,
+   "deger": 11154.11,
    "adet": 4387
   },
   "SPX": {
@@ -107,9 +109,9 @@
    "pb": "TRY",
    "kaynak": "tv:XETR:DAX",
    "ilk": "2009-07-21",
-   "son": "2026-10-26",
-   "deger": 25410.84,
-   "adet": 4386
+   "son": "2026-10-27",
+   "deger": 25411.32,
+   "adet": 4387
   },
   "N225": {
    "ad": "Nikkei 225",
@@ -138,7 +140,7 @@
    "kaynak": "tv:BITSTAMP:BTCUSD",
    "ilk": "2014-10-22",
    "son": "2026-10-27",
-   "deger": 79733.68,
+   "deger": 79529.29,
    "adet": 4386
   },
   "XRPUSD": {
@@ -148,7 +150,7 @@
    "kaynak": "tv:BITSTAMP:XRPUSD",
    "ilk": "2014-09-28",
    "son": "2026-10-27",
-   "deger": 1.30194,
+   "deger": 1.29191,
    "adet": 4386
   },
   "SILVER": {
@@ -158,7 +160,7 @@
    "kaynak": "tv:TVC:SILVER",
    "ilk": "2009-05-29",
    "son": "2026-10-27",
-   "deger": 52.857,
+   "deger": 53.299,
    "adet": 4384
   },
   "K_SMH": {
