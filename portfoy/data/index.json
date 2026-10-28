@@ -1,5 +1,5 @@
 {
- "guncelleme": "2026-10-27T23:43:03.451Z",
+ "guncelleme": "2026-10-28T02:35:42.187Z",
  "seriler": {
   "TGT": {
    "ad": "GARANTİ PORTFÖY KISA VADELİ BORÇLANMA ARAÇLARI FONU",
@@ -47,7 +47,7 @@
    "kaynak": "tv:FX_IDC:USDTRY",
    "ilk": "2010-01-04",
    "son": "2026-10-28",
-   "deger": 49.8068,
+   "deger": 49.813,
    "adet": 4388
   },
   "EURTRY": {
@@ -57,7 +57,7 @@
    "kaynak": "tv:FX_IDC:EURTRY",
    "ilk": "2010-01-04",
    "son": "2026-10-28",
-   "deger": 55.43879,
+   "deger": 55.42708,
    "adet": 4388
   },
   "JPYTRY": {
@@ -67,7 +67,7 @@
    "kaynak": "tv:FX_IDC:JPYTRY",
    "ilk": "2009-12-31",
    "son": "2026-10-28",
-   "deger": 0.315353,
+   "deger": 0.315445,
    "adet": 4388
   },
   "GOLD": {
@@ -77,7 +77,7 @@
    "kaynak": "tv:TVC:GOLD",
    "ilk": "2009-05-27",
    "son": "2026-10-28",
-   "deger": 4058.317,
+   "deger": 4047.42,
    "adet": 4388
   },
   "XU100": {
@@ -126,9 +126,9 @@
    "pb": "TRY",
    "kaynak": "tv:TVC:NI225",
    "ilk": "2008-11-12",
-   "son": "2026-10-27",
-   "deger": 63268.15,
-   "adet": 4387
+   "son": "2026-10-28",
+   "deger": 64066.88,
+   "adet": 4388
   },
   "MSCIW": {
    "ad": "MSCI Dünya (URTH)",
@@ -146,9 +146,9 @@
    "pb": "TRY",
    "kaynak": "tv:BITSTAMP:BTCUSD",
    "ilk": "2014-10-22",
-   "son": "2026-10-27",
-   "deger": 80819.16,
-   "adet": 4386
+   "son": "2026-10-28",
+   "deger": 80810.01,
+   "adet": 4387
   },
   "XRPUSD": {
    "ad": "Ripple XRP ($)",
@@ -156,9 +156,9 @@
    "pb": "TRY",
    "kaynak": "tv:BITSTAMP:XRPUSD",
    "ilk": "2014-09-28",
-   "son": "2026-10-27",
-   "deger": 1.32775,
-   "adet": 4386
+   "son": "2026-10-28",
+   "deger": 1.3335,
+   "adet": 4387
   },
   "SILVER": {
    "ad": "Gümüş (ons, $)",
@@ -167,7 +167,7 @@
    "kaynak": "tv:TVC:SILVER",
    "ilk": "2009-05-29",
    "son": "2026-10-28",
-   "deger": 54.456,
+   "deger": 54.0376,
    "adet": 4385
   },
   "K_SMH": {

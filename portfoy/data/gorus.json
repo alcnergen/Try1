@@ -1,41 +1,41 @@
 {
- "guncelleme": "2026-10-27T23:43:24.228Z",
+ "guncelleme": "2026-10-28T02:36:01.638Z",
  "varliklar": {
   "USDTRY": {
-   "rsi": 92,
+   "rsi": 92.2,
    "teknik": 0.484,
-   "fiyat": 49.8062
+   "fiyat": 49.8249
   },
   "EURTRY": {
-   "rsi": 47,
-   "teknik": 0.101,
-   "fiyat": 55.44736
+   "rsi": 46.4,
+   "teknik": -0.062,
+   "fiyat": 55.4295
   },
   "GOLD": {
-   "rsi": 40.5,
+   "rsi": 39.7,
    "teknik": -0.438,
-   "fiyat": 4058.22
+   "fiyat": 4047.51
   },
   "N225": {
-   "rsi": 40.3,
-   "teknik": -0.205,
-   "fiyat": 63268.15,
+   "rsi": 44.2,
+   "teknik": -0.133,
+   "fiyat": 64066.88,
    "icerik": {
     "al": 0.7,
-    "tut": 0.268,
-    "sat": 0.032,
-    "hedef": 0.285,
+    "tut": 0.269,
+    "sat": 0.031,
+    "hedef": 0.275,
     "hisse": 225,
     "gorus": 2652,
     "kapsam": 1,
     "kaynak": "Nikkei 225 üyeleri (piyasa değeri ağırlıklı)",
-    "hedefFiyat": 81299.57
+    "hedefFiyat": 81685.27
    }
   },
   "SILVER": {
-   "rsi": 34.1,
+   "rsi": 33,
    "teknik": -0.347,
-   "fiyat": 54.4532
+   "fiyat": 54.037
   },
   "XU100": {
    "rsi": 28.2,
@@ -143,12 +143,12 @@
     "al": 0.927,
     "tut": 0.068,
     "sat": 0.004,
-    "hedef": 1.011,
+    "hedef": 0.928,
     "hisse": 4,
     "gorus": 170,
     "kapsam": 1,
     "kaynak": "fonun ana hisseleri: Micron, Samsung, SK Hynix, Seagate (eşit ağırlık)",
-    "hedefFiyat": 101.6
+    "hedefFiyat": 97.4
    }
   },
   "K_NASA": {
@@ -156,15 +156,15 @@
    "teknik": -0.231,
    "fiyat": 21.43,
    "icerik": {
-    "al": 0.788,
-    "tut": 0.183,
-    "sat": 0.029,
-    "hedef": 0.807,
+    "al": 0.789,
+    "tut": 0.182,
+    "sat": 0.03,
+    "hedef": 0.809,
     "hisse": 21,
     "gorus": 279,
-    "kapsam": 0.558,
+    "kapsam": 0.57,
     "kaynak": "fonun günlük içerik listesi",
-    "hedefFiyat": 38.72
+    "hedefFiyat": 38.77
    }
   },
   "DAX": {
@@ -174,10 +174,10 @@
    "icerik": {
     "al": 0.63,
     "tut": 0.292,
-    "sat": 0.079,
+    "sat": 0.078,
     "hedef": 0.198,
     "hisse": 40,
-    "gorus": 876,
+    "gorus": 877,
     "kapsam": 1,
     "kaynak": "DAX üyeleri",
     "hedefFiyat": 30657.74
@@ -185,13 +185,13 @@
   },
   "BTCUSD": {
    "rsi": 45.5,
-   "teknik": 0.07,
-   "fiyat": 80819.16
+   "teknik": -0.112,
+   "fiyat": 80810.01
   },
   "XRPUSD": {
-   "rsi": 45.5,
-   "teknik": -0.042,
-   "fiyat": 1.32775
+   "rsi": 46.6,
+   "teknik": 0.067,
+   "fiyat": 1.3338
   }
  }
 }
