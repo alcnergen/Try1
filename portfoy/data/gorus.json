@@ -1,20 +1,20 @@
 {
- "guncelleme": "2026-10-28T15:26:04.951Z",
+ "guncelleme": "2026-10-28T15:35:49.016Z",
  "varliklar": {
   "USDTRY": {
-   "rsi": 89.2,
+   "rsi": 89.1,
    "teknik": 0.646,
-   "fiyat": 49.8348
+   "fiyat": 49.8327
   },
   "EURTRY": {
-   "rsi": 48.2,
+   "rsi": 48.4,
    "teknik": 0.055,
-   "fiyat": 55.48735
+   "fiyat": 55.49699
   },
   "GOLD": {
-   "rsi": 39.5,
+   "rsi": 39.4,
    "teknik": -0.393,
-   "fiyat": 4044.23
+   "fiyat": 4042.93
   },
   "N225": {
    "rsi": 43.7,
@@ -33,9 +33,9 @@
    }
   },
   "SILVER": {
-   "rsi": 32.2,
+   "rsi": 32.3,
    "teknik": -0.347,
-   "fiyat": 53.636
+   "fiyat": 53.6511
   },
   "XU100": {
    "rsi": 28.7,
@@ -54,62 +54,62 @@
    }
   },
   "SPX": {
-   "rsi": 52.2,
+   "rsi": 52.5,
    "teknik": 0.467,
-   "fiyat": 7734.3,
+   "fiyat": 7737.89,
    "icerik": {
     "al": 0.73,
     "tut": 0.234,
     "sat": 0.036,
-    "hedef": 0.217,
+    "hedef": 0.216,
     "hisse": 501,
     "gorus": 13290,
     "kapsam": 1,
     "kaynak": "S&P 500 üyeleri",
-    "hedefFiyat": 9412.64
+    "hedefFiyat": 9409.27
    }
   },
   "NDX": {
    "rsi": 47.8,
    "teknik": -0.045,
-   "fiyat": 29690.4816,
+   "fiyat": 29691.213,
    "icerik": {
     "al": 0.807,
     "tut": 0.162,
     "sat": 0.031,
-    "hedef": 0.292,
+    "hedef": 0.291,
     "hisse": 98,
     "gorus": 3510,
     "kapsam": 1,
     "kaynak": "Nasdaq 100 üyeleri",
-    "hedefFiyat": 38360.1
+    "hedefFiyat": 38331.36
    }
   },
   "MSCIW": {
-   "rsi": 50.7,
-   "teknik": 0.2,
-   "fiyat": 207.62
+   "rsi": 51,
+   "teknik": 0.379,
+   "fiyat": 207.71
   },
   "K_SMH": {
-   "rsi": 48.4,
+   "rsi": 48.6,
    "teknik": -0.067,
-   "fiyat": 564.66,
+   "fiyat": 565.275,
    "icerik": {
-    "al": 0.849,
+    "al": 0.85,
     "tut": 0.139,
     "sat": 0.012,
-    "hedef": 0.45,
+    "hedef": 0.448,
     "hisse": 27,
     "gorus": 883,
     "kapsam": 1,
     "kaynak": "SOX yarı iletken endeksi üyeleri (SMH'ye yakın)",
-    "hedefFiyat": 818.76
+    "hedefFiyat": 818.52
    }
   },
   "K_NVDA": {
    "rsi": 46.2,
    "teknik": -0.112,
-   "fiyat": 217.835,
+   "fiyat": 217.83,
    "analist": {
     "al": 69,
     "tut": 2,
@@ -120,78 +120,78 @@
    }
   },
   "K_IGV": {
-   "rsi": 56.9,
+   "rsi": 56.5,
    "teknik": 0.491,
-   "fiyat": 111.01,
+   "fiyat": 110.85,
    "icerik": {
     "al": 0.776,
     "tut": 0.191,
     "sat": 0.034,
-    "hedef": 0.275,
+    "hedef": 0.277,
     "hisse": 39,
     "gorus": 1417,
     "kapsam": 0.923,
     "kaynak": "ABD'nin en büyük 40 yazılım şirketi (IGV'ye yakın)",
-    "hedefFiyat": 141.54
+    "hedefFiyat": 141.56
    }
   },
   "K_DRAM": {
-   "rsi": 50.3,
+   "rsi": 50.4,
    "teknik": 0.091,
-   "fiyat": 53.26,
+   "fiyat": 53.3,
    "icerik": {
     "al": 0.927,
     "tut": 0.068,
     "sat": 0.004,
-    "hedef": 0.879,
+    "hedef": 0.875,
     "hisse": 4,
     "gorus": 169,
     "kapsam": 1,
     "kaynak": "fonun ana hisseleri: Micron, Samsung, SK Hynix, Seagate (eşit ağırlık)",
-    "hedefFiyat": 100.08
+    "hedefFiyat": 99.94
    }
   },
   "K_NASA": {
-   "rsi": 42.5,
+   "rsi": 42.7,
    "teknik": -0.276,
-   "fiyat": 21.29,
+   "fiyat": 21.31,
    "icerik": {
     "al": 0.789,
     "tut": 0.182,
     "sat": 0.03,
-    "hedef": 0.839,
+    "hedef": 0.836,
     "hisse": 21,
     "gorus": 279,
     "kapsam": 0.57,
     "kaynak": "fonun günlük içerik listesi",
-    "hedefFiyat": 39.15
+    "hedefFiyat": 39.13
    }
   },
   "DAX": {
-   "rsi": 55.4,
+   "rsi": 55.7,
    "teknik": 0.558,
-   "fiyat": 25675.07,
+   "fiyat": 25688.01,
    "icerik": {
     "al": 0.629,
     "tut": 0.293,
     "sat": 0.078,
-    "hedef": 0.195,
+    "hedef": 0.194,
     "hisse": 40,
     "gorus": 878,
     "kapsam": 1,
     "kaynak": "DAX üyeleri",
-    "hedefFiyat": 30681.71
+    "hedefFiyat": 30671.48
    }
   },
   "BTCUSD": {
-   "rsi": 44.7,
+   "rsi": 44.1,
    "teknik": -0.179,
-   "fiyat": 80611.48
+   "fiyat": 80454.26
   },
   "XRPUSD": {
-   "rsi": 43.4,
-   "teknik": -0.267,
-   "fiyat": 1.31339
+   "rsi": 42.9,
+   "teknik": -0.333,
+   "fiyat": 1.30965
   }
  }
 }
