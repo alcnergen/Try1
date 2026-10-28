@@ -1,20 +1,20 @@
 {
- "guncelleme": "2026-10-28T18:25:40.559Z",
+ "guncelleme": "2026-10-28T18:35:43.101Z",
  "varliklar": {
   "USDTRY": {
-   "rsi": 89.1,
+   "rsi": 89.2,
    "teknik": 0.646,
-   "fiyat": 49.8336
+   "fiyat": 49.8356
   },
   "EURTRY": {
-   "rsi": 47.4,
+   "rsi": 48.9,
    "teknik": 0.055,
-   "fiyat": 55.45823
+   "fiyat": 55.51709
   },
   "GOLD": {
-   "rsi": 38.6,
+   "rsi": 39.5,
    "teknik": -0.393,
-   "fiyat": 4032.23
+   "fiyat": 4044.77
   },
   "N225": {
    "rsi": 43.7,
@@ -24,18 +24,18 @@
     "al": 0.702,
     "tut": 0.267,
     "sat": 0.031,
-    "hedef": 0.278,
+    "hedef": 0.279,
     "hisse": 225,
     "gorus": 2659,
     "kapsam": 1,
     "kaynak": "Nikkei 225 üyeleri (piyasa değeri ağırlıklı)",
-    "hedefFiyat": 81733.17
+    "hedefFiyat": 81797.13
    }
   },
   "SILVER": {
-   "rsi": 31.9,
-   "teknik": -0.302,
-   "fiyat": 53.4962
+   "rsi": 32.3,
+   "teknik": -0.347,
+   "fiyat": 53.6649
   },
   "XU100": {
    "rsi": 28.7,
@@ -54,62 +54,62 @@
    }
   },
   "SPX": {
-   "rsi": 51.7,
+   "rsi": 51.6,
    "teknik": 0.333,
-   "fiyat": 7728.73,
+   "fiyat": 7726.57,
    "icerik": {
     "al": 0.73,
     "tut": 0.234,
     "sat": 0.036,
-    "hedef": 0.217,
+    "hedef": 0.218,
     "hisse": 501,
     "gorus": 13292,
     "kapsam": 1,
     "kaynak": "S&P 500 üyeleri",
-    "hedefFiyat": 9405.86
+    "hedefFiyat": 9410.96
    }
   },
   "NDX": {
-   "rsi": 47.4,
+   "rsi": 47.2,
    "teknik": -0.045,
-   "fiyat": 29664.2353,
+   "fiyat": 29657.6254,
    "icerik": {
     "al": 0.807,
     "tut": 0.162,
     "sat": 0.031,
-    "hedef": 0.292,
+    "hedef": 0.293,
     "hisse": 98,
     "gorus": 3511,
     "kapsam": 1,
     "kaynak": "Nasdaq 100 üyeleri",
-    "hedefFiyat": 38326.19
+    "hedefFiyat": 38347.31
    }
   },
   "MSCIW": {
-   "rsi": 50.4,
+   "rsi": 50.3,
    "teknik": 0.2,
-   "fiyat": 207.555
+   "fiyat": 207.505
   },
   "K_SMH": {
-   "rsi": 48.3,
+   "rsi": 48.4,
    "teknik": -0.067,
-   "fiyat": 564.355,
+   "fiyat": 564.56,
    "icerik": {
-    "al": 0.85,
+    "al": 0.849,
     "tut": 0.139,
     "sat": 0.012,
-    "hedef": 0.45,
+    "hedef": 0.449,
     "hisse": 27,
     "gorus": 884,
     "kapsam": 1,
     "kaynak": "SOX yarı iletken endeksi üyeleri (SMH'ye yakın)",
-    "hedefFiyat": 818.31
+    "hedefFiyat": 818.05
    }
   },
   "K_NVDA": {
    "rsi": 45,
    "teknik": -0.112,
-   "fiyat": 216.665,
+   "fiyat": 216.63,
    "analist": {
     "al": 69,
     "tut": 2,
@@ -120,30 +120,30 @@
    }
   },
   "K_IGV": {
-   "rsi": 55.8,
+   "rsi": 56,
    "teknik": 0.445,
-   "fiyat": 110.605,
+   "fiyat": 110.68,
    "icerik": {
     "al": 0.776,
-    "tut": 0.191,
+    "tut": 0.19,
     "sat": 0.034,
     "hedef": 0.277,
     "hisse": 39,
-    "gorus": 1417,
+    "gorus": 1418,
     "kapsam": 0.923,
     "kaynak": "ABD'nin en büyük 40 yazılım şirketi (IGV'ye yakın)",
-    "hedefFiyat": 141.24
+    "hedefFiyat": 141.34
    }
   },
   "K_DRAM": {
    "rsi": 50.4,
    "teknik": 0.091,
-   "fiyat": 53.322,
+   "fiyat": 53.29,
    "icerik": {
     "al": 0.927,
     "tut": 0.068,
     "sat": 0.004,
-    "hedef": 0.864,
+    "hedef": 0.865,
     "hisse": 4,
     "gorus": 169,
     "kapsam": 1,
@@ -152,9 +152,9 @@
    }
   },
   "K_NASA": {
-   "rsi": 42.5,
+   "rsi": 42.6,
    "teknik": -0.276,
-   "fiyat": 21.29,
+   "fiyat": 21.305,
    "icerik": {
     "al": 0.789,
     "tut": 0.182,
@@ -164,7 +164,7 @@
     "gorus": 279,
     "kapsam": 0.57,
     "kaynak": "fonun günlük içerik listesi",
-    "hedefFiyat": 39.11
+    "hedefFiyat": 39.14
    }
   },
   "DAX": {
@@ -172,26 +172,26 @@
    "teknik": 0.558,
    "fiyat": 25704.02,
    "icerik": {
-    "al": 0.629,
+    "al": 0.628,
     "tut": 0.293,
-    "sat": 0.078,
+    "sat": 0.079,
     "hedef": 0.194,
     "hisse": 40,
-    "gorus": 878,
+    "gorus": 881,
     "kapsam": 1,
     "kaynak": "DAX üyeleri",
     "hedefFiyat": 30690.6
    }
   },
   "BTCUSD": {
-   "rsi": 45.3,
+   "rsi": 46,
    "teknik": -0.112,
-   "fiyat": 80756.42
+   "fiyat": 80925.49
   },
   "XRPUSD": {
-   "rsi": 44.2,
+   "rsi": 44.8,
    "teknik": -0.133,
-   "fiyat": 1.31866
+   "fiyat": 1.32329
   }
  }
 }
