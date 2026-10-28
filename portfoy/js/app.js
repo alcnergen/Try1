@@ -8,7 +8,7 @@ import {
 } from './calc.js';
 import { lineChart, legend } from './chart.js';
 
-export const APP_VERSION = '2026.10.24-a';
+export const APP_VERSION = '2026.10.28-a';
 
 // ---------- Durum ----------
 let S = store.load();
@@ -21,10 +21,11 @@ const persist = () => { store.save(S); backup.schedule(() => S, (r) => { updateS
 // ---------- Biçimlendirme ----------
 const nf = (d) => new Intl.NumberFormat('tr-TR', { minimumFractionDigits: d, maximumFractionDigits: d });
 const NF = [0, 1, 2, 3, 4, 6].reduce((o, d) => ((o[d] = nf(d)), o), {});
-const money = (v, ccy = 'TRY', d = 2) => (v == null || !Number.isFinite(v) ? '—' : (ccy === 'USD' ? '$' : '₺') + NF[d].format(v));
+// Milyon ve üstü tutarlarda kuruş gösterilmez (okunur, dar sütunlara sığar); ondalık açıkça istenirse o geçerli
+const money = (v, ccy = 'TRY', d) => (v == null || !Number.isFinite(v) ? '—' : (ccy === 'USD' ? '$' : '₺') + NF[d ?? (Math.abs(v) >= 1e6 ? 0 : 2)].format(v));
 const num = (v, d = 2) => (v == null || !Number.isFinite(v) ? '—' : NF[d].format(v));
 const pct = (v, d = 2) => (v == null || !Number.isFinite(v) ? '—' : `${v > 0 ? '+' : v < 0 ? '−' : ''}%${NF[d].format(Math.abs(v) * 100)}`);
-const signMoney = (v, ccy, d = 2) => (v == null ? '—' : `${v > 0 ? '+' : v < 0 ? '−' : ''}${money(Math.abs(v), ccy, d)}`);
+const signMoney = (v, ccy, d) => (v == null ? '—' : `${v > 0 ? '+\u2060' : v < 0 ? '−\u2060' : ''}${money(Math.abs(v), ccy, d)}`);
 const cls = (v) => (v > 0 ? 'up' : v < 0 ? 'down' : 'flat');
 const arrow = (v) => (v > 0 ? '▲' : v < 0 ? '▼' : '•');
 // Eksen etiketleri: adım küçükse daha çok ondalık (aynı etiketin tekrarlanmaması için)
@@ -166,6 +167,21 @@ function render() {
   main().innerHTML = '';
   v(main());
   main().scrollTop = 0;
+  fitNumbers(main());
+}
+
+// Rakamlar kesilmez ve bölünmez; kutusuna sığmazsa yazı boyutu küçülür (en fazla %30)
+const FIT_SEL = '.big, .kpis > div > b, .grid3 > div, .k-res, .dist-row';
+function fitNumbers(root = document) {
+  requestAnimationFrame(() => {
+    for (const el of root.querySelectorAll(FIT_SEL)) {
+      el.style.fontSize = '';
+      if (el.scrollWidth <= el.clientWidth + 1) continue;
+      const base = parseFloat(getComputedStyle(el).fontSize);
+      let size = base;
+      while (el.scrollWidth > el.clientWidth + 1 && size > base * 0.7) { size -= 0.5; el.style.fontSize = size + 'px'; }
+    }
+  });
 }
 
 const hhmm = (d) => d.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
@@ -232,7 +248,7 @@ function ozet(root) {
   <section class="hero card">
     <div class="row between"><span class="label">Portföy değeri</span>
       <div class="seg" role="group" aria-label="Para birimi"><button data-ccy="TRY" class="${ccy === 'TRY' ? 'on' : ''}">₺</button><button data-ccy="USD" class="${ccy === 'USD' ? 'on' : ''}">$</button></div></div>
-    <div class="big">${money(val, ccy)}</div>
+    <div class="big">${money(val, ccy, Math.abs(val) >= 1e5 ? 0 : 2)}</div>
     ${C.ahead ? `<div class="tag">${dTR(C.ahead).slice(0, 5)} fiyatlarıyla · erken fiyat, TEFAS onayı bekleniyor</div>` : ''}
     <div class="muted small">Stopaj sonrası: ${ccy === 'USD' ? money((L.cost + L.net) / (L.usd || 1), 'USD') : money(L.cost + L.net)}</div>
     <div class="sub ${cls(dayChg)}">${arrow(dayChg)} ${signMoney(dayChg, 'TRY')} (${pct(dayPct)}) <span class="muted">${P ? 'son fiyat gününe göre' : ''}</span></div>
@@ -289,7 +305,7 @@ function ozet(root) {
       <div class="grid3">
         <div><span class="label">Fiyat</span>${fmtPrice(p?.[1], f.code)}${stale ? ' <span class="warn" title="Fiyat güncel değil">⚠︎</span>' : ''}<span class="muted small">${p ? dTR(p[0]) : 'veri yok'}</span></div>
         <div><span class="label">Değer</span>${money(s.value)}<span class="muted small">${num(s.qty, 0)} adet</span></div>
-        <div><span class="label">Kâr (net)</span><span class="${cls(s.net)}">${signMoney(s.net)}</span><span class="${cls(gp)} small">${pct(gp)} brüt</span></div>
+        <div><span class="label">Kâr (net)</span>${p ? `<span class="${cls(s.net)}">${signMoney(s.net)}</span><span class="${cls(gp)} small">${pct(gp)} brüt</span>` : '<span class="muted">—</span><span class="muted small">fiyat yok</span>'}</div>
       </div></button>`);
     hold.append(card);
   }
@@ -403,7 +419,7 @@ function fonlar(root) {
       <div class="grid3">
         <div><span class="label">Adet</span>${num(s.qty, 0)}</div>
         <div><span class="label">Ort. maliyet (₺)</span>${num(s.avg, isListed(f.code) ? 2 : 6)}</div>
-        <div><span class="label">Net kâr</span><span class="${cls(s.net)}">${signMoney(s.net)}</span></div>
+        <div><span class="label">Net kâr</span>${last ? `<span class="${cls(s.net)}">${signMoney(s.net)}</span>` : '<span class="muted">— fiyat yok</span>'}</div>
       </div></button>`));
   }
   list.querySelectorAll('.hold').forEach((b) => (b.onclick = () => fundDetail(b.dataset.code)));
@@ -833,6 +849,7 @@ function assetEdit(asset, val) {
 }
 
 // ---------- Diyaloglar ----------
+const REDUCED = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 function sheet(title, content) {
   const dlg = document.createElement('dialog');
   dlg.className = 'sheet';
@@ -843,6 +860,9 @@ function sheet(title, content) {
   dlg.addEventListener('close', () => dlg.remove());
   dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
   dlg.showModal();
+  // iOS çekmecesine benzer açılış; "Hareketi azalt" açıksa yalnızca hafif solma
+  try { dlg.animate(REDUCED() ? [{ opacity: 0 }, { opacity: 1 }] : [{ transform: 'translateY(100%)' }, { transform: 'none' }], { duration: REDUCED() ? 150 : 280, easing: 'cubic-bezier(0.32, 0.72, 0, 1)' }); } catch { /* eski tarayıcı */ }
+  fitNumbers(dlg);
   return dlg;
 }
 
@@ -919,8 +939,14 @@ const guessKind = (code, pb) => (pb === 'TRY' && code.length === 3 ? 'fon' : 'hi
 function toast(msg, ms = 4500) {
   let t = document.querySelector('.toast');
   if (!t) { t = document.createElement('div'); t.className = 'toast'; t.setAttribute('role', 'status'); document.body.append(t); }
+  const wasHidden = t.hidden || !t.textContent;
   t.textContent = msg; t.hidden = false;
-  clearTimeout(t._h); t._h = setTimeout(() => { t.hidden = true; }, ms);
+  const move = REDUCED() ? [] : ['translate(-50%, 8px)', 'translate(-50%, 0)'];
+  if (wasHidden) try { t.animate([{ opacity: 0, ...(move[0] ? { transform: move[0] } : {}) }, { opacity: 1, ...(move[1] ? { transform: move[1] } : {}) }], { duration: 200, easing: 'cubic-bezier(0.23, 1, 0.32, 1)' }); } catch { /* yok */ }
+  clearTimeout(t._h);
+  t._h = setTimeout(() => {
+    try { t.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 150, easing: 'ease-out' }).onfinish = () => { t.hidden = true; }; } catch { t.hidden = true; }
+  }, ms);
 }
 
 const pending = new Set();
@@ -1356,7 +1382,7 @@ export async function init() {
   await refresh();
   syncFromBackup();
   let w = innerWidth;
-  addEventListener('resize', () => { if (Math.abs(innerWidth - w) > 40) { w = innerWidth; render(); } });
+  addEventListener('resize', () => { if (Math.abs(innerWidth - w) > 40) { w = innerWidth; render(); } else fitNumbers(main()); });
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState !== 'visible') return;
     if (C.today !== todayISO()) refresh();
