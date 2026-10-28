@@ -1,11 +1,14 @@
 :root {
   color-scheme: light;
-  --bg: #f6f5f1;
-  --card: #fcfcfb;
-  --line: #e4e2dc;
-  --text: #0b0b0b;
-  --text2: #52514e;
-  --muted: #8a8984;
+  --bg: #f2f2f7;
+  --card: #ffffff;
+  --line: #e5e5ea;
+  --text: #111113;
+  --text2: #4b4b52;
+  --muted: #8e8e93;
+  --shadow: 0 1px 2px rgb(0 0 0 / .04), 0 4px 16px rgb(0 0 0 / .05);
+  --tint: rgb(0 0 0 / .04);
+  --seg-on: #ffffff;
   --accent: #2a78d6;
   --up: #0e7a3c;
   --down: #c8302f;
@@ -13,13 +16,14 @@
   --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100; --s5: #e87ba4;
   --s6: #008300; --s7: #6250d6; --s8: #e34948; --s9: #8a6d3b; --s10: #4f6d7a; --s11: #9a9890; --s12: #b4446f;
   --s13: #e8870e; --s14: #0f8fa8; --s15: #8a96a3; --s16: #7a3fb0; --s17: #5f9a00; --s18: #c2185b; --s19: #00897b; --s20: #6d4c41;
-  --r: 14px;
+  --r: 18px;
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    --bg: #141413; --card: #1d1d1b; --line: #2f2f2c; --text: #f0efec; --text2: #c3c2b7; --muted: #8f8e86;
+    --bg: #000000; --card: #1c1c1e; --line: #2c2c2e; --text: #f2f2f7; --text2: #c7c7cc; --muted: #8e8e93;
+    --shadow: 0 0 0 1px rgb(255 255 255 / .05); --tint: rgb(255 255 255 / .06); --seg-on: #48484a;
     --accent: #3987e5; --up: #3fbf74; --down: #ef6b6a; --warn: #e3a33a;
     --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181;
     --s6: #2f9e2f; --s7: #9085e9; --s8: #e66767; --s9: #b0915a; --s10: #7d9cab; --s11: #8f8e86; --s12: #e0729b;
@@ -28,7 +32,8 @@
 }
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --bg: #141413; --card: #1d1d1b; --line: #2f2f2c; --text: #f0efec; --text2: #c3c2b7; --muted: #8f8e86;
+  --bg: #000000; --card: #1c1c1e; --line: #2c2c2e; --text: #f2f2f7; --text2: #c7c7cc; --muted: #8e8e93;
+  --shadow: 0 0 0 1px rgb(255 255 255 / .05); --tint: rgb(255 255 255 / .06); --seg-on: #48484a;
   --accent: #3987e5; --up: #3fbf74; --down: #ef6b6a; --warn: #e3a33a;
   --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181;
   --s6: #2f9e2f; --s7: #9085e9; --s8: #e66767; --s9: #b0915a; --s10: #7d9cab; --s11: #8f8e86; --s12: #e0729b;
@@ -246,3 +251,38 @@ details.fold[open] > summary h3::after { content: ' ▾'; }
 @media (prefers-reduced-motion: reduce) {
   .btn:active, .icon:active, .chips button:active, .tabbar button:active { transform: none; opacity: .7; }
 }
+
+/* ---------- Görsel yenileme: iOS gruplu düzen, gölgeli kartlar, belirgin hiyerarşi ---------- */
+h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.025em; }
+h2 { font-size: 17px; font-weight: 650; letter-spacing: -0.01em; }
+.top { border-bottom-color: transparent; }
+.card { border: 0; box-shadow: var(--shadow); }
+.card.notice { border: 1px solid color-mix(in srgb, var(--warn) 40%, transparent); box-shadow: none; }
+.card.notice.err { border-color: color-mix(in srgb, var(--down) 40%, transparent); }
+.icon { border: 0; background: var(--tint); border-radius: 999px; width: 36px; height: 36px; font-size: 17px; }
+.label { font-size: 10.5px; letter-spacing: .05em; font-weight: 500; }
+
+/* iOS bölümlü seçici: gri yol, beyaz seçili parça */
+.seg { border: 0; background: var(--tint); padding: 2px; border-radius: 10px; gap: 2px; }
+.seg button, .seg label { border-radius: 8px; padding: 5px 12px; color: var(--text2); font-weight: 500; }
+.seg button.on, .seg label:has(input:checked) { background: var(--seg-on); color: var(--text); font-weight: 600; box-shadow: 0 1px 3px rgb(0 0 0 / .12), 0 0 0 .5px rgb(0 0 0 / .04); }
+
+/* Ana rakam ve günlük değişim */
+.hero .big { font-size: 40px; font-weight: 700; letter-spacing: -0.035em; margin: 6px 0 4px; }
+.pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 999px; font-weight: 600; font-size: 13.5px; background: color-mix(in srgb, currentColor 12%, transparent); white-space: nowrap; }
+.chg { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; margin-top: 8px; }
+
+/* KPI'lar: hafif zeminli küçük kutular */
+.kpis { gap: 8px; }
+.kpis > div { background: var(--tint); border-radius: 12px; padding: 10px 12px; }
+.kpis b { font-size: 17px; font-weight: 650; letter-spacing: -0.01em; margin: 2px 0 1px; }
+.kpis .wide { border-top: 0; padding-top: 10px; }
+
+/* Alt menü: seçili sekmede hap gösterge */
+.tabbar { border-top-color: color-mix(in srgb, var(--line) 70%, transparent); }
+.tabbar button span { font-size: 19px; padding: 3px 16px; border-radius: 999px; transition: background-color 160ms ease-out; }
+.tabbar button.on span { background: color-mix(in srgb, var(--accent) 14%, transparent); }
+
+/* Satır listeleri ve tablolar biraz daha ferah */
+.hold { padding: 14px 0; }
+.tbl th { border-bottom-color: var(--line); }
