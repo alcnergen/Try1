@@ -43,9 +43,12 @@ export function lineChart(container, series, opts = {}) {
   if (opts.baseline != null) { ymin = Math.min(ymin, opts.baseline); ymax = Math.max(ymax, opts.baseline); }
   const ticks = niceTicks(ymin, ymax);
   const y0 = ticks[0], y1 = ticks[ticks.length - 1];
+  const fmtY = opts.fmtY || ((v) => v.toLocaleString('tr-TR'));
+  // Sağ eksen boşluğu en uzun etikete göre (büyük değerlerde "190,0 Mn" kesilmesin)
+  const longest = Math.max(...ticks.map((t) => String(fmtY(t, ticks[1] - ticks[0])).length));
+  pad.r = Math.max(40, Math.ceil(longest * 6.6) + 12);
   const X = (d) => pad.l + ((Date.parse(d) - t0) / Math.max(1, t1 - t0)) * (W - pad.l - pad.r);
   const Y = (v) => pad.t + (1 - (v - y0) / (y1 - y0 || 1)) * (H - pad.t - pad.b);
-  const fmtY = opts.fmtY || ((v) => v.toLocaleString('tr-TR'));
 
   const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, width: W, height: H, role: 'img', class: 'chart-svg' });
   svg.setAttribute('aria-label', opts.label || valid.map((s) => s.name).join(', '));
