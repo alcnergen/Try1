@@ -8,7 +8,7 @@ import {
 } from './calc.js';
 import { lineChart, legend } from './chart.js';
 
-export const APP_VERSION = '2026.10.28-a';
+export const APP_VERSION = '2026.10.28-b';
 
 // ---------- Durum ----------
 let S = store.load();
@@ -251,7 +251,7 @@ function ozet(root) {
     <div class="big">${money(val, ccy, Math.abs(val) >= 1e5 ? 0 : 2)}</div>
     ${C.ahead ? `<div class="tag">${dTR(C.ahead).slice(0, 5)} fiyatlarıyla · erken fiyat, TEFAS onayı bekleniyor</div>` : ''}
     <div class="muted small">Stopaj sonrası: ${ccy === 'USD' ? money((L.cost + L.net) / (L.usd || 1), 'USD') : money(L.cost + L.net)}</div>
-    <div class="sub ${cls(dayChg)}">${arrow(dayChg)} ${signMoney(dayChg, 'TRY')} (${pct(dayPct)}) <span class="muted">${P ? 'son fiyat gününe göre' : ''}</span></div>
+    ${P ? `<div class="chg"><span class="pill ${cls(dayChg)}">${arrow(dayChg)} ${signMoney(dayChg, 'TRY')} · ${pct(dayPct)}</span><span class="muted small">son fiyat gününe göre</span></div>` : ''}
     <div class="kpis">
       <div><span class="label">Net kâr (stopaj sonrası)</span><b class="${cls(L.net)}">${signMoney(L.net, 'TRY')}</b><span class="${cls(netPct)}">${pct(netPct)}</span></div>
       <div><span class="label">Brüt kâr</span><b class="${cls(L.gross)}">${signMoney(L.gross, 'TRY')}</b><span class="${cls(grossPct)}">${pct(grossPct)}</span></div>
@@ -389,7 +389,7 @@ function wealthCard(ccy) {
   const dW = prevW ? total - prevW[1] : null;
   return `<section class="card"><div class="row between"><h2>Toplam servet</h2><span class="muted small">${dTR(C.today)} itibarıyla${ccy === 'USD' ? ', bugünkü kurla' : ''}</span></div>
     <div class="big">${money(total / k, ccy, 0)}</div>
-    ${prevW ? `<div class="sub ${cls(dW)}">${arrow(dW)} ${signMoney(dW / k, ccy, 0)} (${pct(total / prevW[1] - 1)}) <span class="muted">önceki güne göre (${dTR(prevW[0])})</span></div>` : ''}
+    ${prevW ? `<div class="chg"><span class="pill ${cls(dW)}">${arrow(dW)} ${signMoney(dW / k, ccy, 0)} · ${pct(total / prevW[1] - 1)}</span><span class="muted small">önceki güne göre (${dTR(prevW[0])})</span></div>` : ''}
     <div class="sub muted small">Yatırımlar bugünkü fiyatlarla ${money(inv / k, ccy, 0)} · diğer varlıklar son bilinen değerleriyle ${money((total - inv) / k, ccy, 0)} (${dTR(last.date)} değerlemesi)</div>
     <div id="wch" class="chart" style="min-height:150px"></div>
     <div class="stack" role="img" aria-label="Varlık dağılımı">${rows.map(([cat, col]) => `<span style="flex:${parts[cat]};background:${col}" title="${cat} %${num((parts[cat] / total) * 100, 1)}"></span>`).join('')}</div>
