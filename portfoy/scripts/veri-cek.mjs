@@ -13,6 +13,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { SCAN_COLS, parseScanRow } from '../js/data.js';
+import { OLCER_SCAN, OLCER_COLS, rowObj, computeOlcer } from '../js/olcer.js';
 export { parseScanRow };
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -465,6 +466,38 @@ async function updateViews(cfg) {
   }
   await writeFile(path.join(DATA, 'gorus.json'), JSON.stringify({ guncelleme: new Date().toISOString(), varliklar }, null, 1));
   log(`görüş: ${Object.keys(varliklar).length} varlık`);
+  return varliklar;
+}
+
+// ---------- Dağılım ölçeri: günlük puan ve geçmişi (data/olcer.json) ----------
+async function updateOlcer(varliklar) {
+  const rows = {};
+  for (const [market, tickers] of Object.entries(OLCER_SCAN)) {
+    try { for (const r of await scanTV(market, { symbols: { tickers }, columns: OLCER_COLS })) rows[r.s] = rowObj(r.d); }
+    catch (e) { log(`ölçer (${market}) alınamadı: ${e.message}`); }
+  }
+  const icerik = Object.fromEntries(Object.entries(varliklar || {}).filter(([, v]) => v.icerik).map(([k, v]) => [k, v.icerik]));
+  // TR girdileri: TCMB mevduat faizi (net, %17,5 stopaj), TÜFE yıllık, dolar/TL 3 aylık değişim
+  const pts = async (id) => (await loadSeries(id))?.points || [];
+  const at = (p, d) => { let v = null; for (const [x, y] of p) { if (x <= d) v = y; else break; } return v; };
+  const [mev, tufe, usd] = await Promise.all([pts('MEVFAIZ'), pts('TUFE'), pts('USDTRY')]);
+  const last = (p) => p[p.length - 1];
+  const ago = (p, days) => (last(p) ? at(p, iso(new Date(Date.parse(last(p)[0]) - days * 864e5))) : null);
+  const tr = {
+    mevduatNet: last(mev) ? (last(mev)[1] / 100) * (1 - 0.175) : null,
+    tufeYillik: last(tufe) && ago(tufe, 365) ? last(tufe)[1] / ago(tufe, 365) - 1 : null,
+    usdtry3m: last(usd) && ago(usd, 91) ? last(usd)[1] / ago(usd, 91) - 1 : null,
+    mevduatDegisim3m: last(mev) && ago(mev, 91) != null ? last(mev)[1] - ago(mev, 91) : null,
+  };
+  const son = computeOlcer(rows, icerik, tr);
+  const f = path.join(DATA, 'olcer.json');
+  let gecmis = [];
+  try { gecmis = JSON.parse(await readFile(f, 'utf8')).gecmis || []; } catch { /* ilk kez */ }
+  const today = iso(new Date(Date.now() + 3 * 3600e3)); // TR günü
+  gecmis = gecmis.filter((g) => g[0] !== today);
+  gecmis.push([today, son.abd.skor, son.altin.skor, son.tl.skor]);
+  await writeFile(f, JSON.stringify({ guncelleme: new Date().toISOString(), tr, son, gecmis: gecmis.slice(-1500) }, null, 1));
+  log(`ölçer: ABD ${son.abd.skor} · altın ${son.altin.skor} · TL ${son.tl.skor} (${Object.keys(rows).length} veri)`);
 }
 
 async function main() {
@@ -482,7 +515,8 @@ async function main() {
   }
   for (const b of cfg.kiyaslar || []) put(await updateBench(b, cfg.gecmisYil || 10));
   await writeFile(path.join(DATA, 'index.json'), JSON.stringify(index, null, 1));
-  await updateViews(cfg);
+  const varliklar = await updateViews(cfg);
+  try { await updateOlcer(varliklar); } catch (e) { log(`ölçer hesaplanamadı: ${e.message}`); }
   const errs = Object.entries(index.seriler).filter(([, v]) => v.hata);
   log(`bitti. ${Object.keys(index.seriler).length} seri, ${errs.length} hatalı${errs.length ? ': ' + errs.map(([k]) => k).join(', ') : ''}`);
 }

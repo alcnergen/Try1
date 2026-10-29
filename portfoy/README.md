@@ -24,6 +24,10 @@ Telefonda ana ekrana eklenen, yalnızca kişisel kullanım için fon portföyü 
 
 Kıyas karnesinde her piyasanın altında ince bir satır: hisselerde analist al/tut/sat dağılımı ve ortalama hedef fiyat farkı; endeks ve ETF'lerde içindeki hisselerin analist dağılımlarının ağırlıklı ortalaması (`config.json` → `icerik`: endeks üyeleri, sektör, sabit liste ya da fonun içerik dosyası); diğerlerinde TradingView teknik gösterge özeti (Güçlü sat … Güçlü al), sağda 14 günlük RSI (70 üstü aşırı alım, 30 altı aşırı satım). Veri `data/gorus.json`, her veri çekiminde TradingView tarayıcısından güncellenir; ayrıca Kıyas ekranındaki *↻ Görüşleri yenile* bağlantısı (ve 30 dakikadan eski veriyle Kıyas açılınca kendiliğinden) aynı veriyi telefondan anlık çeker ve telefonda saklar; `config.json`daki `tarama` alanı pazarı belirtir. Yatırım tavsiyesi değildir.
 
+## Dağılım ölçeri
+
+Senaryo sekmesinin başında: ABD borsası (QQQM, SMH, DRAM, IGV, NASA, CIBR), altın ve TL fonları için 0–100 puan (50 nötr). Faktörler: ETF trend ve ivmesi (50/200 günlük ortalama, 3 ay), içerik bazlı analist görüşü, S&P 500 trendi, ABD 10 ve 2 yıllık tahvil faizi ile Fed faizi, VIX, WTI petrol, dolar endeksi, ABD reel faizi, TL reel getirisi, kura karşı TL getirisi, TR faiz yönü. Kodu `js/olcer.js` (sunucu ve uygulama ortak). Kullanıcının orta vadeli hedefi (varsayılan %50, ABD + altın) iki ölçerin puanına göre bölünür; bir kalemin bugünkü payı ölçer 35'te 0, 65 ve üstünde hedefin tamamıdır. Puanlar her gün `data/olcer.json` geçmişine yazılır. Kural tabanlı bir özettir, tavsiye değildir.
+
 ## Otomatik yedek
 
 Ayarlar → *Otomatik yedek*: veri telefonda kullanıcının parolasıyla şifrelenir (AES-GCM-256, PBKDF2-SHA256 310.000 tur) ve GitHub hesabındaki gizli bir Gist'e (`portfoyum-yedek.json`) yazılır. Her değişiklikten birkaç saniye sonra yeniden yedeklenir; eski sürümler Gist geçmişinde kalır. Yeni cihazda *GitHub yedeğinden geri yükle* ile anahtar + parola girilerek geri alınır. Parola cihazdan çıkmaz; unutulursa yedek açılamaz.

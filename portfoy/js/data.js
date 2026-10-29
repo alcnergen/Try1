@@ -22,6 +22,8 @@ export const BENCHES = [
   { id: 'IGV', ad: 'IGV (yazılım ETF)', renk: 18, need: ['K_IGV', 'USDTRY'], tl: (s) => combine(s.K_IGV, s.USDTRY, (a, b) => a * b) },
   { id: 'DRAM', ad: 'DRAM (bellek ETF)', renk: 19, need: ['K_DRAM', 'USDTRY'], tl: (s) => combine(s.K_DRAM, s.USDTRY, (a, b) => a * b) },
   { id: 'NASA', ad: 'NASA (uzay ETF)', renk: 20, need: ['K_NASA', 'USDTRY'], tl: (s) => combine(s.K_NASA, s.USDTRY, (a, b) => a * b) },
+  { id: 'QQQM', ad: 'QQQM (Nasdaq 100 ETF)', renk: 21, need: ['K_QQQM', 'USDTRY'], tl: (s) => combine(s.K_QQQM, s.USDTRY, (a, b) => a * b) },
+  { id: 'CIBR', ad: 'CIBR (siber güvenlik ETF)', renk: 22, need: ['K_CIBR', 'USDTRY'], tl: (s) => combine(s.K_CIBR, s.USDTRY, (a, b) => a * b) },
   { id: 'TUFE', ad: 'Enflasyon (TÜFE)', renk: 12, need: ['TUFE'], tl: (s) => cpiDaily(s.TUFE).points },
   { id: 'MEVDUAT', ad: 'Mevduat', renk: 11, need: [], tl: null },
 ];
@@ -39,6 +41,7 @@ export async function loadMarket(fundCodes) {
   const market = { index: null, raw: {}, names: {}, meta: {}, errors: [], tefasSon: null };
   try { market.index = await getJSON('data/index.json'); } catch (e) { market.errors.push('Veri dizini yok (Actions henüz çalışmamış olabilir)'); }
   try { market.gorus = await getJSON('data/gorus.json'); } catch { market.gorus = null; }
+  try { market.olcer = await getJSON('data/olcer.json'); } catch { market.olcer = null; }
   // telefonda anlık çekilmiş daha yeni görüş varsa o kullanılır
   try { const c = JSON.parse(localStorage.getItem('portfoy.gorus')); if (c?.guncelleme > (market.gorus?.guncelleme || '')) market.gorus = withHoldings(c, market.gorus); } catch { /* yok */ }
   const ids = new Set([...fundCodes, ...BENCH_SERIES, 'EURTRY', 'JPYTRY', 'MEVFAIZ']);

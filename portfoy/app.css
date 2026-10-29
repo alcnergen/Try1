@@ -15,7 +15,7 @@
   --warn: #b26a00;
   --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100; --s5: #e87ba4;
   --s6: #008300; --s7: #6250d6; --s8: #e34948; --s9: #8a6d3b; --s10: #4f6d7a; --s11: #9a9890; --s12: #b4446f;
-  --s13: #e8870e; --s14: #0f8fa8; --s15: #8a96a3; --s16: #7a3fb0; --s17: #5f9a00; --s18: #c2185b; --s19: #00897b; --s20: #6d4c41;
+  --s13: #e8870e; --s14: #0f8fa8; --s15: #8a96a3; --s16: #7a3fb0; --s17: #5f9a00; --s18: #c2185b; --s19: #00897b; --s20: #6d4c41; --s21: #3949ab; --s22: #00838f;
   --r: 18px;
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 }
@@ -27,7 +27,7 @@
     --accent: #3987e5; --up: #3fbf74; --down: #ef6b6a; --warn: #e3a33a;
     --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181;
     --s6: #2f9e2f; --s7: #9085e9; --s8: #e66767; --s9: #b0915a; --s10: #7d9cab; --s11: #8f8e86; --s12: #e0729b;
-    --s13: #f7a541; --s14: #2bb6cf; --s15: #a9b4bf; --s16: #a06ad6; --s17: #8fd11a; --s18: #e35d8e; --s19: #26a69a; --s20: #a1887f;
+    --s13: #f7a541; --s14: #2bb6cf; --s15: #a9b4bf; --s16: #a06ad6; --s17: #8fd11a; --s18: #e35d8e; --s19: #26a69a; --s20: #a1887f; --s21: #7986cb; --s22: #4dd0e1;
   }
 }
 :root[data-theme="dark"] {
@@ -37,7 +37,7 @@
   --accent: #3987e5; --up: #3fbf74; --down: #ef6b6a; --warn: #e3a33a;
   --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181;
   --s6: #2f9e2f; --s7: #9085e9; --s8: #e66767; --s9: #b0915a; --s10: #7d9cab; --s11: #8f8e86; --s12: #e0729b;
-    --s13: #f7a541; --s14: #2bb6cf; --s15: #a9b4bf; --s16: #a06ad6; --s17: #8fd11a; --s18: #e35d8e; --s19: #26a69a; --s20: #a1887f;
+    --s13: #f7a541; --s14: #2bb6cf; --s15: #a9b4bf; --s16: #a06ad6; --s17: #8fd11a; --s18: #e35d8e; --s19: #26a69a; --s20: #a1887f; --s21: #7986cb; --s22: #4dd0e1;
 }
 
 * { box-sizing: border-box; }
@@ -286,3 +286,25 @@ h2 { font-size: 17px; font-weight: 650; letter-spacing: -0.01em; }
 /* Satır listeleri ve tablolar biraz daha ferah */
 .hold { padding: 14px 0; }
 .tbl th { border-bottom-color: var(--line); }
+
+/* Dağılım ölçeri */
+.gauges { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 10px 0 4px; }
+.gauge-tile { background: var(--tint); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.gauge-tile b { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; }
+.g-bar { position: relative; height: 5px; border-radius: 3px; background: color-mix(in srgb, var(--line) 80%, transparent); margin: 2px 0; }
+.g-bar i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 3px; background: currentColor; opacity: .55; }
+.gauge-tile .g-bar { color: var(--accent); }
+.g-bar em { position: absolute; top: -2px; bottom: -2px; width: 1px; background: var(--muted); }
+.inline-form label { font-size: 13px; }
+.inline-form input { max-width: 120px; }
+.etf-list { display: grid; }
+.etf-row { display: grid; grid-template-columns: auto 1fr auto auto; align-items: center; gap: 8px; padding: 9px 0; border-top: 1px solid var(--line); }
+.etf-row:first-child { border-top: 0; }
+.etf-row .r { display: flex; flex-direction: column; align-items: flex-end; min-width: 84px; }
+.chip-s { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: color-mix(in srgb, currentColor 12%, transparent); }
+.facts { display: grid; gap: 10px; margin-bottom: 8px; }
+.fact { display: grid; gap: 4px; font-size: 14px; }
+.f-bar { position: relative; height: 5px; border-radius: 3px; background: color-mix(in srgb, var(--line) 70%, transparent); }
+.f-bar i { position: absolute; top: 0; bottom: 0; border-radius: 3px; opacity: .6; }
+.f-bar i.pos { background: var(--up); } .f-bar i.neg { background: var(--down); }
+.f-bar::after { content: ''; position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: var(--muted); }

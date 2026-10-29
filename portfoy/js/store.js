@@ -7,7 +7,7 @@ export const DEFAULT = {
   manual: {},           // { SERI_ID: { 'YYYY-MM-DD': değer } } — el ile fiyat/kur
   snapshots: {},        // { 'YYYY-MM-DD': { value, cost, gross, net, usd, prices:{} } }
   others: { assets: [], vals: [] }, // assets: {id,name,cat}; vals: {date, usd, values:{id:tutar}}
-  settings: { tax: 0.175, deposit: 0.40, ccy: 'TRY', compare: ['USD', 'ALTIN', 'XU100'] },
+  settings: { tax: 0.175, deposit: 0.40, ccy: 'TRY', compare: ['USD', 'ALTIN', 'XU100'], olcerHedef: 0.5 },
   scenario: null,
 };
 

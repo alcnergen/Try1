@@ -26,6 +26,8 @@
     { "id": "K_IGV", "ad": "iShares Expanded Tech-Software ETF (IGV)", "tv": "AMEX:IGV", "tarama": "america", "taramaSembol": "CBOE:IGV", "icerik": { "tip": "sanayi", "pazar": "america", "sanayi": "Packaged Software", "adet": 40, "tavan": 0.09, "not": "ABD'nin en büyük 40 yazılım şirketi (IGV'ye yakın)" } },
     { "id": "K_DRAM", "ad": "Roundhill Memory ETF (DRAM)", "tv": "AMEX:DRAM", "tarama": "america", "taramaSembol": "CBOE:DRAM", "icerik": { "tip": "liste", "semboller": [["america", "NASDAQ:MU"], ["korea", "KRX:005930"], ["korea", "KRX:000660"], ["america", "NASDAQ:STX"]], "not": "fonun ana hisseleri: Micron, Samsung, SK Hynix, Seagate (eşit ağırlık)" } },
     { "id": "K_NASA", "ad": "Tema Space Innovators ETF (NASA)", "tv": "AMEX:NASA", "tarama": "america", "icerik": { "tip": "tema", "url": "https://temaetfs.com/nasa", "not": "fonun günlük içerik listesi" } },
+    { "id": "K_QQQM", "ad": "Invesco NASDAQ 100 ETF (QQQM)", "tv": "NASDAQ:QQQM", "tarama": "america", "icerik": { "tip": "endeks", "pazar": "america", "endeks": "NASDAQ:NDX", "adet": 2000, "not": "Nasdaq 100 üyeleri" } },
+    { "id": "K_CIBR", "ad": "First Trust NASDAQ Cybersecurity ETF (CIBR)", "tv": "NASDAQ:CIBR", "tarama": "america", "icerik": { "tip": "liste", "semboller": [["america", "NASDAQ:AVGO"], ["america", "NASDAQ:CSCO"], ["america", "NASDAQ:CRWD"], ["america", "NASDAQ:PANW"], ["america", "NASDAQ:FTNT"], ["america", "NASDAQ:ZS"], ["america", "NYSE:NET"], ["america", "NASDAQ:CHKP"]], "not": "ana siber güvenlik hisseleri (eşit ağırlık, yaklaşık)" } },
     { "id": "TUFE", "ad": "TÜFE (aylık endeks)", "tv": "ECONOMICS:TRCPI", "tf": "1M" },
     { "id": "MEVFAIZ", "ad": "Mevduat faizi (TCMB, yıllık %)", "tv": "ECONOMICS:TRDIR", "tf": "1M" }
   ]

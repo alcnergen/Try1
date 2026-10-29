@@ -7,8 +7,9 @@ import {
   replicate, periodReturn, periodStart, annualize, dailyRate, projectScenario, monthsToTarget, combine, cpiDaily, findCashDuplicates, removeCashDuplicates, nextBusinessDay, applyValuationPatch,
 } from './calc.js';
 import { lineChart, legend } from './chart.js';
+import { allocation, skorEtiket } from './olcer.js';
 
-export const APP_VERSION = '2026.10.28-b';
+export const APP_VERSION = '2026.10.29-a';
 
 // ---------- Durum ----------
 let S = store.load();
@@ -48,7 +49,7 @@ export function parseNum(s) {
   else if ((s.match(/\./g) || []).length > 1) s = s.replace(/\./g, '');
   return Number(s);
 }
-const COLORS = { PORT: 'var(--s1)', USD: 'var(--s2)', XU100: 'var(--s3)', ALTIN: 'var(--s4)', NDX: 'var(--s5)', DAX: 'var(--s6)', SPX: 'var(--s7)', EUR: 'var(--s8)', N225: 'var(--s9)', MSCIW: 'var(--s10)', MEVDUAT: 'var(--s11)', TUFE: 'var(--s12)', BTC: 'var(--s13)', XRP: 'var(--s14)', GUMUS: 'var(--s15)', SMH: 'var(--s16)', NVDA: 'var(--s17)', IGV: 'var(--s18)', DRAM: 'var(--s19)', NASA: 'var(--s20)', COST: 'var(--muted)' };
+const COLORS = { PORT: 'var(--s1)', USD: 'var(--s2)', XU100: 'var(--s3)', ALTIN: 'var(--s4)', NDX: 'var(--s5)', DAX: 'var(--s6)', SPX: 'var(--s7)', EUR: 'var(--s8)', N225: 'var(--s9)', MSCIW: 'var(--s10)', MEVDUAT: 'var(--s11)', TUFE: 'var(--s12)', BTC: 'var(--s13)', XRP: 'var(--s14)', GUMUS: 'var(--s15)', SMH: 'var(--s16)', NVDA: 'var(--s17)', IGV: 'var(--s18)', DRAM: 'var(--s19)', NASA: 'var(--s20)', QQQM: 'var(--s21)', CIBR: 'var(--s22)', COST: 'var(--muted)' };
 const FUND_COLORS = ['var(--s1)', 'var(--s7)', 'var(--s3)', 'var(--s5)', 'var(--s6)', 'var(--s8)'];
 const benchName = (id) => {
   if (id !== 'MEVDUAT') return BENCHES.find((b) => b.id === id)?.ad || id;
@@ -667,6 +668,56 @@ function scenarioDefaults() {
   return { months: 12, monthly: 0, spread: 0.15, perFund, usdEnd: Math.round(u * 1.2 * 100) / 100, target: null, inflation: inf1y != null ? Math.round(inf1y * 1000) / 1000 : 0.3 };
 }
 
+// ---------- Dağılım ölçeri (ABD ETF'leri / altın / TL fonları) ----------
+const GOLD_RE = /ALTIN|KIYMETL[İI] MADEN|GOLD/i;
+function holdingShares() {
+  const tot = C.states.reduce((a, x) => a + (x.s.value || 0), 0) || 0;
+  let abd = 0, gold = 0;
+  for (const { f, s } of C.states) {
+    const v = s.value || 0;
+    if (f.ccy === 'USD' || (isListed(f.code) && assetCcy(f.code) === 'USD')) abd += v;
+    else if (GOLD_RE.test(fundName(f.code)) || f.code === 'GOLD') gold += v;
+  }
+  return { tot, abd: tot ? abd / tot : 0, altin: tot ? gold / tot : 0, tl: tot ? 1 - (abd + gold) / tot : 1 };
+}
+function olcerCard(root) {
+  const O = M.olcer;
+  if (!O?.son) { root.append(h(`<section class="card"><h2>Dağılım ölçeri</h2><p class="muted small">Ölçer verisi henüz yok; bir sonraki veri çekiminde gelir.</p></section>`)); return; }
+  const o = O.son, hedef = S.settings.olcerHedef ?? 0.5;
+  const al = allocation(o, hedef), cur = holdingShares();
+  const p0 = (x) => `%${num(x * 100, 0)}`;
+  const tone = (sk) => (sk >= 55 ? 'up' : sk <= 45 ? 'down' : 'flat');
+  const g = (key, ad, alt) => { const sk = o[key].skor; return `<div class="gauge-tile"><span class="label">${ad}</span><b class="${tone(sk)}">${sk}</b><span class="g-bar"><i style="width:${sk}%"></i><em style="left:50%"></em></span><span class="small ${tone(sk)}">${skorEtiket(sk)}</span>${alt ? `<span class="muted small">${alt}</span>` : ''}</div>`; };
+  const row = (ad, k) => { const d = al[k].simdi - cur[k], tl = d * cur.tot; return `<tr><td>${ad}</td><td>${p0(al[k].hedef)}</td><td><b>${p0(al[k].simdi)}</b></td><td>${p0(cur[k])}</td><td class="${Math.abs(tl) < 1 ? '' : tl > 0 ? 'up' : 'down'}">${Math.abs(tl) < 1 ? '—' : (tl > 0 ? '+' : '−') + money(Math.abs(tl), 'TRY', 0)}</td></tr>`; };
+  const facts = (key, ad) => `<details class="fold"><summary><h3>${ad}: neden ${o[key].skor}?</h3></summary><div class="facts">${o[key].faktorler.map((f) => `<div class="fact"><div class="row between"><span>${esc(f.ad)}</span><span class="${f.puan == null ? 'muted' : f.puan > 0.1 ? 'up' : f.puan < -0.1 ? 'down' : 'flat'} small">${f.puan == null ? 'veri yok' : (f.puan > 0 ? '+' : '') + num(f.puan, 2)}</span></div><span class="f-bar"><i style="${f.puan == null ? 'width:0' : f.puan >= 0 ? `left:50%;width:${f.puan * 50}%` : `left:${50 + f.puan * 50}%;width:${-f.puan * 50}%`}" class="${f.puan >= 0 ? 'pos' : 'neg'}"></i></span><span class="muted small">${esc(f.deger)} · ağırlık %${num(f.agirlik * 100, 0)} — ${esc(f.aciklama)}</span></div>`).join('')}</div></details>`;
+  const upd = new Date(O.guncelleme);
+  const card = h(`<section class="card olcer">
+    <div class="row between"><h2>Dağılım ölçeri</h2><span class="muted small">${dTR(upd.toISOString().slice(0, 10))} ${hhmm(upd)}</span></div>
+    <p class="muted small">Trend, analist görüşü, ABD faizleri, petrol, dolar, volatilite ve TL'nin reel getirisinden çıkan özet puanlar. 50 nötr; 55 üstü olumlu, 45 altı olumsuz.</p>
+    <div class="gauges">${g('abd', 'ABD borsası', 'ETF\'lerin')}${g('altin', 'Altın')}${g('tl', 'TL fonları', 'kalma cazibesi')}</div>
+    <h3>Önerilen dağılım</h3>
+    <form class="form inline-form" id="olh"><label>Orta vadeli hedefin (ABD + altın, portföyün %'si)<input name="h" inputmode="decimal" value="${num(hedef * 100, 0)}"></label></form>
+    <div class="tbl-wrap"><table class="tbl"><thead><tr><th></th><th>Hedef</th><th>Şimdi</th><th>Sende</th><th>Fark ₺</th></tr></thead><tbody>
+      ${row('ABD ETF\'leri', 'abd')}${row('Altın', 'altin')}${row('TL fonları', 'tl')}
+    </tbody></table></div>
+    <p class="muted small"><b>Hedef</b>: orta vadeli planın. <b>Şimdi</b>: ölçere göre bugün uygun pay. <b>Fark</b>: o paya ulaşmak için kaydırılabilecek tutar. Hedef, iki ölçerin puanına göre ABD ve altın arasında bölünür. Bir kalemin "şimdi" payı ölçer 35'teyken 0, 65 ve üstündeyken hedefinin tamamıdır. Arada kademeli artar.</p>
+    <h3>ABD payının ETF'lere dağılımı</h3>
+    <div class="etf-list">${o.etfler.map((e, i) => { const pay = al.etf[i].pay * al.abd.simdi; return `<div class="etf-row"><b>${esc(e.kod)}</b><span class="muted small">${esc(e.ad)}</span><span class="chip-s ${e.skor == null ? '' : tone(e.skor)}">${e.skor ?? '—'}</span><span class="r"><b>${p0(pay)}</b><span class="muted small">${money(pay * cur.tot, 'TRY', 0)}</span></span></div>`; }).join('')}</div>
+    <h3>Puanların seyri</h3><div id="olch" class="chart" style="min-height:150px"></div><div id="ollg"></div>
+    ${O.gecmis.length < 5 ? `<p class="muted small">Geçmiş ${dTR(O.gecmis[0][0])} tarihinden itibaren her gün kaydediliyor.</p>` : ''}
+    ${facts('abd', 'ABD borsası')}${facts('altin', 'Altın')}${facts('tl', 'TL fonları')}
+    <p class="muted small">Kural tabanlı bir özettir, tahmin ya da yatırım tavsiyesi değildir. Analist görüşleri ETF'lerin içindeki hisselerden gelir. Altın ve Fed için toplu bir uzman görüşü verisi olmadığından piyasa fiyatlamaları (tahvil faizleri, dolar endeksi, VIX) kullanılır. Kararını kademeli ve kendi risk sınırların içinde ver.</p>
+  </section>`);
+  root.append(card);
+  const el = root.querySelector('section.olcer'); // h() bir parça döndürür; eklendikten sonra kartı sayfada bul
+  const f = el.querySelector('#olh');
+  f.onsubmit = (e) => e.preventDefault();
+  f.h.onchange = () => { const v = parseNum(f.h.value); if (v >= 0 && v <= 100) { S.settings.olcerHedef = v / 100; persist(); const y = scrollY; render(); scrollTo(0, y); } };
+  const ser = [['ABD borsası', 1, 'var(--s1)'], ['Altın', 2, 'var(--s4)'], ['TL fonları', 3, 'var(--s11)']].map(([name, i, color]) => ({ name, color, points: O.gecmis.map((r) => [r[0], r[i]]) }));
+  requestAnimationFrame(() => lineChart(el.querySelector('#olch'), ser, { height: 150, baseline: 50, fmtY: (v) => num(v, 0), fmtTip: (v) => num(v, 0) }));
+  el.querySelector('#ollg').innerHTML = legend(ser);
+}
+
 function senaryo(root) {
   if (!C.last) return root.append(h(emptyState()));
   const sc = { ...scenarioDefaults(), ...(S.scenario || {}) };
@@ -679,6 +730,7 @@ function senaryo(root) {
   const res = scen.map(([n, a, c]) => ({ n, a, c, ...projectScenario({ start: L.value, annual: a, months: sc.months, monthly: sc.monthly, taxRate: S.settings.tax, costBase: L.cost }) }));
   const mt = sc.target ? monthsToTarget({ start: L.value, annual: base, monthly: sc.monthly, target: sc.target }) : null;
 
+  olcerCard(root);
   root.append(h(`
   <section class="card">
     <h2>Kâr senaryoları</h2>
