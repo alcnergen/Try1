@@ -1,20 +1,20 @@
 {
- "guncelleme": "2026-10-29T20:25:52.648Z",
+ "guncelleme": "2026-10-29T20:35:42.014Z",
  "varliklar": {
   "USDTRY": {
    "rsi": 89.1,
    "teknik": 0.438,
-   "fiyat": 49.833
+   "fiyat": 49.8323
   },
   "EURTRY": {
-   "rsi": 56,
+   "rsi": 55.8,
    "teknik": 0.555,
-   "fiyat": 55.8193
+   "fiyat": 55.81218
   },
   "GOLD": {
-   "rsi": 38.3,
+   "rsi": 38.4,
    "teknik": -0.601,
-   "fiyat": 4026.19
+   "fiyat": 4027.28
   },
   "N225": {
    "rsi": 47.1,
@@ -35,7 +35,7 @@
   "SILVER": {
    "rsi": 29.3,
    "teknik": -0.555,
-   "fiyat": 52.2901
+   "fiyat": 52.319
   },
   "XU100": {
    "rsi": 28.7,
@@ -61,12 +61,12 @@
     "al": 0.724,
     "tut": 0.24,
     "sat": 0.037,
-    "hedef": 0.221,
+    "hedef": 0.22,
     "hisse": 501,
     "gorus": 13294,
     "kapsam": 1,
     "kaynak": "S&P 500 üyeleri",
-    "hedefFiyat": 9426.6
+    "hedefFiyat": 9418.88
    }
   },
   "NDX": {
@@ -98,24 +98,24 @@
     "al": 0.849,
     "tut": 0.139,
     "sat": 0.012,
-    "hedef": 0.462,
+    "hedef": 0.461,
     "hisse": 27,
     "gorus": 884,
     "kapsam": 1,
     "kaynak": "SOX yarı iletken endeksi üyeleri (SMH'ye yakın)",
-    "hedefFiyat": 821.16
+    "hedefFiyat": 820.6
    }
   },
   "K_NVDA": {
-   "rsi": 42.2,
+   "rsi": 42.3,
    "teknik": -0.333,
-   "fiyat": 213.601,
+   "fiyat": 213.66,
    "analist": {
     "al": 69,
     "tut": 2,
     "sat": 1,
     "toplam": 72,
-    "hedef": 0.566,
+    "hedef": 0.565,
     "hedefFiyat": 334.448911
    }
   },
@@ -216,14 +216,14 @@
    }
   },
   "BTCUSD": {
-   "rsi": 43.5,
+   "rsi": 42,
    "teknik": -0.291,
-   "fiyat": 80262.23
+   "fiyat": 79828.13
   },
   "XRPUSD": {
-   "rsi": 37.6,
-   "teknik": -0.512,
-   "fiyat": 1.26998
+   "rsi": 36.6,
+   "teknik": -0.603,
+   "fiyat": 1.2603
   }
  }
 }
