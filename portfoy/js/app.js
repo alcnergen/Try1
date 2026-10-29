@@ -9,7 +9,7 @@ import {
 import { lineChart, legend } from './chart.js';
 import { allocation, skorEtiket } from './olcer.js';
 
-export const APP_VERSION = '2026.10.29-a';
+export const APP_VERSION = '2026.10.29-b';
 
 // ---------- Durum ----------
 let S = store.load();

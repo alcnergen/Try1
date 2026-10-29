@@ -230,7 +230,7 @@ test('dağılım ölçeri: puanlama ve dağılım', async () => {
   assert.equal(trendScore(null), null);
   const up = { close: 110, SMA50: 105, SMA200: 100, 'Perf.3M': 10, RSI: 50 };
   const rows = { 'NASDAQ:QQQM': up, 'NASDAQ:SMH': up, 'CBOE:DRAM': up, 'CBOE:IGV': up, 'AMEX:NASA': up, 'NASDAQ:CIBR': up, 'SP:SPX': up,
-    'TVC:GOLD': { close: 90, SMA50: 95, SMA200: 100, 'Perf.3M': -8, RSI: 50 }, 'TVC:VIX': { close: 14 }, 'TVC:DXY': { close: 104, 'Perf.3M': 4 }, 'TVC:USOIL': { close: 70, 'Perf.3M': 0 },
+    'TVC:GOLD': { close: 90, SMA50: 95, SMA200: 100, 'Perf.3M': -8, RSI: 50 }, 'TVC:VIX': { close: 14 }, 'TVC:DXY': { close: 104, 'Perf.3M': 4 }, 'FX:USOIL': { close: 70, 'Perf.3M': 0 },
     'TVC:US10Y': { close: 4, 'Perf.1M': -5 }, 'TVC:US02Y': { close: 3.5 }, 'ECONOMICS:USINTR': { close: 4 }, 'ECONOMICS:USIRYY': { close: 3 } };
   const o = computeOlcer(rows, { K_QQQM: { al: 0.8, hedef: 0.2 } }, { mevduatNet: 0.3, tufeYillik: 0.3, usdtry3m: 0.05, mevduatDegisim3m: -1 });
   assert.ok(o.abd.skor > 65, `ABD güçlü olmalı: ${o.abd.skor}`);
