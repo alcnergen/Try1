@@ -13,7 +13,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { SCAN_COLS, parseScanRow } from '../js/data.js';
-import { OLCER_SCAN, OLCER_COLS, rowObj, computeOlcer } from '../js/olcer.js';
+import { OLCER_ETF, OLCER_SCAN, OLCER_COLS, rowObj, computeOlcer } from '../js/olcer.js';
+import { backtest } from '../js/olcer-test.js';
 export { parseScanRow };
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -490,13 +491,25 @@ async function updateOlcer(varliklar) {
     mevduatDegisim3m: last(mev) && ago(mev, 91) != null ? last(mev)[1] - ago(mev, 91) : null,
   };
   const son = computeOlcer(rows, icerik, tr);
+  // Geçmiş sınaması (yalnızca fiyat/faiz faktörleri) ve bugünün aynı yöntemle puanı: barem bu dağılıma göre
+  let sinama = null;
+  try {
+    const ids = ['SPX', 'GOLD', 'USDTRY', 'MEVFAIZ', 'TUFE', 'G_VIX', 'G_DXY', 'G_PETROL', 'G_US10Y', 'G_US02Y', 'G_FED', 'G_USTUFE', 'G_TCMB', ...OLCER_ETF.map((e) => e.gorus)];
+    const S = Object.fromEntries(await Promise.all(ids.map(async (id) => [id, await pts(id)])));
+    const bt = backtest(S);
+    sinama = bt;
+    tr.tcmb = last(S.G_TCMB)?.[1] ?? null;
+    tr.mevduat = last(mev)?.[1] ?? null;
+    tr.fed = last(S.G_FED)?.[1] ?? null;
+    log(`sınama: ${bt.adet} hafta (${bt.baslangic}–${bt.bitis}), TL üst sınır ${bt.dagilim.tl.max}`);
+  } catch (e) { log(`sınama yapılamadı: ${e.message}`); }
   const f = path.join(DATA, 'olcer.json');
   let gecmis = [];
   try { gecmis = JSON.parse(await readFile(f, 'utf8')).gecmis || []; } catch { /* ilk kez */ }
   const today = iso(new Date(Date.now() + 3 * 3600e3)); // TR günü
   gecmis = gecmis.filter((g) => g[0] !== today);
   gecmis.push([today, son.abd.skor, son.altin.skor, son.tl.skor]);
-  await writeFile(f, JSON.stringify({ guncelleme: new Date().toISOString(), tr, son, gecmis: gecmis.slice(-1500) }, null, 1));
+  await writeFile(f, JSON.stringify({ guncelleme: new Date().toISOString(), tr, son, gecmis: gecmis.slice(-1500), sinama }));
   log(`ölçer: ABD ${son.abd.skor} · altın ${son.altin.skor} · TL ${son.tl.skor} (${Object.keys(rows).length} veri)`);
 }
 

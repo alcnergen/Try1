@@ -295,6 +295,20 @@ h2 { font-size: 17px; font-weight: 650; letter-spacing: -0.01em; }
 .g-bar i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 3px; background: currentColor; opacity: .55; }
 .gauge-tile .g-bar { color: var(--accent); }
 .g-bar em { position: absolute; top: -2px; bottom: -2px; width: 1px; background: var(--muted); }
+.g-range { position: relative; height: 6px; border-radius: 3px; background: color-mix(in srgb, var(--line) 70%, transparent); margin: 4px 0 0; }
+.g-range s { position: absolute; top: 0; bottom: 0; border-radius: 3px; background: color-mix(in srgb, var(--muted) 35%, transparent); }
+.g-range em { position: absolute; top: -2px; bottom: -2px; width: 1px; background: var(--muted); }
+.g-range i { position: absolute; top: 50%; width: 11px; height: 11px; margin: -5.5px 0 0 -5.5px; border-radius: 50%; background: currentColor; box-shadow: 0 0 0 2px var(--tint); }
+.g-range i.flat { color: var(--text); }
+.g-ends { display: flex; justify-content: space-between; font-size: 10px; font-variant-numeric: tabular-nums; }
+.tbl.bt tr.now td { font-weight: 600; background: var(--tint); }
+.fz-in input { width: 62px; padding: 6px 8px; text-align: right; }
+.fz-in td:not(:first-child) { text-align: right; }
+.fz-out { font-size: 14px; }
+.fz-out td, .fz-out th, .fz-in td, .fz-in th { padding-left: 6px; padding-right: 6px; }
+@media (max-width: 360px) { .fz-out, .tbl.bt { font-size: 12.5px; } .tbl.bt td, .tbl.bt th { padding-left: 4px; padding-right: 4px; } .fz-in input { width: 56px; } }
+.fz-out td:first-child, .tbl.bt td:first-child { white-space: normal; }
+.fz-in td:first-child { white-space: normal; }
 .inline-form label { font-size: 13px; }
 .inline-form input { max-width: 120px; }
 .etf-list { display: grid; }

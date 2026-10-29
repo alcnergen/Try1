@@ -246,3 +246,40 @@ test('dağılım ölçeri: puanlama ve dağılım', async () => {
   const bos = computeOlcer({}, {}, {});
   assert.equal(bos.abd.skor, 50); assert.equal(bos.altin.skor, 50);
 });
+
+test('ölçer barem, dağılım ve faiz senaryosu', async () => {
+  const { yuzdelik, baremEtiket, allocation, faizSenaryo, computeOlcer } = await import('../js/olcer.js');
+  const dg = { min: 0, p20: 17, p40: 24, p50: 31, p60: 37, p80: 41, max: 70 };
+  assert.equal(yuzdelik(17, dg), 0.2);
+  assert.equal(yuzdelik(70, dg), 1);
+  assert.equal(baremEtiket(40, dg), 'Ortalamanın üstü'); // eski ölçekte "Zayıf" olurdu
+  assert.equal(baremEtiket(45, dg), 'Geçmişe göre çok yüksek');
+  assert.equal(baremEtiket(10, dg), 'Geçmişe göre çok düşük');
+  // dağılım: alt dilimde hedefin dörtte biri, üst dilimde tamamı
+  const o = computeOlcer({}, {}, {});
+  const lo = allocation(o, 0.5, { abd: 0.1, altin: 0.1 }), hi = allocation(o, 0.5, { abd: 0.9, altin: 0.9 });
+  assert.ok(Math.abs(lo.abd.simdi - lo.abd.hedef / 4) < 1e-9);
+  assert.equal(hi.abd.simdi, hi.abd.hedef);
+  assert.ok(Math.abs(lo.abd.simdi + lo.altin.simdi + lo.tl.simdi - 1) < 1e-9);
+  // faiz senaryosu: sabit faizde net getiri ≈ (1 + r(1−v)/12)^12 − 1
+  const f = faizSenaryo({ tcmb: 36, tcmbSon: 36, mevFark: 0, vergi: 0.175, enf: 0.25, kur: 0.2, fed: 4, fedSon: 4 });
+  assert.ok(Math.abs(f.tlNet - ((1 + 0.36 * 0.825 / 12) ** 12 - 1)) < 1e-9);
+  assert.ok(Math.abs(f.dolarTL - ((1 + 0.04 / 12) ** 12 * 1.2 - 1)) < 1e-9);
+  const cut = faizSenaryo({ tcmb: 36, tcmbSon: 26, enf: 0.25, kur: 0.2, fed: 4 });
+  assert.ok(cut.tlNet < f.tlNet && Math.abs(cut.ortFaiz - 31) < 1e-9);
+});
+
+test('ölçer geçmiş sınaması: göstergeler ve dilim getirileri', async () => {
+  const { indicators, backtest } = await import('../js/olcer-test.js');
+  const days = (n, f) => Array.from({ length: n }, (_, i) => [new Date(Date.UTC(2014, 0, 1) + i * 864e5).toISOString().slice(0, 10), f(i)]);
+  const ind = indicators(days(300, (i) => 100 + i));
+  assert.equal(ind.s50[299], 100 + 299 - 24.5);
+  assert.equal(ind.rsi[299], 100); // hep yükselen seri
+  const N = 1500, up = days(N, (i) => 100 * 1.0005 ** i);
+  const S = { SPX: up, K_SMH: up, GOLD: up, USDTRY: days(N, (i) => 10 * 1.0003 ** i), MEVFAIZ: days(N, () => 20), TUFE: days(N, (i) => 100 * 1.0002 ** i) };
+  const r = backtest(S, { start: '2015-01-01' });
+  assert.ok(r.adet > 100 && r.gecmis.length === r.adet);
+  assert.ok(r.dagilim.abd.min <= r.dagilim.abd.p50 && r.dagilim.abd.p50 <= r.dagilim.abd.max);
+  const y = r.getiri.abd.yuksek[91];
+  assert.ok(y.n > 0 && y.getiri > 0 && y.isabet >= 0 && y.isabet <= 1);
+});
