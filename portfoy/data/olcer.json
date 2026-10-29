@@ -1,9 +1,9 @@
 {
- "guncelleme": "2026-10-29T13:05:44.839Z",
+ "guncelleme": "2026-10-29T13:16:03.183Z",
  "tr": {
   "mevduatNet": 0.28462499999999996,
   "tufeYillik": 0.29731518245415,
-  "usdtry3m": 0.05058169198787299,
+  "usdtry3m": 0.050724637681159424,
   "mevduatDegisim3m": -1
  },
  "son": {
@@ -33,22 +33,22 @@
     },
     {
      "ad": "Fed ve tahvil faizleri",
-     "deger": "10Y %5.01 (1 ay -4.26%) · 2Y−Fed +0.69 puan",
+     "deger": "10Y %5 (1 ay -4.34%) · 2Y−Fed +0.69 puan",
      "puan": -0.13,
      "agirlik": 0.15,
      "aciklama": "Faizler düşüyorsa ve piyasa indirim bekliyorsa (2 yıllık < Fed faizi) hisseler için olumlu"
     },
     {
      "ad": "Volatilite (VIX)",
-     "deger": "16.92",
+     "deger": "16.96",
      "puan": 0.38,
      "agirlik": 0.1,
      "aciklama": "20 altı sakin, 30 üstü panik"
     },
     {
      "ad": "Petrol (WTI)",
-     "deger": "100.75$ · 3 ay 20.03%",
-     "puan": -0.75,
+     "deger": "100.61$ · 3 ay 19.86%",
+     "puan": -0.74,
      "agirlik": 0.1,
      "aciklama": "Hızlı petrol artışı enflasyon ve faiz baskısı demek"
     },
@@ -66,43 +66,43 @@
    "faktorler": [
     {
      "ad": "Altın trendi",
-     "deger": "4024.14$ · 200 gün ort. 4502.14$",
+     "deger": "4026.02$ · 200 gün ort. 4502.15$",
      "puan": -1,
      "agirlik": 0.25,
      "aciklama": "Fiyat 50/200 günlük ortalamaların üstünde mi"
     },
     {
      "ad": "Altın ivmesi",
-     "deger": "3 ay -1.94%",
+     "deger": "3 ay -1.89%",
      "puan": -0.13,
      "agirlik": 0.15,
      "aciklama": "Son 3 aylık değişim"
     },
     {
      "ad": "ABD reel faizi",
-     "deger": "10Y − enflasyon ≈ %1.31",
-     "puan": -0.05,
+     "deger": "10Y − enflasyon ≈ %1.30",
+     "puan": -0.04,
      "agirlik": 0.2,
      "aciklama": "Reel faiz yüksekse faiz getirmeyen altın baskılanır"
     },
     {
      "ad": "Dolar endeksi (DXY)",
-     "deger": "102.29 · 3 ay 2.27%",
+     "deger": "102.28 · 3 ay 2.26%",
      "puan": -0.45,
      "agirlik": 0.15,
      "aciklama": "Güçlenen dolar altını baskılar"
     },
     {
      "ad": "Risk algısı (VIX)",
-     "deger": "16.92",
+     "deger": "16.96",
      "puan": -0.19,
      "agirlik": 0.1,
      "aciklama": "Panik dönemlerinde altına talep artar"
     },
     {
      "ad": "RSI (aşırı alım/satım)",
-     "deger": "38.14",
-     "puan": 0.46,
+     "deger": "38.27",
+     "puan": 0.45,
      "agirlik": 0.05,
      "aciklama": "30 altı aşırı satım (fırsat), 70 üstü aşırı alım"
     },
