@@ -1,15 +1,18 @@
 {
- "guncelleme": "2026-10-28T20:55:17.963Z",
+ "guncelleme": "2026-10-29T00:00:36.483Z",
  "seriler": {
   "TGT": {
    "ad": "GARANTİ PORTFÖY KISA VADELİ BORÇLANMA ARAÇLARI FONU",
    "tur": "fon",
    "pb": "TRY",
+   "erken": [
+    "2026-10-29"
+   ],
    "kaynak": "tefas:TGT",
    "ilk": "2021-10-18",
-   "son": "2026-10-28",
-   "deger": 0.127862,
-   "adet": 1266
+   "son": "2026-10-29",
+   "deger": 0.128104,
+   "adet": 1267
   },
   "YFBL1": {
    "ad": "YAPI KREDİ PORTFÖY PARA PİYASASI FONU",
@@ -43,9 +46,9 @@
    "pb": "TRY",
    "kaynak": "tv:FX_IDC:USDTRY",
    "ilk": "2010-01-04",
-   "son": "2026-10-28",
-   "deger": 49.8344,
-   "adet": 4388
+   "son": "2026-10-29",
+   "deger": 49.8216,
+   "adet": 4389
   },
   "EURTRY": {
    "ad": "Euro/TL",
@@ -53,9 +56,9 @@
    "pb": "TRY",
    "kaynak": "tv:FX_IDC:EURTRY",
    "ilk": "2010-01-04",
-   "son": "2026-10-28",
-   "deger": 55.57565,
-   "adet": 4388
+   "son": "2026-10-29",
+   "deger": 55.66163,
+   "adet": 4389
   },
   "JPYTRY": {
    "ad": "Yen/TL",
@@ -63,9 +66,9 @@
    "pb": "TRY",
    "kaynak": "tv:FX_IDC:JPYTRY",
    "ilk": "2009-12-31",
-   "son": "2026-10-28",
-   "deger": 0.31574,
-   "adet": 4388
+   "son": "2026-10-29",
+   "deger": 0.315742,
+   "adet": 4389
   },
   "GOLD": {
    "ad": "Altın (ons, $)",
@@ -73,9 +76,9 @@
    "pb": "TRY",
    "kaynak": "tv:TVC:GOLD",
    "ilk": "2009-05-27",
-   "son": "2026-10-28",
-   "deger": 4068.454,
-   "adet": 4388
+   "son": "2026-10-29",
+   "deger": 4053.31,
+   "adet": 4389
   },
   "XU100": {
    "ad": "BIST 100",
@@ -123,9 +126,9 @@
    "pb": "TRY",
    "kaynak": "tv:TVC:NI225",
    "ilk": "2008-11-12",
-   "son": "2026-10-28",
-   "deger": 63953.97,
-   "adet": 4388
+   "son": "2026-10-29",
+   "deger": 64197.01,
+   "adet": 4389
   },
   "MSCIW": {
    "ad": "MSCI Dünya (URTH)",
@@ -143,9 +146,9 @@
    "pb": "TRY",
    "kaynak": "tv:BITSTAMP:BTCUSD",
    "ilk": "2014-10-22",
-   "son": "2026-10-28",
-   "deger": 81120.77,
-   "adet": 4387
+   "son": "2026-10-29",
+   "deger": 81271.03,
+   "adet": 4388
   },
   "XRPUSD": {
    "ad": "Ripple XRP ($)",
@@ -153,9 +156,9 @@
    "pb": "TRY",
    "kaynak": "tv:BITSTAMP:XRPUSD",
    "ilk": "2014-09-28",
-   "son": "2026-10-28",
-   "deger": 1.32963,
-   "adet": 4387
+   "son": "2026-10-29",
+   "deger": 1.32435,
+   "adet": 4388
   },
   "SILVER": {
    "ad": "Gümüş (ons, $)",
@@ -163,9 +166,9 @@
    "pb": "TRY",
    "kaynak": "tv:TVC:SILVER",
    "ilk": "2009-05-29",
-   "son": "2026-10-28",
-   "deger": 53.9716,
-   "adet": 4385
+   "son": "2026-10-29",
+   "deger": 53.8914,
+   "adet": 4386
   },
   "K_SMH": {
    "ad": "VanEck Semiconductor ETF (SMH)",
