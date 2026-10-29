@@ -1,14 +1,14 @@
 {
- "guncelleme": "2026-10-29T13:45:52.598Z",
+ "guncelleme": "2026-10-29T13:55:45.430Z",
  "tr": {
   "mevduatNet": 0.28462499999999996,
   "tufeYillik": 0.29731518245415,
-  "usdtry3m": 0.0506466289694838,
+  "usdtry3m": 0.050724637681159424,
   "mevduatDegisim3m": -1
  },
  "son": {
   "abd": {
-   "skor": 66,
+   "skor": 65,
    "faktorler": [
     {
      "ad": "ETF'lerin trendi ve ivmesi",
@@ -26,29 +26,29 @@
     },
     {
      "ad": "S&P 500 trendi",
-     "deger": "3.18% (3 ay)",
+     "deger": "3.32% (3 ay)",
      "puan": 1,
      "agirlik": 0.1,
      "aciklama": "Geniş piyasa 200 günlük ortalamanın üstünde mi"
     },
     {
      "ad": "Fed ve tahvil faizleri",
-     "deger": "10Y %4.98 (1 ay -4.82%) · 2Y−Fed +0.66 puan",
-     "puan": -0.09,
+     "deger": "10Y %4.97 (1 ay -4.93%) · 2Y−Fed +0.65 puan",
+     "puan": -0.08,
      "agirlik": 0.15,
      "aciklama": "Faizler düşüyorsa ve piyasa indirim bekliyorsa (2 yıllık < Fed faizi) hisseler için olumlu"
     },
     {
      "ad": "Volatilite (VIX)",
-     "deger": "16.95",
-     "puan": 0.38,
+     "deger": "17.04",
+     "puan": 0.37,
      "agirlik": 0.1,
      "aciklama": "20 altı sakin, 30 üstü panik"
     },
     {
      "ad": "Petrol (WTI)",
-     "deger": "99.98$ · 3 ay 19.11%",
-     "puan": -0.71,
+     "deger": "100.29$ · 3 ay 19.48%",
+     "puan": -0.72,
      "agirlik": 0.1,
      "aciklama": "Hızlı petrol artışı enflasyon ve faiz baskısı demek"
     },
@@ -66,43 +66,43 @@
    "faktorler": [
     {
      "ad": "Altın trendi",
-     "deger": "4025.49$ · 200 gün ort. 4502.14$",
+     "deger": "4021.69$ · 200 gün ort. 4502.13$",
      "puan": -1,
      "agirlik": 0.25,
      "aciklama": "Fiyat 50/200 günlük ortalamaların üstünde mi"
     },
     {
      "ad": "Altın ivmesi",
-     "deger": "3 ay -1.9%",
+     "deger": "3 ay -2%",
      "puan": -0.13,
      "agirlik": 0.15,
      "aciklama": "Son 3 aylık değişim"
     },
     {
      "ad": "ABD reel faizi",
-     "deger": "10Y − enflasyon ≈ %1.28",
+     "deger": "10Y − enflasyon ≈ %1.27",
      "puan": -0.02,
      "agirlik": 0.2,
      "aciklama": "Reel faiz yüksekse faiz getirmeyen altın baskılanır"
     },
     {
      "ad": "Dolar endeksi (DXY)",
-     "deger": "102.32 · 3 ay 2.29%",
-     "puan": -0.46,
+     "deger": "102.25 · 3 ay 2.23%",
+     "puan": -0.45,
      "agirlik": 0.15,
      "aciklama": "Güçlenen dolar altını baskılar"
     },
     {
      "ad": "Risk algısı (VIX)",
-     "deger": "16.95",
+     "deger": "17.04",
      "puan": -0.19,
      "agirlik": 0.1,
      "aciklama": "Panik dönemlerinde altına talep artar"
     },
     {
      "ad": "RSI (aşırı alım/satım)",
-     "deger": "38.23",
-     "puan": 0.45,
+     "deger": "37.96",
+     "puan": 0.47,
      "agirlik": 0.05,
      "aciklama": "30 altı aşırı satım (fırsat), 70 üstü aşırı alım"
     },
@@ -145,31 +145,31 @@
    {
     "kod": "QQQM",
     "ad": "Nasdaq 100",
-    "skor": 81,
-    "fiyat": 294.65,
-    "perf3m": 3.39,
-    "rsi": 44.48,
+    "skor": 82,
+    "fiyat": 293.575,
+    "perf3m": 3.01,
+    "rsi": 43.31,
     "analistAl": 0.802,
-    "hedef": 0.317,
+    "hedef": 0.324,
     "parcalar": {
      "trend": 1,
-     "momentum": 0.23,
+     "momentum": 0.2,
      "analist": 0.76,
-     "rsi": 0.03
+     "rsi": 0.11
     }
    },
    {
     "kod": "SMH",
     "ad": "Yarı iletken",
     "skor": 81,
-    "fiyat": 560.4,
-    "perf3m": 0.52,
-    "rsi": 47.06,
+    "fiyat": 558.1,
+    "perf3m": 0.11,
+    "rsi": 46.35,
     "analistAl": 0.849,
-    "hedef": 0.458,
+    "hedef": 0.466,
     "parcalar": {
      "trend": 1,
-     "momentum": 0.03,
+     "momentum": 0.01,
      "analist": 0.87,
      "rsi": 0
     }
@@ -177,15 +177,15 @@
    {
     "kod": "DRAM",
     "ad": "Bellek",
-    "skor": 45,
-    "fiyat": 52.36,
-    "perf3m": -4.28,
-    "rsi": 48.4,
+    "skor": 44,
+    "fiyat": 51.88,
+    "perf3m": -5.16,
+    "rsi": 47.52,
     "analistAl": 0.927,
-    "hedef": 0.876,
+    "hedef": 0.879,
     "parcalar": {
      "trend": -1,
-     "momentum": -0.29,
+     "momentum": -0.34,
      "analist": 1,
      "rsi": 0
     }
@@ -194,15 +194,15 @@
     "kod": "IGV",
     "ad": "Yazılım",
     "skor": 88,
-    "fiyat": 107.3325,
-    "perf3m": 15.1,
-    "rsi": 47.39,
+    "fiyat": 106.905,
+    "perf3m": 14.87,
+    "rsi": 46.51,
     "analistAl": 0.775,
-    "hedef": 0.299,
+    "hedef": 0.305,
     "parcalar": {
      "trend": 1,
-     "momentum": 1,
-     "analist": 0.68,
+     "momentum": 0.99,
+     "analist": 0.69,
      "rsi": 0
     }
    },
@@ -210,31 +210,31 @@
     "kod": "NASA",
     "ad": "Uzay",
     "skor": 42,
-    "fiyat": 21.43,
-    "perf3m": -3.03,
-    "rsi": 43.6,
+    "fiyat": 21.46,
+    "perf3m": -2.9,
+    "rsi": 43.78,
     "analistAl": 0.79,
-    "hedef": 0.813,
+    "hedef": 0.799,
     "parcalar": {
      "trend": -1,
-     "momentum": -0.2,
+     "momentum": -0.19,
      "analist": 0.73,
-     "rsi": 0.09
+     "rsi": 0.08
     }
    },
    {
     "kod": "CIBR",
     "ad": "Siber güvenlik",
     "skor": 74,
-    "fiyat": 102.64,
-    "perf3m": 13.11,
-    "rsi": 47.63,
+    "fiyat": 103.09,
+    "perf3m": 13.6,
+    "rsi": 48.42,
     "analistAl": 0.634,
-    "hedef": 0.162,
+    "hedef": 0.152,
     "parcalar": {
      "trend": 1,
-     "momentum": 0.87,
-     "analist": -0.12,
+     "momentum": 0.91,
+     "analist": -0.16,
      "rsi": 0
     }
    }
@@ -243,7 +243,7 @@
  "gecmis": [
   [
    "2026-10-29",
-   66,
+   65,
    36,
    40
   ]
