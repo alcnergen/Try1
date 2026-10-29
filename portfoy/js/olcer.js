@@ -12,7 +12,7 @@ export const OLCER_ETF = [
 ];
 export const OLCER_SCAN = {
   america: [...OLCER_ETF.map((e) => e.tv), 'SP:SPX'],
-  cfd: ['TVC:GOLD', 'TVC:DXY', 'TVC:VIX', 'TVC:USOIL'],
+  cfd: ['TVC:GOLD', 'TVC:DXY', 'TVC:VIX', 'FX:USOIL'],
   global: ['TVC:US10Y', 'TVC:US02Y'],
   economics2: ['ECONOMICS:USINTR', 'ECONOMICS:USIRYY'],
 };
@@ -74,7 +74,7 @@ export function computeOlcer(rows, icerik = {}, tr = {}) {
   });
 
   const us10 = R('TVC:US10Y'), us2 = R('TVC:US02Y'), ff = R('ECONOMICS:USINTR'), cpi = R('ECONOMICS:USIRYY');
-  const vix = R('TVC:VIX'), oil = R('TVC:USOIL'), dxy = R('TVC:DXY'), gold = R('TVC:GOLD'), spx = R('SP:SPX');
+  const vix = R('TVC:VIX'), oil = R('FX:USOIL'), dxy = R('TVC:DXY'), gold = R('TVC:GOLD'), spx = R('SP:SPX');
   const realTL = ok(tr.mevduatNet) && ok(tr.tufeYillik) ? (1 + tr.mevduatNet) / (1 + tr.tufeYillik) - 1 : null;
   const realUS = ok(us10?.close) && ok(cpi?.close) ? us10.close - cpi.close : null;
   const spread2y = ok(us2?.close) && ok(ff?.close) ? us2.close - ff.close : null;
