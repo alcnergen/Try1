@@ -30,5 +30,15 @@
     { "id": "K_CIBR", "ad": "First Trust NASDAQ Cybersecurity ETF (CIBR)", "tv": "NASDAQ:CIBR", "tarama": "america", "icerik": { "tip": "liste", "semboller": [["america", "NASDAQ:AVGO"], ["america", "NASDAQ:CSCO"], ["america", "NASDAQ:CRWD"], ["america", "NASDAQ:PANW"], ["america", "NASDAQ:FTNT"], ["america", "NASDAQ:ZS"], ["america", "NYSE:NET"], ["america", "NASDAQ:CHKP"]], "not": "ana siber güvenlik hisseleri (eşit ağırlık, yaklaşık)" } },
     { "id": "TUFE", "ad": "TÜFE (aylık endeks)", "tv": "ECONOMICS:TRCPI", "tf": "1M" },
     { "id": "MEVFAIZ", "ad": "Mevduat faizi (TCMB, yıllık %)", "tv": "ECONOMICS:TRDIR", "tf": "1M" }
+  ],
+  "gostergeler": [
+    { "id": "G_VIX", "ad": "VIX oynaklık endeksi", "tv": "TVC:VIX" },
+    { "id": "G_DXY", "ad": "Dolar endeksi (DXY)", "tv": "TVC:DXY" },
+    { "id": "G_PETROL", "ad": "Ham petrol (WTI)", "tv": "TVC:USOIL" },
+    { "id": "G_US10Y", "ad": "ABD 10 yıllık tahvil faizi", "tv": "TVC:US10Y" },
+    { "id": "G_US02Y", "ad": "ABD 2 yıllık tahvil faizi", "tv": "TVC:US02Y" },
+    { "id": "G_FED", "ad": "Fed politika faizi", "tv": "ECONOMICS:USINTR", "tf": "1M" },
+    { "id": "G_USTUFE", "ad": "ABD yıllık enflasyon", "tv": "ECONOMICS:USIRYY", "tf": "1M" },
+    { "id": "G_TCMB", "ad": "TCMB politika faizi", "tv": "ECONOMICS:TRINTR", "tf": "1M" }
   ]
 }

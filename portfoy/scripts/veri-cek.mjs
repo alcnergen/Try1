@@ -340,7 +340,7 @@ async function updateBench(b, years) {
       if (!pts.length) throw new Error('boş');
       // Kaynak değişirse eski seriyle karıştırma (ölçek farkı olabilir)
       const base = prev && prev.source === source ? prev.points : [];
-      const s = { id: b.id, ad: b.ad, tur: 'kiyas', source, points: mergePoints(base, pts) };
+      const s = { id: b.id, ad: b.ad, tur: b.tur || 'kiyas', source, points: mergePoints(base, pts) };
       await saveSeries(s);
       log(`${b.id}: ${source} ${pts.length} satır, son ${pts[pts.length - 1][0]} ${pts[pts.length - 1][1]}`);
       return s;
@@ -514,6 +514,8 @@ async function main() {
     await sleep(500);
   }
   for (const b of cfg.kiyaslar || []) put(await updateBench(b, cfg.gecmisYil || 10));
+  // ölçerin geçmiş sınaması ve faiz senaryoları için göstergeler (Kıyas ekranında görünmez)
+  for (const b of cfg.gostergeler || []) put(await updateBench({ tur: 'gosterge', ...b }, cfg.gecmisYil || 10));
   await writeFile(path.join(DATA, 'index.json'), JSON.stringify(index, null, 1));
   const varliklar = await updateViews(cfg);
   try { await updateOlcer(varliklar); } catch (e) { log(`ölçer hesaplanamadı: ${e.message}`); }
