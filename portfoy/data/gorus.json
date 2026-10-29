@@ -1,20 +1,20 @@
 {
- "guncelleme": "2026-10-29T17:35:47.840Z",
+ "guncelleme": "2026-10-29T17:40:50.250Z",
  "varliklar": {
   "USDTRY": {
-   "rsi": 89.2,
+   "rsi": 89.1,
    "teknik": 0.438,
-   "fiyat": 49.8339
+   "fiyat": 49.8323
   },
   "EURTRY": {
-   "rsi": 55,
+   "rsi": 54.3,
    "teknik": 0.438,
-   "fiyat": 55.75935
+   "fiyat": 55.73998
   },
   "GOLD": {
-   "rsi": 37.7,
+   "rsi": 37.5,
    "teknik": -0.601,
-   "fiyat": 4017.87
+   "fiyat": 4015.07
   },
   "N225": {
    "rsi": 47.1,
@@ -33,9 +33,9 @@
    }
   },
   "SILVER": {
-   "rsi": 29.1,
+   "rsi": 29,
    "teknik": -0.555,
-   "fiyat": 52.1833
+   "fiyat": 52.126
   },
   "XU100": {
    "rsi": 28.7,
@@ -54,25 +54,25 @@
    }
   },
   "SPX": {
-   "rsi": 49.7,
-   "teknik": -0.091,
-   "fiyat": 7707.35,
+   "rsi": 49.9,
+   "teknik": -0.024,
+   "fiyat": 7710.14,
    "icerik": {
     "al": 0.726,
     "tut": 0.237,
     "sat": 0.036,
-    "hedef": 0.224,
+    "hedef": 0.225,
     "hisse": 501,
     "gorus": 13289,
     "kapsam": 1,
     "kaynak": "S&P 500 üyeleri",
-    "hedefFiyat": 9433.8
+    "hedefFiyat": 9444.92
    }
   },
   "NDX": {
    "rsi": 44,
    "teknik": -0.403,
-   "fiyat": 29364.6448,
+   "fiyat": 29365.9056,
    "icerik": {
     "al": 0.802,
     "tut": 0.166,
@@ -82,18 +82,18 @@
     "gorus": 3514,
     "kapsam": 1,
     "kaynak": "Nasdaq 100 üyeleri",
-    "hedefFiyat": 38673.24
+    "hedefFiyat": 38674.9
    }
   },
   "MSCIW": {
-   "rsi": 50.9,
-   "teknik": 0.333,
-   "fiyat": 207.74
+   "rsi": 50.7,
+   "teknik": 0.2,
+   "fiyat": 207.68
   },
   "K_SMH": {
    "rsi": 47.1,
    "teknik": -0.336,
-   "fiyat": 560.69,
+   "fiyat": 560.635,
    "icerik": {
     "al": 0.849,
     "tut": 0.14,
@@ -103,13 +103,13 @@
     "gorus": 884,
     "kapsam": 1,
     "kaynak": "SOX yarı iletken endeksi üyeleri (SMH'ye yakın)",
-    "hedefFiyat": 819.73
+    "hedefFiyat": 819.65
    }
   },
   "K_NVDA": {
-   "rsi": 42,
+   "rsi": 42.1,
    "teknik": -0.333,
-   "fiyat": 213.4092,
+   "fiyat": 213.43,
    "analist": {
     "al": 69,
     "tut": 2,
@@ -120,14 +120,14 @@
    }
   },
   "K_IGV": {
-   "rsi": 46.9,
+   "rsi": 47.1,
    "teknik": -0.158,
-   "fiyat": 107.11,
+   "fiyat": 107.19,
    "icerik": {
     "al": 0.776,
     "tut": 0.191,
     "sat": 0.033,
-    "hedef": 0.303,
+    "hedef": 0.302,
     "hisse": 39,
     "gorus": 1419,
     "kapsam": 0.914,
@@ -138,28 +138,28 @@
   "K_DRAM": {
    "rsi": 47.3,
    "teknik": -0.353,
-   "fiyat": 51.76,
+   "fiyat": 51.78,
    "icerik": {
     "al": 0.927,
     "tut": 0.069,
     "sat": 0.004,
-    "hedef": 0.874,
+    "hedef": 0.872,
     "hisse": 4,
     "gorus": 168,
     "kapsam": 1,
     "kaynak": "fonun ana hisseleri: Micron, Samsung, SK Hynix, Seagate (eşit ağırlık)",
-    "hedefFiyat": 97
+    "hedefFiyat": 96.93
    }
   },
   "K_NASA": {
    "rsi": 46.5,
    "teknik": -0.14,
-   "fiyat": 21.85,
+   "fiyat": 21.86,
    "icerik": {
     "al": 0.79,
     "tut": 0.182,
     "sat": 0.029,
-    "hedef": 0.757,
+    "hedef": 0.756,
     "hisse": 21,
     "gorus": 279,
     "kapsam": 0.568,
@@ -170,7 +170,7 @@
   "K_QQQM": {
    "rsi": 43.9,
    "teknik": -0.403,
-   "fiyat": 294.08,
+   "fiyat": 294.145,
    "icerik": {
     "al": 0.802,
     "tut": 0.166,
@@ -180,23 +180,23 @@
     "gorus": 3514,
     "kapsam": 1,
     "kaynak": "Nasdaq 100 üyeleri",
-    "hedefFiyat": 387.3
+    "hedefFiyat": 387.39
    }
   },
   "K_CIBR": {
-   "rsi": 49.6,
+   "rsi": 49.8,
    "teknik": 0,
-   "fiyat": 103.75,
+   "fiyat": 103.8651,
    "icerik": {
     "al": 0.632,
     "tut": 0.334,
     "sat": 0.035,
-    "hedef": 0.143,
+    "hedef": 0.141,
     "hisse": 8,
     "gorus": 374,
     "kapsam": 1,
     "kaynak": "ana siber güvenlik hisseleri (eşit ağırlık, yaklaşık)",
-    "hedefFiyat": 118.59
+    "hedefFiyat": 118.51
    }
   },
   "DAX": {
@@ -216,14 +216,14 @@
    }
   },
   "BTCUSD": {
-   "rsi": 46.6,
+   "rsi": 46.2,
    "teknik": -0.158,
-   "fiyat": 81026.88
+   "fiyat": 80926.8
   },
   "XRPUSD": {
-   "rsi": 40.6,
+   "rsi": 40.3,
    "teknik": -0.445,
-   "fiyat": 1.29444
+   "fiyat": 1.29244
   }
  }
 }
