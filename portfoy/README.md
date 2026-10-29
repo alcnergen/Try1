@@ -26,7 +26,11 @@ Kıyas karnesinde her piyasanın altında ince bir satır: hisselerde analist al
 
 ## Dağılım ölçeri
 
-Senaryo sekmesinin başında: ABD borsası (QQQM, SMH, DRAM, IGV, NASA, CIBR), altın ve TL fonları için 0–100 puan (50 nötr). Faktörler: ETF trend ve ivmesi (50/200 günlük ortalama, 3 ay), içerik bazlı analist görüşü, S&P 500 trendi, ABD 10 ve 2 yıllık tahvil faizi ile Fed faizi, VIX, WTI petrol, dolar endeksi, ABD reel faizi, TL reel getirisi, kura karşı TL getirisi, TR faiz yönü. Kodu `js/olcer.js` (sunucu ve uygulama ortak). Kullanıcının orta vadeli hedefi (varsayılan %50, ABD + altın) iki ölçerin puanına göre bölünür; bir kalemin bugünkü payı ölçer 35'te 0, 65 ve üstünde hedefin tamamıdır. Puanlar her gün `data/olcer.json` geçmişine yazılır. Kural tabanlı bir özettir, tavsiye değildir.
+Senaryo sekmesinin başında: ABD borsası (QQQM, SMH, DRAM, IGV, NASA, CIBR), altın ve TL fonları için 0–100 puan (50 nötr). Faktörler: ETF trend ve ivmesi (50/200 günlük ortalama, 3 ay), içerik bazlı analist görüşü, S&P 500 trendi, ABD 10 ve 2 yıllık tahvil faizi ile Fed faizi, VIX, WTI petrol, dolar endeksi, ABD reel faizi, TL reel getirisi, kura karşı TL getirisi, TR faiz yönü. Kodu `js/olcer.js` (sunucu ve uygulama ortak). Puanlar her gün `data/olcer.json` geçmişine yazılır. Kural tabanlı bir özettir, tavsiye değildir.
+
+**Geçmiş sınaması ve barem** (`js/olcer-test.js`): 2015'ten bugüne her hafta ölçer, `gostergeler` serileriyle (VIX, DXY, petrol, ABD 2/10 yıllık faiz, Fed, ABD enflasyonu, TCMB) yeniden hesaplanır ve sonraki 3/6 ayın TL bazlı getirisi ölçülür (ABD: kullanıcının ETF'leri, altın: ons × kur, TL: net mevduat; rakip ABD/altın için TL mevduatı, TL için dolar). Geçmişte analist verisi olmadığından sınama ve barem analist hariç puanla (`taban`) yapılır. Etiketler sabit eşiklerle değil, her ölçerin kendi geçmiş dağılımındaki yerine göredir (alt/üst %20 …). Kullanıcının hedefi (varsayılan %50, ABD + altın) iki ölçerin geçmişteki yerine göre bölünür; bugünkü pay alt %20'de hedefin dörtte biri, üst %20'de tamamıdır.
+
+**Faiz senaryoları**: TCMB ve Fed faizinin 12 ayda girilen seviyeye doğrusal gittiği üç senaryoda TL fonu/mevduat (stopaj sonrası) ile dolarda beklemenin TL getirisi, reel getiri, kullanıcının TL fonlarına etkisi ve dönem sonundaki TL ölçeri.
 
 ## Otomatik yedek
 

@@ -7,9 +7,9 @@ import {
   replicate, periodReturn, periodStart, annualize, dailyRate, projectScenario, monthsToTarget, combine, cpiDaily, findCashDuplicates, removeCashDuplicates, nextBusinessDay, applyValuationPatch,
 } from './calc.js';
 import { lineChart, legend } from './chart.js';
-import { allocation, skorEtiket } from './olcer.js';
+import { allocation, skorEtiket, baremEtiket, yuzdelik, faizSenaryo } from './olcer.js';
 
-export const APP_VERSION = '2026.10.29-b';
+export const APP_VERSION = '2026.10.29-c';
 
 // ---------- Durum ----------
 let S = store.load();
@@ -27,6 +27,7 @@ const money = (v, ccy = 'TRY', d) => (v == null || !Number.isFinite(v) ? '—' :
 const num = (v, d = 2) => (v == null || !Number.isFinite(v) ? '—' : NF[d].format(v));
 const pct = (v, d = 2) => (v == null || !Number.isFinite(v) ? '—' : `${v > 0 ? '+' : v < 0 ? '−' : ''}%${NF[d].format(Math.abs(v) * 100)}`);
 const signMoney = (v, ccy, d) => (v == null ? '—' : `${v > 0 ? '+\u2060' : v < 0 ? '−\u2060' : ''}${money(Math.abs(v), ccy, d)}`);
+const sgn = (v, d = 1) => `${v > 0.05 ? '+' : v < -0.05 ? '−' : ''}${num(Math.abs(v), d)}`;
 const cls = (v) => (v > 0 ? 'up' : v < 0 ? 'down' : 'flat');
 const arrow = (v) => (v > 0 ? '▲' : v < 0 ? '▼' : '•');
 // Eksen etiketleri: adım küçükse daha çok ondalık (aynı etiketin tekrarlanmaması için)
@@ -680,31 +681,67 @@ function holdingShares() {
   }
   return { tot, abd: tot ? abd / tot : 0, altin: tot ? gold / tot : 0, tl: tot ? 1 - (abd + gold) / tot : 1 };
 }
+// Ölçer kalemleri: anahtar, ad, rakip (geçmiş sınamada neye karşı ölçüldü)
+const OLCER_K = [['abd', 'ABD borsası', 'TL mevduatı'], ['altin', 'Altın', 'TL mevduatı'], ['tl', 'TL fonları', 'dolar']];
 function olcerCard(root) {
   const O = M.olcer;
   if (!O?.son) { root.append(h(`<section class="card"><h2>Dağılım ölçeri</h2><p class="muted small">Ölçer verisi henüz yok; bir sonraki veri çekiminde gelir.</p></section>`)); return; }
-  const o = O.son, hedef = S.settings.olcerHedef ?? 0.5;
-  const al = allocation(o, hedef), cur = holdingShares();
+  const o = O.son, hedef = S.settings.olcerHedef ?? 0.5, T = O.sinama;
+  const fb = Object.fromEntries(OLCER_K.map(([k]) => [k, o[k].taban ?? o[k].skor]));
+  // barem: bugünün fiyat bazlı puanının geçmiş dağılımındaki yeri (analist görüşü geçmişte olmadığı için hariç)
+  const yer = Object.fromEntries(OLCER_K.map(([k]) => [k, T ? yuzdelik(fb[k], T.dagilim[k]) : null]));
+  const al = allocation(o, hedef, T ? yer : null), cur = holdingShares();
   const p0 = (x) => `%${num(x * 100, 0)}`;
-  const tone = (sk) => (sk >= 55 ? 'up' : sk <= 45 ? 'down' : 'flat');
-  const g = (key, ad, alt) => { const sk = o[key].skor; return `<div class="gauge-tile"><span class="label">${ad}</span><b class="${tone(sk)}">${sk}</b><span class="g-bar"><i style="width:${sk}%"></i><em style="left:50%"></em></span><span class="small ${tone(sk)}">${skorEtiket(sk)}</span>${alt ? `<span class="muted small">${alt}</span>` : ''}</div>`; };
+  const tone = (y) => (y == null ? 'flat' : y >= 0.6 ? 'up' : y <= 0.4 ? 'down' : 'flat');
+  const toneS = (sk) => (sk >= 55 ? 'up' : sk <= 45 ? 'down' : 'flat');
+  const g = (k, ad, alt) => {
+    const sk = o[k].skor, dg = T?.dagilim[k], y = yer[k];
+    if (!dg) return `<div class="gauge-tile"><span class="label">${ad}</span><b class="${toneS(sk)}">${sk}</b><span class="g-bar"><i style="width:${sk}%"></i><em style="left:50%"></em></span><span class="small ${toneS(sk)}">${skorEtiket(sk)}</span>${alt ? `<span class="muted small">${alt}</span>` : ''}</div>`;
+    const at = (v) => `${Math.max(0, Math.min(100, ((v - dg.min) / (dg.max - dg.min || 1)) * 100))}%`;
+    return `<div class="gauge-tile"><span class="label">${ad}</span><b>${sk}</b>
+      <span class="g-range" title="Geçmiş aralık ${dg.min}–${dg.max}"><s style="left:${at(dg.p20)};right:calc(100% - ${at(dg.p80)})"></s><em style="left:${at(dg.p50)}"></em><i class="${tone(y)}" style="left:${at(fb[k])}"></i></span>
+      <span class="g-ends muted"><span>${dg.min}</span><span>${dg.max}</span></span>
+      <span class="small ${tone(y)}">${baremEtiket(fb[k], dg)}</span>
+      <span class="muted small">geçmişteki yeri: %${num(y * 100, 0)}${fb[k] !== sk ? ` · analist hariç ${fb[k]}` : ''}</span></div>`;
+  };
   const row = (ad, k) => { const d = al[k].simdi - cur[k], tl = d * cur.tot; return `<tr><td>${ad}</td><td>${p0(al[k].hedef)}</td><td><b>${p0(al[k].simdi)}</b></td><td>${p0(cur[k])}</td><td class="${Math.abs(tl) < 1 ? '' : tl > 0 ? 'up' : 'down'}">${Math.abs(tl) < 1 ? '—' : (tl > 0 ? '+' : '−') + money(Math.abs(tl), 'TRY', 0)}</td></tr>`; };
   const facts = (key, ad) => `<details class="fold"><summary><h3>${ad}: neden ${o[key].skor}?</h3></summary><div class="facts">${o[key].faktorler.map((f) => `<div class="fact"><div class="row between"><span>${esc(f.ad)}</span><span class="${f.puan == null ? 'muted' : f.puan > 0.1 ? 'up' : f.puan < -0.1 ? 'down' : 'flat'} small">${f.puan == null ? 'veri yok' : (f.puan > 0 ? '+' : '') + num(f.puan, 2)}</span></div><span class="f-bar"><i style="${f.puan == null ? 'width:0' : f.puan >= 0 ? `left:50%;width:${f.puan * 50}%` : `left:${50 + f.puan * 50}%;width:${-f.puan * 50}%`}" class="${f.puan >= 0 ? 'pos' : 'neg'}"></i></span><span class="muted small">${esc(f.deger)} · ağırlık %${num(f.agirlik * 100, 0)} — ${esc(f.aciklama)}</span></div>`).join('')}</div></details>`;
+  // geçmiş sınama tablosu: ölçerin üçte birlik dilimlerinde sonraki 3 ay
+  const sinama = () => {
+    if (!T) return '';
+    const blok = ([k, ad, rakip]) => {
+      const G = T.getiri[k], [t1, t2] = G.sinir, now = fb[k];
+      const cur = now <= t1 ? 'dusuk' : now < t2 ? 'orta' : 'yuksek';
+      const ad3 = { dusuk: `Alt (≤${num(t1, 0)})`, orta: 'Orta', yuksek: `Üst (≥${num(t2, 0)})` };
+      const own = k === 'tl' ? 'TL fonları' : k === 'abd' ? "ABD ETF'leri" : 'Altın';
+      const r = (b) => { const x = G[b][91]; return `<tr class="${b === cur ? 'now' : ''}"><td>${ad3[b]}${b === cur ? ' ◂' : ''}</td><td class="${cls(x.getiri)}">${pct(x.getiri, 1)}</td><td class="${cls(x.fark)}">${sgn(x.fark * 100)}</td><td>%${num(x.isabet * 100, 0)}</td></tr>`; };
+      const lo = G.dusuk[91], hi = G.yuksek[91];
+      const rk = rakip === 'dolar' ? 'doları' : 'mevduatı';
+      return `<h3>${ad}</h3><div class="tbl-wrap"><table class="tbl bt"><thead><tr><th>Ölçer</th><th>3 ay</th><th>${rakip === 'dolar' ? 'Dolara' : 'Mevduata'} fark</th><th>Geçti</th></tr></thead><tbody>${['dusuk', 'orta', 'yuksek'].map(r).join('')}</tbody></table></div>
+        <p class="small">${own}, ölçer üst dilimdeyken 3 ayda ${rk} <b>%${num(hi.isabet * 100, 0)}</b>, alt dilimdeyken <b>%${num(lo.isabet * 100, 0)}</b> oranında geçti.</p>`;
+    };
+    return `<details class="fold"><summary><h3>Geçmişte nasıl çalıştı?</h3></summary>
+      <p class="muted small">${dTR(T.baslangic)}–${dTR(T.bitis)} arasında her hafta ölçer yeniden hesaplandı (${T.adet} hafta) ve sonraki 3 ayın TL bazlı getirisi ölçüldü. ◂ bugünün dilimi. Getiriler TL bazlı; fark yüzde puan; "geçti" o dilimdeki haftaların kaçında rakibinden iyi gittiğidir.</p>
+      ${OLCER_K.map(blok).join('')}
+      <p class="muted small">Okuma: TL ölçeri en güçlü sinyal; yüksekken TL fonlarında kalmak dolara karşı çoğunlukla kazandırdı. ABD ve altında ölçer düşükken bile çoğu dönemde mevduatı geçti; bu yüzden ölçer "ne zaman" değil "ne hızda" sorusu için kullanılıyor. Analist görüşü geçmişte olmadığından sınamaya girmedi. ABD tarafı o tarihte en az 200 günlük geçmişi olan ETF'lerinden (SMH, IGV, CIBR, QQQM) hesaplandı. Son 10 yıl ABD teknolojisi için olağanüstüydü, geleceğin aynı olacağı garanti değil.</p></details>`;
+  };
   const upd = new Date(O.guncelleme);
+  const hist = T?.gecmis?.length ? T.gecmis : O.gecmis;
   const card = h(`<section class="card olcer">
     <div class="row between"><h2>Dağılım ölçeri</h2><span class="muted small">${dTR(upd.toISOString().slice(0, 10))} ${hhmm(upd)}</span></div>
-    <p class="muted small">Trend, analist görüşü, ABD faizleri, petrol, dolar, volatilite ve TL'nin reel getirisinden çıkan özet puanlar. 50 nötr; 55 üstü olumlu, 45 altı olumsuz.</p>
+    <p class="muted small">Trend, analist görüşü, ABD faizleri, petrol, dolar, korku endeksi ve TL'nin reel getirisinden çıkan 0–100 puan. ${T ? `Etiket ve çubuk, puanın ${T.baslangic.slice(0, 4)}'ten beri aldığı değerler içindeki yerini gösterir: gri bant geçmişin orta %60'ı, çizgi ortanca.` : '50 nötr.'}</p>
     <div class="gauges">${g('abd', 'ABD borsası', 'ETF\'lerin')}${g('altin', 'Altın')}${g('tl', 'TL fonları', 'kalma cazibesi')}</div>
     <h3>Önerilen dağılım</h3>
     <form class="form inline-form" id="olh"><label>Orta vadeli hedefin (ABD + altın, portföyün %'si)<input name="h" inputmode="decimal" value="${num(hedef * 100, 0)}"></label></form>
     <div class="tbl-wrap"><table class="tbl"><thead><tr><th></th><th>Hedef</th><th>Şimdi</th><th>Sende</th><th>Fark ₺</th></tr></thead><tbody>
       ${row('ABD ETF\'leri', 'abd')}${row('Altın', 'altin')}${row('TL fonları', 'tl')}
     </tbody></table></div>
-    <p class="muted small"><b>Hedef</b>: orta vadeli planın. <b>Şimdi</b>: ölçere göre bugün uygun pay. <b>Fark</b>: o paya ulaşmak için kaydırılabilecek tutar. Hedef, iki ölçerin puanına göre ABD ve altın arasında bölünür. Bir kalemin "şimdi" payı ölçer 35'teyken 0, 65 ve üstündeyken hedefinin tamamıdır. Arada kademeli artar.</p>
+    <p class="muted small"><b>Hedef</b>: orta vadeli planın, iki ölçerin geçmişteki yerine göre ABD ve altın arasında bölünür. <b>Şimdi</b>: bugün için uygun pay. Ölçer geçmişinin alt %20'sindeyken hedefin dörtte biri, üst %20'sindeyken tamamı; arada kademeli. <b>Fark</b>: o paya ulaşmak için kaydırılabilecek tutar.</p>
     <h3>ABD payının ETF'lere dağılımı</h3>
-    <div class="etf-list">${o.etfler.map((e, i) => { const pay = al.etf[i].pay * al.abd.simdi; return `<div class="etf-row"><b>${esc(e.kod)}</b><span class="muted small">${esc(e.ad)}</span><span class="chip-s ${e.skor == null ? '' : tone(e.skor)}">${e.skor ?? '—'}</span><span class="r"><b>${p0(pay)}</b><span class="muted small">${money(pay * cur.tot, 'TRY', 0)}</span></span></div>`; }).join('')}</div>
-    <h3>Puanların seyri</h3><div id="olch" class="chart" style="min-height:150px"></div><div id="ollg"></div>
-    ${O.gecmis.length < 5 ? `<p class="muted small">Geçmiş ${dTR(O.gecmis[0][0])} tarihinden itibaren her gün kaydediliyor.</p>` : ''}
+    <div class="etf-list">${o.etfler.map((e, i) => { const pay = al.etf[i].pay * al.abd.simdi; return `<div class="etf-row"><b>${esc(e.kod)}</b><span class="muted small">${esc(e.ad)}</span><span class="chip-s ${e.skor == null ? '' : toneS(e.skor)}">${e.skor ?? '—'}</span><span class="r"><b>${p0(pay)}</b><span class="muted small">${money(pay * cur.tot, 'TRY', 0)}</span></span></div>`; }).join('')}</div>
+    <h3>Puanların geçmişi</h3><div id="olch" class="chart" style="min-height:150px"></div><div id="ollg"></div>
+    ${T ? `<p class="muted small">${T.baslangic.slice(0, 4)}'ten beri haftalık, fiyat ve faiz verileriyle (analist hariç) hesaplandı.</p>` : O.gecmis.length < 5 ? `<p class="muted small">Geçmiş ${dTR(O.gecmis[0][0])} tarihinden itibaren her gün kaydediliyor.</p>` : ''}
+    ${sinama()}
     ${facts('abd', 'ABD borsası')}${facts('altin', 'Altın')}${facts('tl', 'TL fonları')}
     <p class="muted small">Kural tabanlı bir özettir, tahmin ya da yatırım tavsiyesi değildir. Analist görüşleri ETF'lerin içindeki hisselerden gelir. Altın ve Fed için toplu bir uzman görüşü verisi olmadığından piyasa fiyatlamaları (tahvil faizleri, dolar endeksi, VIX) kullanılır. Kararını kademeli ve kendi risk sınırların içinde ver.</p>
   </section>`);
@@ -713,9 +750,58 @@ function olcerCard(root) {
   const f = el.querySelector('#olh');
   f.onsubmit = (e) => e.preventDefault();
   f.h.onchange = () => { const v = parseNum(f.h.value); if (v >= 0 && v <= 100) { S.settings.olcerHedef = v / 100; persist(); const y = scrollY; render(); scrollTo(0, y); } };
-  const ser = [['ABD borsası', 1, 'var(--s1)'], ['Altın', 2, 'var(--s4)'], ['TL fonları', 3, 'var(--s11)']].map(([name, i, color]) => ({ name, color, points: O.gecmis.map((r) => [r[0], r[i]]) }));
+  const ser = [['ABD borsası', 1, 'var(--s1)'], ['Altın', 2, 'var(--s4)'], ['TL fonları', 3, 'var(--s11)']].map(([name, i, color]) => ({ name, color, points: hist.map((r) => [r[0], r[i]]) }));
   requestAnimationFrame(() => lineChart(el.querySelector('#olch'), ser, { height: 150, baseline: 50, fmtY: (v) => num(v, 0), fmtTip: (v) => num(v, 0) }));
   el.querySelector('#ollg').innerHTML = legend(ser);
+}
+
+// Faiz senaryoları: TCMB ve Fed patikasına göre 12 ayda TL fonu/mevduat ile dolarda beklemenin karşılaştırması
+const FAIZ_VARSAYILAN = [
+  { ad: 'Hızlı', tcmbSon: 26, enf: 0.22, kur: 0.15 },
+  { ad: 'Baz', tcmbSon: 30, enf: 0.25, kur: 0.2 },
+  { ad: 'Sıkı', tcmbSon: 40, enf: 0.33, kur: 0.32 },
+];
+function faizCard(root) {
+  const tr = M.olcer?.tr || {};
+  const tcmb = tr.tcmb ?? 36, mev = tr.mevduat ?? (tr.mevduatNet != null ? (tr.mevduatNet / 0.825) * 100 : tcmb), fed = tr.fed ?? 4;
+  const fs = S.settings.faiz || {};
+  const sen = FAIZ_VARSAYILAN.map((d, i) => ({ ...d, ...(fs.s?.[i] || {}) }));
+  const fedSon = fs.fedSon ?? Math.max(0, fed - 0.5);
+  const dg = M.olcer?.sinama?.dagilim?.tl;
+  const cur = holdingShares(), tlTut = cur.tot * cur.tl;
+  const res = sen.map((x) => ({ ...x, ...faizSenaryo({ tcmb, tcmbSon: x.tcmbSon, mevFark: mev - tcmb, vergi: S.settings.tax, enf: x.enf, kur: x.kur, fed, fedSon }) }));
+  const tdS = (f) => res.map((r) => `<td>${f(r)}</td>`).join('');
+  const inp = (i, k, v, d = 0) => `<input name="${k}${i}" inputmode="decimal" value="${num(v, d)}" aria-label="${k}">`;
+  root.append(h(`<section class="card faiz">
+    <h2>Faiz senaryoları</h2>
+    <p class="muted small">TCMB politika faizi bugün <b>%${num(tcmb, 1)}</b>, mevduat <b>%${num(mev, 1)}</b>, Fed <b>%${num(fed, 2)}</b>. Üç senaryo: hızlı indirim, baz ve sıkı para politikası / kur şoku. Faizler 12 ay içinde girdiğin seviyeye doğrusal gider. TL tarafı mevduat/para piyasası fonu (stopaj sonrası), dolar tarafı dolarda faizde beklemektir (hisse getirisi hariç).</p>
+    <form id="fzf" class="form"><div class="tbl-wrap"><table class="tbl fz-in"><thead><tr><th></th>${res.map((r) => `<th>${esc(r.ad)}</th>`).join('')}</tr></thead><tbody>
+      <tr><td>TCMB 12 ay sonra (%)</td>${res.map((r, i) => `<td>${inp(i, 't', r.tcmbSon, 1)}</td>`).join('')}</tr>
+      <tr><td>Enflasyon (%)</td>${res.map((r, i) => `<td>${inp(i, 'e', r.enf * 100, 1)}</td>`).join('')}</tr>
+      <tr><td>Dolar/TL artışı (%)</td>${res.map((r, i) => `<td>${inp(i, 'k', r.kur * 100, 1)}</td>`).join('')}</tr>
+    </tbody></table></div>
+    <label>Fed 12 ay sonra (%)<input name="fed" inputmode="decimal" value="${num(fedSon, 2)}"></label>
+    <div class="row gap"><button class="btn" type="submit">Hesapla</button><button class="btn ghost" type="button" id="fzr">Varsayılana dön</button></div></form>
+    <div class="tbl-wrap"><table class="tbl fz-out"><thead><tr><th>12 ayda</th>${res.map((r) => `<th>${esc(r.ad)}</th>`).join('')}</tr></thead><tbody>
+      <tr><td>Ort. faiz</td>${tdS((r) => `%${num(r.ortFaiz, 1)}`)}</tr>
+      <tr><td>TL fonu (net)</td>${tdS((r) => `<b class="${cls(r.tlNet)}">${pct(r.tlNet, 1)}</b>`)}</tr>
+      <tr><td>Reel</td>${tdS((r) => `<span class="${cls(r.reel)}">${pct(r.reel, 1)}</span>`)}</tr>
+      <tr><td>Dolarda (TL)</td>${tdS((r) => `${pct(r.dolarTL, 1)}`)}</tr>
+      <tr><td>TL − dolar (puan)</td>${tdS((r) => `<b class="${cls(r.fark)}">${sgn(r.fark * 100)}</b>`)}</tr>
+      ${tlTut > 0 ? `<tr><td>Senin TL fonların</td>${tdS((r) => `<span class="${cls(r.tlNet)}">+₺${compact(tlTut * r.tlNet, 1e5)}</span>`)}</tr>
+      <tr><td>Dolarda olsa</td>${tdS((r) => `+₺${compact(tlTut * r.dolarTL, 1e5)}`)}</tr>` : ''}
+      <tr><td>TL ölçeri sonra</td>${tdS((r) => `<b>${r.tlOlcer}</b>${dg ? `<br><span class="muted small">yeri %${num(yuzdelik(r.tlOlcer, dg) * 100, 0)}</span>` : ''}`)}</tr>
+    </tbody></table></div>
+    <p class="muted small">${tlTut > 0 ? `TL fonların bugün ${money(tlTut, 'TRY', 0)}. ` : ''}TL ölçerinin yanındaki yüzde, geçmişteki yeri (üst %20 TL için çok cazip). Faiz indirimi TL fonlarının ileriki getirisini düşürür; kur enflasyonun altında kalırsa TL yine dolardan iyi gidebilir (TL'nin reel değer kazanması). Para piyasası ve kısa vadeli borçlanma araçları fonları faiz değişimini birkaç haftada yansıtır; uzun vadeli tahvil fonları indirimde değer kazanır. Hisse ve altın getirisi bu tabloya dahil değildir.</p>
+  </section>`));
+  const form = root.querySelector('#fzf');
+  form.onsubmit = (e) => {
+    e.preventDefault();
+    const fd = new FormData(form), v = (k, def) => { const x = parseNum(fd.get(k)); return Number.isFinite(x) ? x : def; };
+    S.settings.faiz = { fedSon: v('fed', fedSon), s: sen.map((x, i) => ({ tcmbSon: v('t' + i, x.tcmbSon), enf: v('e' + i, x.enf * 100) / 100, kur: v('k' + i, x.kur * 100) / 100 })) };
+    persist(); const y = scrollY; render(); scrollTo(0, y);
+  };
+  root.querySelector('#fzr').onclick = () => { delete S.settings.faiz; persist(); const y = scrollY; render(); scrollTo(0, y); };
 }
 
 function senaryo(root) {
@@ -731,6 +817,7 @@ function senaryo(root) {
   const mt = sc.target ? monthsToTarget({ start: L.value, annual: base, monthly: sc.monthly, target: sc.target }) : null;
 
   olcerCard(root);
+  faizCard(root);
   root.append(h(`
   <section class="card">
     <h2>Kâr senaryoları</h2>
