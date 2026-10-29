@@ -222,3 +222,27 @@ test('içerik bazlı analist görüşü (ağırlıklı)', () => {
   const t = aggregate([{ w: 9, total: 1, buy: 1 }, { w: 1, total: 1, sell: 1 }], { tavan: 0.5 });
   assert.equal(t.al, 0.5); assert.equal(t.sat, 0.5);
 });
+
+test('dağılım ölçeri: puanlama ve dağılım', async () => {
+  const { computeOlcer, allocation, trendScore } = await import('../js/olcer.js');
+  assert.equal(trendScore({ close: 110, SMA50: 105, SMA200: 100 }), 1);
+  assert.equal(trendScore({ close: 90, SMA50: 95, SMA200: 100 }), -1);
+  assert.equal(trendScore(null), null);
+  const up = { close: 110, SMA50: 105, SMA200: 100, 'Perf.3M': 10, RSI: 50 };
+  const rows = { 'NASDAQ:QQQM': up, 'NASDAQ:SMH': up, 'CBOE:DRAM': up, 'CBOE:IGV': up, 'AMEX:NASA': up, 'NASDAQ:CIBR': up, 'SP:SPX': up,
+    'TVC:GOLD': { close: 90, SMA50: 95, SMA200: 100, 'Perf.3M': -8, RSI: 50 }, 'TVC:VIX': { close: 14 }, 'TVC:DXY': { close: 104, 'Perf.3M': 4 }, 'TVC:USOIL': { close: 70, 'Perf.3M': 0 },
+    'TVC:US10Y': { close: 4, 'Perf.1M': -5 }, 'TVC:US02Y': { close: 3.5 }, 'ECONOMICS:USINTR': { close: 4 }, 'ECONOMICS:USIRYY': { close: 3 } };
+  const o = computeOlcer(rows, { K_QQQM: { al: 0.8, hedef: 0.2 } }, { mevduatNet: 0.3, tufeYillik: 0.3, usdtry3m: 0.05, mevduatDegisim3m: -1 });
+  assert.ok(o.abd.skor > 65, `ABD güçlü olmalı: ${o.abd.skor}`);
+  assert.ok(o.altin.skor < 45, `altın zayıf olmalı: ${o.altin.skor}`);
+  assert.ok(o.tl.skor >= 0 && o.tl.skor <= 100);
+  const a = allocation(o, 0.5);
+  assert.ok(Math.abs(a.abd.hedef + a.altin.hedef - 0.5) < 1e-9);
+  assert.ok(Math.abs(a.abd.simdi + a.altin.simdi + a.tl.simdi - 1) < 1e-9);
+  assert.equal(a.abd.simdi, a.abd.hedef); // güçlü ölçerde hedefin tamamı
+  assert.ok(a.altin.simdi < a.altin.hedef);
+  assert.ok(Math.abs(a.etf.reduce((s, e) => s + e.pay, 0) - 1) < 1e-9);
+  // veri yoksa nötr (50) ve çökmez
+  const bos = computeOlcer({}, {}, {});
+  assert.equal(bos.abd.skor, 50); assert.equal(bos.altin.skor, 50);
+});
