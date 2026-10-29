@@ -1,9 +1,9 @@
 {
- "guncelleme": "2026-10-29T13:16:03.183Z",
+ "guncelleme": "2026-10-29T13:25:44.627Z",
  "tr": {
   "mevduatNet": 0.28462499999999996,
   "tufeYillik": 0.29731518245415,
-  "usdtry3m": 0.050724637681159424,
+  "usdtry3m": 0.05065927903083667,
   "mevduatDegisim3m": -1
  },
  "son": {
@@ -33,21 +33,21 @@
     },
     {
      "ad": "Fed ve tahvil faizleri",
-     "deger": "10Y %5 (1 ay -4.34%) · 2Y−Fed +0.69 puan",
-     "puan": -0.13,
+     "deger": "10Y %5 (1 ay -4.42%) · 2Y−Fed +0.68 puan",
+     "puan": -0.12,
      "agirlik": 0.15,
      "aciklama": "Faizler düşüyorsa ve piyasa indirim bekliyorsa (2 yıllık < Fed faizi) hisseler için olumlu"
     },
     {
      "ad": "Volatilite (VIX)",
-     "deger": "16.96",
+     "deger": "16.98",
      "puan": 0.38,
      "agirlik": 0.1,
      "aciklama": "20 altı sakin, 30 üstü panik"
     },
     {
      "ad": "Petrol (WTI)",
-     "deger": "100.61$ · 3 ay 19.86%",
+     "deger": "100.48$ · 3 ay 19.7%",
      "puan": -0.74,
      "agirlik": 0.1,
      "aciklama": "Hızlı petrol artışı enflasyon ve faiz baskısı demek"
@@ -66,14 +66,14 @@
    "faktorler": [
     {
      "ad": "Altın trendi",
-     "deger": "4026.02$ · 200 gün ort. 4502.15$",
+     "deger": "4026.31$ · 200 gün ort. 4502.15$",
      "puan": -1,
      "agirlik": 0.25,
      "aciklama": "Fiyat 50/200 günlük ortalamaların üstünde mi"
     },
     {
      "ad": "Altın ivmesi",
-     "deger": "3 ay -1.89%",
+     "deger": "3 ay -1.88%",
      "puan": -0.13,
      "agirlik": 0.15,
      "aciklama": "Son 3 aylık değişim"
@@ -87,21 +87,21 @@
     },
     {
      "ad": "Dolar endeksi (DXY)",
-     "deger": "102.28 · 3 ay 2.26%",
-     "puan": -0.45,
+     "deger": "102.33 · 3 ay 2.31%",
+     "puan": -0.46,
      "agirlik": 0.15,
      "aciklama": "Güçlenen dolar altını baskılar"
     },
     {
      "ad": "Risk algısı (VIX)",
-     "deger": "16.96",
+     "deger": "16.98",
      "puan": -0.19,
      "agirlik": 0.1,
      "aciklama": "Panik dönemlerinde altına talep artar"
     },
     {
      "ad": "RSI (aşırı alım/satım)",
-     "deger": "38.27",
+     "deger": "38.29",
      "puan": 0.45,
      "agirlik": 0.05,
      "aciklama": "30 altı aşırı satım (fırsat), 70 üstü aşırı alım"
