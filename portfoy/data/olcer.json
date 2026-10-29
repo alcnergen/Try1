@@ -1,53 +1,53 @@
 {
- "guncelleme": "2026-10-29T13:35:44.691Z",
+ "guncelleme": "2026-10-29T13:45:52.598Z",
  "tr": {
   "mevduatNet": 0.28462499999999996,
   "tufeYillik": 0.29731518245415,
-  "usdtry3m": 0.05069090418421851,
+  "usdtry3m": 0.0506466289694838,
   "mevduatDegisim3m": -1
  },
  "son": {
   "abd": {
-   "skor": 67,
+   "skor": 66,
    "faktorler": [
     {
      "ad": "ETF'lerin trendi ve ivmesi",
      "deger": "4/6 ETF yükseliş trendinde",
-     "puan": 0.47,
+     "puan": 0.31,
      "agirlik": 0.25,
      "aciklama": "Fiyat 50/200 günlük ortalamaların üstünde mi, son 3 ayda ne kadar değişti"
     },
     {
      "ad": "Analist görüşü (ETF içerikleri)",
-     "deger": "ort. %80 al · hedef +%45",
-     "puan": 0.58,
+     "deger": "ort. %80 al · hedef +%49",
+     "puan": 0.65,
      "agirlik": 0.2,
      "aciklama": "İçlerindeki hisselerin analist al oranı ve ortalama hedef fiyat farkı"
     },
     {
      "ad": "S&P 500 trendi",
-     "deger": "4.78% (3 ay)",
+     "deger": "3.18% (3 ay)",
      "puan": 1,
      "agirlik": 0.1,
      "aciklama": "Geniş piyasa 200 günlük ortalamanın üstünde mi"
     },
     {
      "ad": "Fed ve tahvil faizleri",
-     "deger": "10Y %4.96 (1 ay -5.24%) · 2Y−Fed +0.64 puan",
-     "puan": -0.06,
+     "deger": "10Y %4.98 (1 ay -4.82%) · 2Y−Fed +0.66 puan",
+     "puan": -0.09,
      "agirlik": 0.15,
      "aciklama": "Faizler düşüyorsa ve piyasa indirim bekliyorsa (2 yıllık < Fed faizi) hisseler için olumlu"
     },
     {
      "ad": "Volatilite (VIX)",
-     "deger": "17.34",
-     "puan": 0.33,
+     "deger": "16.95",
+     "puan": 0.38,
      "agirlik": 0.1,
      "aciklama": "20 altı sakin, 30 üstü panik"
     },
     {
      "ad": "Petrol (WTI)",
-     "deger": "100.07$ · 3 ay 19.22%",
+     "deger": "99.98$ · 3 ay 19.11%",
      "puan": -0.71,
      "agirlik": 0.1,
      "aciklama": "Hızlı petrol artışı enflasyon ve faiz baskısı demek"
@@ -66,43 +66,43 @@
    "faktorler": [
     {
      "ad": "Altın trendi",
-     "deger": "4033.97$ · 200 gün ort. 4502.19$",
+     "deger": "4025.49$ · 200 gün ort. 4502.14$",
      "puan": -1,
      "agirlik": 0.25,
      "aciklama": "Fiyat 50/200 günlük ortalamaların üstünde mi"
     },
     {
      "ad": "Altın ivmesi",
-     "deger": "3 ay -1.7%",
-     "puan": -0.11,
+     "deger": "3 ay -1.9%",
+     "puan": -0.13,
      "agirlik": 0.15,
      "aciklama": "Son 3 aylık değişim"
     },
     {
      "ad": "ABD reel faizi",
-     "deger": "10Y − enflasyon ≈ %1.26",
-     "puan": 0,
+     "deger": "10Y − enflasyon ≈ %1.28",
+     "puan": -0.02,
      "agirlik": 0.2,
      "aciklama": "Reel faiz yüksekse faiz getirmeyen altın baskılanır"
     },
     {
      "ad": "Dolar endeksi (DXY)",
-     "deger": "102.24 · 3 ay 2.21%",
-     "puan": -0.44,
+     "deger": "102.32 · 3 ay 2.29%",
+     "puan": -0.46,
      "agirlik": 0.15,
      "aciklama": "Güçlenen dolar altını baskılar"
     },
     {
      "ad": "Risk algısı (VIX)",
-     "deger": "17.34",
-     "puan": -0.17,
+     "deger": "16.95",
+     "puan": -0.19,
      "agirlik": 0.1,
      "aciklama": "Panik dönemlerinde altına talep artar"
     },
     {
      "ad": "RSI (aşırı alım/satım)",
-     "deger": "38.86",
-     "puan": 0.41,
+     "deger": "38.23",
+     "puan": 0.45,
      "agirlik": 0.05,
      "aciklama": "30 altı aşırı satım (fırsat), 70 üstü aşırı alım"
     },
@@ -145,31 +145,31 @@
    {
     "kod": "QQQM",
     "ad": "Nasdaq 100",
-    "skor": 83,
-    "fiyat": 298.71,
-    "perf3m": 7.52,
-    "rsi": 49.5,
-    "analistAl": 0.805,
-    "hedef": 0.283,
+    "skor": 81,
+    "fiyat": 294.65,
+    "perf3m": 3.39,
+    "rsi": 44.48,
+    "analistAl": 0.802,
+    "hedef": 0.317,
     "parcalar": {
      "trend": 1,
-     "momentum": 0.5,
-     "analist": 0.71,
-     "rsi": 0
+     "momentum": 0.23,
+     "analist": 0.76,
+     "rsi": 0.03
     }
    },
    {
     "kod": "SMH",
     "ad": "Yarı iletken",
-    "skor": 85,
-    "fiyat": 567.67,
-    "perf3m": 7.14,
-    "rsi": 49.44,
-    "analistAl": 0.85,
-    "hedef": 0.435,
+    "skor": 81,
+    "fiyat": 560.4,
+    "perf3m": 0.52,
+    "rsi": 47.06,
+    "analistAl": 0.849,
+    "hedef": 0.458,
     "parcalar": {
      "trend": 1,
-     "momentum": 0.48,
+     "momentum": 0.03,
      "analist": 0.87,
      "rsi": 0
     }
@@ -177,15 +177,15 @@
    {
     "kod": "DRAM",
     "ad": "Bellek",
-    "skor": 56,
-    "fiyat": 54.12,
-    "perf3m": 12.7,
-    "rsi": 51.94,
+    "skor": 45,
+    "fiyat": 52.36,
+    "perf3m": -4.28,
+    "rsi": 48.4,
     "analistAl": 0.927,
-    "hedef": 0.859,
+    "hedef": 0.876,
     "parcalar": {
      "trend": -1,
-     "momentum": 0.85,
+     "momentum": -0.29,
      "analist": 1,
      "rsi": 0
     }
@@ -193,49 +193,49 @@
    {
     "kod": "IGV",
     "ad": "Yazılım",
-    "skor": 84,
-    "fiyat": 111.91,
-    "perf3m": 21.04,
-    "rsi": 59.48,
-    "analistAl": 0.777,
-    "hedef": 0.262,
+    "skor": 88,
+    "fiyat": 107.3325,
+    "perf3m": 15.1,
+    "rsi": 47.39,
+    "analistAl": 0.775,
+    "hedef": 0.299,
     "parcalar": {
      "trend": 1,
      "momentum": 1,
-     "analist": 0.57,
-     "rsi": -0.3
+     "analist": 0.68,
+     "rsi": 0
     }
    },
    {
     "kod": "NASA",
     "ad": "Uzay",
-    "skor": 45,
-    "fiyat": 21.64,
-    "perf3m": 2.8,
-    "rsi": 44.88,
+    "skor": 42,
+    "fiyat": 21.43,
+    "perf3m": -3.03,
+    "rsi": 43.6,
     "analistAl": 0.79,
-    "hedef": 0.793,
+    "hedef": 0.813,
     "parcalar": {
      "trend": -1,
-     "momentum": 0.19,
+     "momentum": -0.2,
      "analist": 0.73,
-     "rsi": 0.01
+     "rsi": 0.09
     }
    },
    {
     "kod": "CIBR",
     "ad": "Siber güvenlik",
-    "skor": 70,
-    "fiyat": 107.92,
-    "perf3m": 20.19,
-    "rsi": 58.76,
+    "skor": 74,
+    "fiyat": 102.64,
+    "perf3m": 13.11,
+    "rsi": 47.63,
     "analistAl": 0.634,
-    "hedef": 0.08,
+    "hedef": 0.162,
     "parcalar": {
      "trend": 1,
-     "momentum": 1,
-     "analist": -0.4,
-     "rsi": -0.25
+     "momentum": 0.87,
+     "analist": -0.12,
+     "rsi": 0
     }
    }
   ]
@@ -243,7 +243,7 @@
  "gecmis": [
   [
    "2026-10-29",
-   67,
+   66,
    36,
    40
   ]
