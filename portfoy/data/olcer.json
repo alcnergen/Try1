@@ -1,14 +1,14 @@
 {
- "guncelleme": "2026-10-29T13:25:44.627Z",
+ "guncelleme": "2026-10-29T13:35:44.691Z",
  "tr": {
   "mevduatNet": 0.28462499999999996,
   "tufeYillik": 0.29731518245415,
-  "usdtry3m": 0.05065927903083667,
+  "usdtry3m": 0.05069090418421851,
   "mevduatDegisim3m": -1
  },
  "son": {
   "abd": {
-   "skor": 66,
+   "skor": 67,
    "faktorler": [
     {
      "ad": "ETF'lerin trendi ve ivmesi",
@@ -33,22 +33,22 @@
     },
     {
      "ad": "Fed ve tahvil faizleri",
-     "deger": "10Y %5 (1 ay -4.42%) · 2Y−Fed +0.68 puan",
-     "puan": -0.12,
+     "deger": "10Y %4.96 (1 ay -5.24%) · 2Y−Fed +0.64 puan",
+     "puan": -0.06,
      "agirlik": 0.15,
      "aciklama": "Faizler düşüyorsa ve piyasa indirim bekliyorsa (2 yıllık < Fed faizi) hisseler için olumlu"
     },
     {
      "ad": "Volatilite (VIX)",
-     "deger": "16.98",
-     "puan": 0.38,
+     "deger": "17.34",
+     "puan": 0.33,
      "agirlik": 0.1,
      "aciklama": "20 altı sakin, 30 üstü panik"
     },
     {
      "ad": "Petrol (WTI)",
-     "deger": "100.48$ · 3 ay 19.7%",
-     "puan": -0.74,
+     "deger": "100.07$ · 3 ay 19.22%",
+     "puan": -0.71,
      "agirlik": 0.1,
      "aciklama": "Hızlı petrol artışı enflasyon ve faiz baskısı demek"
     },
@@ -62,47 +62,47 @@
    ]
   },
   "altin": {
-   "skor": 35,
+   "skor": 36,
    "faktorler": [
     {
      "ad": "Altın trendi",
-     "deger": "4026.31$ · 200 gün ort. 4502.15$",
+     "deger": "4033.97$ · 200 gün ort. 4502.19$",
      "puan": -1,
      "agirlik": 0.25,
      "aciklama": "Fiyat 50/200 günlük ortalamaların üstünde mi"
     },
     {
      "ad": "Altın ivmesi",
-     "deger": "3 ay -1.88%",
-     "puan": -0.13,
+     "deger": "3 ay -1.7%",
+     "puan": -0.11,
      "agirlik": 0.15,
      "aciklama": "Son 3 aylık değişim"
     },
     {
      "ad": "ABD reel faizi",
-     "deger": "10Y − enflasyon ≈ %1.30",
-     "puan": -0.04,
+     "deger": "10Y − enflasyon ≈ %1.26",
+     "puan": 0,
      "agirlik": 0.2,
      "aciklama": "Reel faiz yüksekse faiz getirmeyen altın baskılanır"
     },
     {
      "ad": "Dolar endeksi (DXY)",
-     "deger": "102.33 · 3 ay 2.31%",
-     "puan": -0.46,
+     "deger": "102.24 · 3 ay 2.21%",
+     "puan": -0.44,
      "agirlik": 0.15,
      "aciklama": "Güçlenen dolar altını baskılar"
     },
     {
      "ad": "Risk algısı (VIX)",
-     "deger": "16.98",
-     "puan": -0.19,
+     "deger": "17.34",
+     "puan": -0.17,
      "agirlik": 0.1,
      "aciklama": "Panik dönemlerinde altına talep artar"
     },
     {
      "ad": "RSI (aşırı alım/satım)",
-     "deger": "38.29",
-     "puan": 0.45,
+     "deger": "38.86",
+     "puan": 0.41,
      "agirlik": 0.05,
      "aciklama": "30 altı aşırı satım (fırsat), 70 üstü aşırı alım"
     },
@@ -243,8 +243,8 @@
  "gecmis": [
   [
    "2026-10-29",
-   66,
-   35,
+   67,
+   36,
    40
   ]
  ]
