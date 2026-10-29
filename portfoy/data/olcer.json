@@ -1,9 +1,9 @@
 {
- "guncelleme": "2026-10-29T17:31:28.582Z",
+ "guncelleme": "2026-10-29T17:35:48.271Z",
  "tr": {
   "mevduatNet": 0.28462499999999996,
   "tufeYillik": 0.29731518245415,
-  "usdtry3m": 0.05067825412286586,
+  "usdtry3m": 0.05066982074863069,
   "mevduatDegisim3m": -1
  },
  "son": {
@@ -33,22 +33,22 @@
     },
     {
      "ad": "Fed ve tahvil faizleri",
-     "deger": "10Y %5 (1 ay -4.42%) · 2Y−Fed +0.67 puan",
-     "puan": -0.11,
+     "deger": "10Y %5 (1 ay -4.38%) · 2Y−Fed +0.67 puan",
+     "puan": -0.12,
      "agirlik": 0.15,
      "aciklama": "Faizler düşüyorsa ve piyasa indirim bekliyorsa (2 yıllık < Fed faizi) hisseler için olumlu"
     },
     {
      "ad": "Volatilite (VIX)",
-     "deger": "16.51",
-     "puan": 0.44,
+     "deger": "16.58",
+     "puan": 0.43,
      "agirlik": 0.1,
      "aciklama": "20 altı sakin, 30 üstü panik"
     },
     {
      "ad": "Petrol (WTI)",
-     "deger": "101.94$ · 3 ay 21.44%",
-     "puan": -0.82,
+     "deger": "102.08$ · 3 ay 21.61%",
+     "puan": -0.83,
      "agirlik": 0.1,
      "aciklama": "Hızlı petrol artışı enflasyon ve faiz baskısı demek"
     },
@@ -66,14 +66,14 @@
    "faktorler": [
     {
      "ad": "Altın trendi",
-     "deger": "4019.16$ · 200 gün ort. 4502.11$",
+     "deger": "4017.87$ · 200 gün ort. 4502.11$",
      "puan": -1,
      "agirlik": 0.25,
      "aciklama": "Fiyat 50/200 günlük ortalamaların üstünde mi"
     },
     {
      "ad": "Altın ivmesi",
-     "deger": "3 ay -2.06%",
+     "deger": "3 ay -2.09%",
      "puan": -0.14,
      "agirlik": 0.15,
      "aciklama": "Son 3 aylık değişim"
@@ -94,15 +94,15 @@
     },
     {
      "ad": "Risk algısı (VIX)",
-     "deger": "16.51",
-     "puan": -0.22,
+     "deger": "16.58",
+     "puan": -0.21,
      "agirlik": 0.1,
      "aciklama": "Panik dönemlerinde altına talep artar"
     },
     {
      "ad": "RSI (aşırı alım/satım)",
-     "deger": "37.78",
-     "puan": 0.48,
+     "deger": "37.69",
+     "puan": 0.49,
      "agirlik": 0.05,
      "aciklama": "30 altı aşırı satım (fırsat), 70 üstü aşırı alım"
     },
@@ -146,30 +146,30 @@
     "kod": "QQQM",
     "ad": "Nasdaq 100",
     "skor": 82,
-    "fiyat": 293.86,
-    "perf3m": 3.11,
-    "rsi": 43.62,
+    "fiyat": 294.08,
+    "perf3m": 3.19,
+    "rsi": 43.85,
     "analistAl": 0.802,
-    "hedef": 0.318,
+    "hedef": 0.317,
     "parcalar": {
      "trend": 1,
      "momentum": 0.21,
      "analist": 0.76,
-     "rsi": 0.09
+     "rsi": 0.08
     }
    },
    {
     "kod": "SMH",
     "ad": "Yarı iletken",
     "skor": 81,
-    "fiyat": 560.23,
-    "perf3m": 0.49,
-    "rsi": 47.01,
+    "fiyat": 560.69,
+    "perf3m": 0.57,
+    "rsi": 47.15,
     "analistAl": 0.849,
-    "hedef": 0.463,
+    "hedef": 0.462,
     "parcalar": {
      "trend": 1,
-     "momentum": 0.03,
+     "momentum": 0.04,
      "analist": 0.87,
      "rsi": 0
     }
@@ -178,11 +178,11 @@
     "kod": "DRAM",
     "ad": "Bellek",
     "skor": 44,
-    "fiyat": 51.72,
-    "perf3m": -5.45,
-    "rsi": 47.24,
+    "fiyat": 51.76,
+    "perf3m": -5.37,
+    "rsi": 47.31,
     "analistAl": 0.927,
-    "hedef": 0.876,
+    "hedef": 0.874,
     "parcalar": {
      "trend": -1,
      "momentum": -0.36,
@@ -194,9 +194,9 @@
     "kod": "IGV",
     "ad": "Yazılım",
     "skor": 88,
-    "fiyat": 107.06,
-    "perf3m": 14.81,
-    "rsi": 46.82,
+    "fiyat": 107.11,
+    "perf3m": 14.86,
+    "rsi": 46.93,
     "analistAl": 0.776,
     "hedef": 0.303,
     "parcalar": {
@@ -214,7 +214,7 @@
     "perf3m": -1.13,
     "rsi": 46.46,
     "analistAl": 0.79,
-    "hedef": 0.759,
+    "hedef": 0.757,
     "parcalar": {
      "trend": -1,
      "momentum": -0.08,
@@ -230,7 +230,7 @@
     "perf3m": 14.33,
     "rsi": 49.61,
     "analistAl": 0.632,
-    "hedef": 0.144,
+    "hedef": 0.143,
     "parcalar": {
      "trend": 1,
      "momentum": 0.96,
