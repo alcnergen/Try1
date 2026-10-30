@@ -1,5 +1,5 @@
 {
- "guncelleme": "2026-10-30T18:35:18.242Z",
+ "guncelleme": "2026-10-30T18:45:28.242Z",
  "seriler": {
   "TGT": {
    "ad": "GARANTİ PORTFÖY KISA VADELİ BORÇLANMA ARAÇLARI FONU",
@@ -35,7 +35,8 @@
    "ilk": "2022-07-04",
    "son": "2026-11-02",
    "deger": 4.737252,
-   "adet": 1088
+   "adet": 1088,
+   "hata": "tefas:YVD → fetch failed"
   },
   "USDTRY": {
    "ad": "Dolar/TL",
@@ -44,7 +45,7 @@
    "kaynak": "tv:FX_IDC:USDTRY",
    "ilk": "2010-01-04",
    "son": "2026-10-30",
-   "deger": 49.93613,
+   "deger": 49.9443,
    "adet": 4390
   },
   "EURTRY": {
@@ -54,7 +55,7 @@
    "kaynak": "tv:FX_IDC:EURTRY",
    "ilk": "2010-01-04",
    "son": "2026-10-30",
-   "deger": 55.8224,
+   "deger": 55.81738,
    "adet": 4390
   },
   "JPYTRY": {
@@ -64,7 +65,7 @@
    "kaynak": "tv:FX_IDC:JPYTRY",
    "ilk": "2009-12-31",
    "son": "2026-10-30",
-   "deger": 0.31736,
+   "deger": 0.31739,
    "adet": 4390
   },
   "GOLD": {
@@ -74,7 +75,7 @@
    "kaynak": "tv:TVC:GOLD",
    "ilk": "2009-05-27",
    "son": "2026-10-30",
-   "deger": 3881.81,
+   "deger": 3882.888,
    "adet": 4390
   },
   "XU100": {
@@ -94,7 +95,7 @@
    "kaynak": "tv:SP:SPX",
    "ilk": "2016-07-01",
    "son": "2026-10-30",
-   "deger": 7544.23,
+   "deger": 7532.44,
    "adet": 2598
   },
   "NDX": {
@@ -104,7 +105,7 @@
    "kaynak": "tv:NASDAQ:NDX",
    "ilk": "2009-05-20",
    "son": "2026-10-30",
-   "deger": 28176.8181,
+   "deger": 28153.3023,
    "adet": 4390
   },
   "DAX": {
@@ -134,7 +135,7 @@
    "kaynak": "tv:AMEX:URTH",
    "ilk": "2012-01-12",
    "son": "2026-10-30",
-   "deger": 203.5,
+   "deger": 203.59,
    "adet": 3525
   },
   "BTCUSD": {
@@ -144,7 +145,7 @@
    "kaynak": "tv:BITSTAMP:BTCUSD",
    "ilk": "2014-10-22",
    "son": "2026-10-30",
-   "deger": 76641.34,
+   "deger": 76569.87,
    "adet": 4389
   },
   "XRPUSD": {
@@ -154,7 +155,7 @@
    "kaynak": "tv:BITSTAMP:XRPUSD",
    "ilk": "2014-09-28",
    "son": "2026-10-30",
-   "deger": 1.23659,
+   "deger": 1.23661,
    "adet": 4389
   },
   "SILVER": {
@@ -164,7 +165,7 @@
    "kaynak": "tv:TVC:SILVER",
    "ilk": "2009-05-29",
    "son": "2026-10-30",
-   "deger": 48.904,
+   "deger": 48.9592,
    "adet": 4387
   },
   "K_SMH": {
@@ -174,7 +175,7 @@
    "kaynak": "tv:NASDAQ:SMH",
    "ilk": "2009-05-22",
    "son": "2026-10-30",
-   "deger": 512.06,
+   "deger": 513.32,
    "adet": 4388
   },
   "K_NVDA": {
@@ -184,7 +185,7 @@
    "kaynak": "tv:NASDAQ:NVDA",
    "ilk": "2009-05-22",
    "son": "2026-10-30",
-   "deger": 201.22,
+   "deger": 201.48,
    "adet": 4388
   },
   "K_IGV": {
@@ -194,7 +195,7 @@
    "kaynak": "tv:AMEX:IGV",
    "ilk": "2009-05-22",
    "son": "2026-10-30",
-   "deger": 103.36,
+   "deger": 103.69,
    "adet": 4388
   },
   "K_DRAM": {
@@ -204,7 +205,7 @@
    "kaynak": "tv:AMEX:DRAM",
    "ilk": "2026-04-06",
    "son": "2026-10-30",
-   "deger": 47.005,
+   "deger": 47.09,
    "adet": 146
   },
   "K_NASA": {
@@ -224,7 +225,7 @@
    "kaynak": "tv:NASDAQ:QQQM",
    "ilk": "2020-10-13",
    "son": "2026-10-30",
-   "deger": 281.6,
+   "deger": 281.96,
    "adet": 1520
   },
   "K_CIBR": {
@@ -234,7 +235,7 @@
    "kaynak": "tv:NASDAQ:CIBR",
    "ilk": "2015-07-07",
    "son": "2026-10-30",
-   "deger": 99.64,
+   "deger": 99.985,
    "adet": 2848
   },
   "TUFE": {
@@ -264,7 +265,7 @@
    "kaynak": "tv:TVC:VIX",
    "ilk": "2009-07-06",
    "son": "2026-10-30",
-   "deger": 23.88,
+   "deger": 22.69,
    "adet": 4381
   },
   "G_DXY": {
@@ -274,7 +275,7 @@
    "kaynak": "tv:TVC:DXY",
    "ilk": "2009-07-20",
    "son": "2026-10-30",
-   "deger": 101.849,
+   "deger": 101.867,
    "adet": 4381
   },
   "G_PETROL": {
@@ -284,7 +285,7 @@
    "kaynak": "tv:TVC:USOIL",
    "ilk": "2009-06-08",
    "son": "2026-10-30",
-   "deger": 103.89,
+   "deger": 103.97,
    "adet": 4381
   },
   "G_US10Y": {
@@ -294,7 +295,7 @@
    "kaynak": "tv:TVC:US10Y",
    "ilk": "2008-09-23",
    "son": "2026-10-30",
-   "deger": 4.912,
+   "deger": 4.921,
    "adet": 4381
   },
   "G_US02Y": {
@@ -304,7 +305,7 @@
    "kaynak": "tv:TVC:US02Y",
    "ilk": "2009-05-15",
    "son": "2026-10-30",
-   "deger": 4.565,
+   "deger": 4.567,
    "adet": 4234
   },
   "G_FED": {
