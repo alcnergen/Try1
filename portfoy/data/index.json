@@ -1,5 +1,5 @@
 {
- "guncelleme": "2026-11-02T19:35:19.135Z",
+ "guncelleme": "2026-11-02T19:45:28.084Z",
  "seriler": {
   "TGT": {
    "ad": "GARANTİ PORTFÖY KISA VADELİ BORÇLANMA ARAÇLARI FONU",
@@ -74,7 +74,7 @@
    "kaynak": "tv:TVC:GOLD",
    "ilk": "2009-05-27",
    "son": "2026-11-02",
-   "deger": 3946.48,
+   "deger": 3943.452,
    "adet": 4391
   },
   "XU100": {
@@ -94,7 +94,7 @@
    "kaynak": "tv:SP:SPX",
    "ilk": "2016-07-01",
    "son": "2026-11-02",
-   "deger": 7568.9,
+   "deger": 7572.43,
    "adet": 2599
   },
   "NDX": {
@@ -104,7 +104,7 @@
    "kaynak": "tv:NASDAQ:NDX",
    "ilk": "2009-05-20",
    "son": "2026-11-02",
-   "deger": 28216.8582,
+   "deger": 28187.8972,
    "adet": 4391
   },
   "DAX": {
@@ -134,7 +134,7 @@
    "kaynak": "tv:AMEX:URTH",
    "ilk": "2012-01-12",
    "son": "2026-11-02",
-   "deger": 204.735,
+   "deger": 204.655,
    "adet": 3526
   },
   "BTCUSD": {
@@ -144,7 +144,7 @@
    "kaynak": "tv:BITSTAMP:BTCUSD",
    "ilk": "2014-10-22",
    "son": "2026-11-02",
-   "deger": 76780.23,
+   "deger": 76642.5,
    "adet": 4392
   },
   "XRPUSD": {
@@ -154,7 +154,7 @@
    "kaynak": "tv:BITSTAMP:XRPUSD",
    "ilk": "2014-09-28",
    "son": "2026-11-02",
-   "deger": 1.24482,
+   "deger": 1.24156,
    "adet": 4392
   },
   "SILVER": {
@@ -164,7 +164,7 @@
    "kaynak": "tv:TVC:SILVER",
    "ilk": "2009-05-29",
    "son": "2026-11-02",
-   "deger": 50.55,
+   "deger": 50.4866,
    "adet": 4388
   },
   "K_SMH": {
@@ -264,7 +264,7 @@
    "kaynak": "tv:TVC:VIX",
    "ilk": "2009-07-06",
    "son": "2026-11-02",
-   "deger": 20.96,
+   "deger": 21.2,
    "adet": 4382
   },
   "G_DXY": {
@@ -284,7 +284,7 @@
    "kaynak": "tv:TVC:USOIL",
    "ilk": "2009-06-08",
    "son": "2026-11-02",
-   "deger": 96.5,
+   "deger": 96.81,
    "adet": 4382
   },
   "G_US10Y": {
@@ -294,7 +294,7 @@
    "kaynak": "tv:TVC:US10Y",
    "ilk": "2008-09-23",
    "son": "2026-11-02",
-   "deger": 4.892,
+   "deger": 4.896,
    "adet": 4382
   },
   "G_US02Y": {
@@ -304,7 +304,7 @@
    "kaynak": "tv:TVC:US02Y",
    "ilk": "2009-05-15",
    "son": "2026-11-02",
-   "deger": 4.583,
+   "deger": 4.585,
    "adet": 4235
   },
   "G_FED": {
