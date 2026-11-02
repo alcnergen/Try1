@@ -1,20 +1,20 @@
 {
- "guncelleme": "2026-11-02T07:55:48.168Z",
+ "guncelleme": "2026-11-02T10:05:51.598Z",
  "varliklar": {
   "USDTRY": {
-   "rsi": 85.2,
-   "teknik": 0.302,
-   "fiyat": 49.889
+   "rsi": 91.1,
+   "teknik": 0.464,
+   "fiyat": 49.97044
   },
   "EURTRY": {
-   "rsi": 59.2,
-   "teknik": 0.51,
-   "fiyat": 55.98462
+   "rsi": 61.2,
+   "teknik": 0.555,
+   "fiyat": 56.06894
   },
   "GOLD": {
-   "rsi": 32.3,
+   "rsi": 31.9,
    "teknik": -0.419,
-   "fiyat": 3902.09
+   "fiyat": 3897.962
   },
   "N225": {
    "rsi": 41.1,
@@ -33,24 +33,24 @@
    }
   },
   "SILVER": {
-   "rsi": 29.3,
+   "rsi": 29.2,
    "teknik": -0.256,
-   "fiyat": 50.3262
+   "fiyat": 50.3095
   },
   "XU100": {
-   "rsi": 23.5,
-   "teknik": -0.467,
-   "fiyat": 10704.72,
+   "rsi": 26.5,
+   "teknik": -0.376,
+   "fiyat": 10836.49,
    "icerik": {
     "al": 0.7,
     "tut": 0.284,
     "sat": 0.016,
-    "hedef": 0.585,
+    "hedef": 0.567,
     "hisse": 60,
     "gorus": 291,
     "kapsam": 0.908,
     "kaynak": "BIST 100 üyeleri",
-    "hedefFiyat": 16966.98
+    "hedefFiyat": 16980.78
    }
   },
   "SPX": {
@@ -159,12 +159,12 @@
     "al": 0.802,
     "tut": 0.175,
     "sat": 0.022,
-    "hedef": 0.895,
+    "hedef": 0.885,
     "hisse": 22,
     "gorus": 284,
     "kapsam": 0.561,
     "kaynak": "fonun günlük içerik listesi",
-    "hedefFiyat": 38.7
+    "hedefFiyat": 38.49
    }
   },
   "K_QQQM": {
@@ -200,30 +200,30 @@
    }
   },
   "DAX": {
-   "rsi": 56.4,
-   "teknik": 0.309,
-   "fiyat": 25818.21,
+   "rsi": 57.6,
+   "teknik": 0.355,
+   "fiyat": 25885.61,
    "icerik": {
     "al": 0.623,
     "tut": 0.293,
     "sat": 0.084,
-    "hedef": 0.184,
+    "hedef": 0.181,
     "hisse": 40,
     "gorus": 885,
     "kapsam": 1,
     "kaynak": "DAX üyeleri",
-    "hedefFiyat": 30568.76
+    "hedefFiyat": 30570.91
    }
   },
   "BTCUSD": {
-   "rsi": 38.8,
+   "rsi": 38.4,
    "teknik": -0.179,
-   "fiyat": 78000
+   "fiyat": 77882.62
   },
   "XRPUSD": {
-   "rsi": 37.3,
+   "rsi": 36.9,
    "teknik": -0.4,
-   "fiyat": 1.25011
+   "fiyat": 1.24767
   }
  }
 }
