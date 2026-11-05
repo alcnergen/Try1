@@ -1,20 +1,20 @@
 {
- "guncelleme": "2026-11-05T10:55:47.858Z",
+ "guncelleme": "2026-11-05T13:05:53.780Z",
  "varliklar": {
   "USDTRY": {
-   "rsi": 91.3,
-   "teknik": 0.529,
-   "fiyat": 50.0428
+   "rsi": 91.9,
+   "teknik": 0.464,
+   "fiyat": 50.0424
   },
   "EURTRY": {
-   "rsi": 66.2,
+   "rsi": 65.9,
    "teknik": 0.601,
-   "fiyat": 56.31267
+   "fiyat": 56.29005
   },
   "GOLD": {
-   "rsi": 52.6,
+   "rsi": 51.9,
    "teknik": 0.127,
-   "fiyat": 4131.36
+   "fiyat": 4120.41
   },
   "N225": {
    "rsi": 34.4,
@@ -33,24 +33,24 @@
    }
   },
   "SILVER": {
-   "rsi": 40.7,
-   "teknik": -0.25,
-   "fiyat": 52.8471
+   "rsi": 39.9,
+   "teknik": -0.321,
+   "fiyat": 52.6136
   },
   "XU100": {
-   "rsi": 42.5,
+   "rsi": 42.1,
    "teknik": -0.176,
-   "fiyat": 11427.92,
+   "fiyat": 11403.43,
    "icerik": {
-    "al": 0.703,
-    "tut": 0.281,
+    "al": 0.704,
+    "tut": 0.28,
     "sat": 0.016,
-    "hedef": 0.499,
+    "hedef": 0.503,
     "hisse": 60,
-    "gorus": 285,
+    "gorus": 286,
     "kapsam": 0.905,
     "kaynak": "BIST 100 üyeleri",
-    "hedefFiyat": 17130.45
+    "hedefFiyat": 17139.36
    }
   },
   "SPX": {
@@ -59,11 +59,11 @@
    "fiyat": 7688.62,
    "icerik": {
     "al": 0.719,
-    "tut": 0.242,
+    "tut": 0.241,
     "sat": 0.04,
     "hedef": 0.222,
-    "hisse": 500,
-    "gorus": 13160,
+    "hisse": 501,
+    "gorus": 13206,
     "kapsam": 1,
     "kaynak": "S&P 500 üyeleri",
     "hedefFiyat": 9395.49
@@ -200,30 +200,30 @@
    }
   },
   "DAX": {
-   "rsi": 66.7,
+   "rsi": 66.5,
    "teknik": 0.558,
-   "fiyat": 26598.75,
+   "fiyat": 26582.03,
    "icerik": {
     "al": 0.62,
     "tut": 0.292,
     "sat": 0.089,
-    "hedef": 0.15,
+    "hedef": 0.151,
     "hisse": 40,
     "gorus": 893,
     "kapsam": 1,
     "kaynak": "DAX üyeleri",
-    "hedefFiyat": 30588.56
+    "hedefFiyat": 30595.92
    }
   },
   "BTCUSD": {
-   "rsi": 49.9,
-   "teknik": 0.267,
-   "fiyat": 80185.36
+   "rsi": 48,
+   "teknik": -0.136,
+   "fiyat": 79627.53
   },
   "XRPUSD": {
-   "rsi": 50.2,
-   "teknik": 0.021,
-   "fiyat": 1.31696
+   "rsi": 48.8,
+   "teknik": -0.045,
+   "fiyat": 1.30844
   }
  }
 }
