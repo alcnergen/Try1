@@ -1,20 +1,20 @@
 {
- "guncelleme": "2026-11-06T13:35:46.701Z",
+ "guncelleme": "2026-11-06T13:45:56.990Z",
  "varliklar": {
   "USDTRY": {
-   "rsi": 90.7,
+   "rsi": 90.8,
    "teknik": 0.646,
-   "fiyat": 50.15264
+   "fiyat": 50.15747
   },
   "EURTRY": {
-   "rsi": 55.7,
+   "rsi": 54.7,
    "teknik": 0.347,
-   "fiyat": 55.97347
+   "fiyat": 55.93595
   },
   "GOLD": {
-   "rsi": 46.6,
+   "rsi": 46.7,
    "teknik": -0.367,
-   "fiyat": 4046.477
+   "fiyat": 4047.09
   },
   "N225": {
    "rsi": 25.9,
@@ -33,41 +33,30 @@
    }
   },
   "SILVER": {
-   "rsi": 37.9,
+   "rsi": 38.2,
    "teknik": -0.393,
-   "fiyat": 51.8621
+   "fiyat": 51.9249
   },
   "XU100": {
-   "rsi": 43.3,
-   "teknik": -0.221,
-   "fiyat": 11434.06,
+   "rsi": 43.2,
+   "teknik": -0.288,
+   "fiyat": 11428.99,
    "icerik": {
     "al": 0.704,
     "tut": 0.28,
     "sat": 0.016,
-    "hedef": 0.498,
+    "hedef": 0.497,
     "hisse": 60,
     "gorus": 286,
     "kapsam": 0.905,
     "kaynak": "BIST 100 üyeleri",
-    "hedefFiyat": 17128.22
+    "hedefFiyat": 17109.2
    }
   },
   "SPX": {
    "rsi": 33.5,
    "teknik": -0.491,
-   "fiyat": 7353.73,
-   "icerik": {
-    "al": 0.716,
-    "tut": 0.244,
-    "sat": 0.04,
-    "hedef": 0.276,
-    "hisse": 501,
-    "gorus": 13207,
-    "kapsam": 1,
-    "kaynak": "S&P 500 üyeleri",
-    "hedefFiyat": 9383.36
-   }
+   "fiyat": 7353.73
   },
   "NDX": {
    "rsi": 27,
@@ -200,30 +189,30 @@
    }
   },
   "DAX": {
-   "rsi": 50.8,
-   "teknik": 0.2,
-   "fiyat": 25717.3,
+   "rsi": 51.3,
+   "teknik": 0.267,
+   "fiyat": 25739.21,
    "icerik": {
     "al": 0.62,
     "tut": 0.292,
     "sat": 0.089,
-    "hedef": 0.189,
+    "hedef": 0.188,
     "hisse": 40,
     "gorus": 893,
     "kapsam": 1,
     "kaynak": "DAX üyeleri",
-    "hedefFiyat": 30577.87
+    "hedefFiyat": 30578.18
    }
   },
   "BTCUSD": {
-   "rsi": 38.1,
+   "rsi": 38.2,
    "teknik": -0.536,
-   "fiyat": 75721.79
+   "fiyat": 75769.22
   },
   "XRPUSD": {
-   "rsi": 33.6,
+   "rsi": 33.5,
    "teknik": -0.603,
-   "fiyat": 1.18294
+   "fiyat": 1.1826
   }
  }
 }
