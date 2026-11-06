@@ -32,19 +32,40 @@ jobs:
       - name: Fiyatları çek
         run: node portfoy/scripts/veri-cek.mjs
       - name: Değişiklikleri kaydet
+        id: kaydet
         run: |
           git config user.name "portfoy-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add portfoy/data
-          if git diff --cached --quiet; then echo "Yeni veri yok"; exit 0; fi
+          if git diff --cached --quiet; then echo "Yeni veri yok"; [ "$GITHUB_EVENT_NAME" = push ] && echo "yeni=1" >> "$GITHUB_OUTPUT" || echo "yeni=0" >> "$GITHUB_OUTPUT"; exit 0; fi
+          echo "yeni=1" >> "$GITHUB_OUTPUT"
           git commit -m "Portföy verisi: $(date -u +%Y-%m-%d)"
           for i in 1 2 3; do git pull --rebase origin master && git push origin HEAD:master && break; sleep 5; done
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      # Yayın: yalnızca yeni veri ya da kod varsa. GitHub Pages akşam yoğunluğunda bazen 10 dakikada
+      # bitmiyor; bu durumda bir kez daha denenir, yine olmazsa çalıştırma hata vermez (veri zaten kaydedildi,
+      # bir sonraki çalıştırma yeniden yayınlar).
+      - if: steps.kaydet.outputs.yeni != '0'
+        uses: actions/configure-pages@v5
+      - if: steps.kaydet.outputs.yeni != '0'
+        uses: actions/upload-pages-artifact@v3
         with:
           path: portfoy
       - id: deployment
+        if: steps.kaydet.outputs.yeni != '0'
+        continue-on-error: true
         uses: actions/deploy-pages@v4
+        with:
+          timeout: 300000
+      - if: steps.deployment.outcome == 'failure'
+        run: sleep 90
+      - id: deployment2
+        if: steps.deployment.outcome == 'failure'
+        continue-on-error: true
+        uses: actions/deploy-pages@v4
+        with:
+          timeout: 300000
+      - if: steps.deployment.outcome == 'failure' && steps.deployment2.outcome == 'failure'
+        run: echo "::warning::GitHub Pages yayını bu sefer olmadı (GitHub tarafında yoğunluk). Veri kaydedildi; sonraki çalıştırma yeniden yayınlayacak."
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
