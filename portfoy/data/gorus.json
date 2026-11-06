@@ -1,41 +1,41 @@
 {
- "guncelleme": "2026-11-06T01:44:01.032Z",
+ "guncelleme": "2026-11-06T07:05:45.346Z",
  "varliklar": {
   "USDTRY": {
-   "rsi": 88.4,
-   "teknik": 0.692,
-   "fiyat": 50.1515
+   "rsi": 89.3,
+   "teknik": 0.51,
+   "fiyat": 50.0526
   },
   "EURTRY": {
-   "rsi": 64.9,
-   "teknik": 0.393,
-   "fiyat": 56.28111
+   "rsi": 59.2,
+   "teknik": 0.347,
+   "fiyat": 56.10286
   },
   "GOLD": {
-   "rsi": 48.2,
-   "teknik": -0.062,
-   "fiyat": 4069.388
+   "rsi": 46.6,
+   "teknik": -0.367,
+   "fiyat": 4045.952
   },
   "N225": {
-   "rsi": 25.7,
+   "rsi": 25.9,
    "teknik": -0.601,
-   "fiyat": 57285.45,
+   "fiyat": 57434.7,
    "icerik": {
     "al": 0.696,
     "tut": 0.273,
     "sat": 0.031,
-    "hedef": 0.432,
+    "hedef": 0.421,
     "hisse": 225,
     "gorus": 2662,
     "kapsam": 1,
     "kaynak": "Nikkei 225 üyeleri (piyasa değeri ağırlıklı)",
-    "hedefFiyat": 82032.76
+    "hedefFiyat": 81614.71
    }
   },
   "SILVER": {
-   "rsi": 37.6,
+   "rsi": 36.8,
    "teknik": -0.393,
-   "fiyat": 51.7851
+   "fiyat": 51.456
   },
   "XU100": {
    "rsi": 41,
@@ -127,12 +127,12 @@
     "al": 0.763,
     "tut": 0.204,
     "sat": 0.033,
-    "hedef": 0.376,
+    "hedef": 0.375,
     "hisse": 39,
     "gorus": 1421,
     "kapsam": 0.919,
     "kaynak": "ABD'nin en büyük 40 yazılım şirketi (IGV'ye yakın)",
-    "hedefFiyat": 136.24
+    "hedefFiyat": 136.14
    }
   },
   "K_DRAM": {
@@ -143,12 +143,12 @@
     "al": 0.923,
     "tut": 0.073,
     "sat": 0.004,
-    "hedef": 1.573,
+    "hedef": 1.552,
     "hisse": 4,
     "gorus": 169,
     "kapsam": 1,
     "kaynak": "fonun ana hisseleri: Micron, Samsung, SK Hynix, Seagate (eşit ağırlık)",
-    "hedefFiyat": 95.23
+    "hedefFiyat": 94.45
    }
   },
   "K_NASA": {
@@ -216,14 +216,14 @@
    }
   },
   "BTCUSD": {
-   "rsi": 38.9,
-   "teknik": -0.491,
-   "fiyat": 76040.27
+   "rsi": 37.3,
+   "teknik": -0.536,
+   "fiyat": 75369.14
   },
   "XRPUSD": {
-   "rsi": 37,
-   "teknik": -0.512,
-   "fiyat": 1.21296
+   "rsi": 33.8,
+   "teknik": -0.603,
+   "fiyat": 1.18633
   }
  }
 }
