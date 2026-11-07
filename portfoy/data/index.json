@@ -1,15 +1,18 @@
 {
- "guncelleme": "2026-11-07T00:50:33.817Z",
+ "guncelleme": "2026-11-07T11:41:21.512Z",
  "seriler": {
   "TGT": {
    "ad": "GARANTİ PORTFÖY KISA VADELİ BORÇLANMA ARAÇLARI FONU",
    "tur": "fon",
    "pb": "TRY",
+   "erken": [
+    "2026-11-09"
+   ],
    "kaynak": "tefas:TGT",
    "ilk": "2021-10-18",
-   "son": "2026-11-06",
-   "deger": 0.128966,
-   "adet": 1272
+   "son": "2026-11-09",
+   "deger": 0.129315,
+   "adet": 1273
   },
   "YFBL1": {
    "ad": "YAPI KREDİ PORTFÖY PARA PİYASASI FONU",
@@ -144,7 +147,7 @@
    "kaynak": "tv:BITSTAMP:BTCUSD",
    "ilk": "2014-10-22",
    "son": "2026-11-07",
-   "deger": 75788.63,
+   "deger": 75929.39,
    "adet": 4397
   },
   "XRPUSD": {
@@ -154,7 +157,7 @@
    "kaynak": "tv:BITSTAMP:XRPUSD",
    "ilk": "2014-09-28",
    "son": "2026-11-07",
-   "deger": 1.178,
+   "deger": 1.17043,
    "adet": 4397
   },
   "SILVER": {
