@@ -1,20 +1,20 @@
 {
- "guncelleme": "2026-11-09T07:55:49.862Z",
+ "guncelleme": "2026-11-09T10:06:04.919Z",
  "varliklar": {
   "USDTRY": {
    "rsi": 91.1,
    "teknik": 0.601,
-   "fiyat": 50.182
+   "fiyat": 50.1815
   },
   "EURTRY": {
-   "rsi": 58.1,
-   "teknik": 0.484,
-   "fiyat": 56.13392
+   "rsi": 59.9,
+   "teknik": 0.555,
+   "fiyat": 56.2448
   },
   "GOLD": {
-   "rsi": 49.7,
-   "teknik": -0.179,
-   "fiyat": 4087.27
+   "rsi": 50.5,
+   "teknik": -0.016,
+   "fiyat": 4098.311
   },
   "N225": {
    "rsi": 32.5,
@@ -33,24 +33,24 @@
    }
   },
   "SILVER": {
-   "rsi": 38.9,
-   "teknik": -0.302,
-   "fiyat": 52.1172
+   "rsi": 40.7,
+   "teknik": -0.159,
+   "fiyat": 52.582
   },
   "XU100": {
-   "rsi": 46.7,
-   "teknik": -0.042,
-   "fiyat": 11587.36,
+   "rsi": 45.4,
+   "teknik": -0.109,
+   "fiyat": 11530.9,
    "icerik": {
     "al": 0.704,
     "tut": 0.28,
     "sat": 0.016,
-    "hedef": 0.479,
+    "hedef": 0.487,
     "hisse": 60,
     "gorus": 286,
     "kapsam": 0.905,
     "kaynak": "BIST 100 üyeleri",
-    "hedefFiyat": 17137.71
+    "hedefFiyat": 17146.45
    }
   },
   "SPX": {
@@ -124,12 +124,12 @@
    "teknik": -0.333,
    "fiyat": 98.88,
    "icerik": {
-    "al": 0.764,
-    "tut": 0.203,
+    "al": 0.768,
+    "tut": 0.199,
     "sat": 0.033,
     "hedef": 0.376,
     "hisse": 39,
-    "gorus": 1421,
+    "gorus": 1432,
     "kapsam": 0.919,
     "kaynak": "ABD'nin en büyük 40 yazılım şirketi (IGV'ye yakın)",
     "hedefFiyat": 136.06
@@ -200,30 +200,30 @@
    }
   },
   "DAX": {
-   "rsi": 52.4,
-   "teknik": 0.267,
-   "fiyat": 25820.36,
+   "rsi": 54.9,
+   "teknik": 0.445,
+   "fiyat": 25986.34,
    "icerik": {
     "al": 0.62,
     "tut": 0.292,
     "sat": 0.089,
-    "hedef": 0.183,
+    "hedef": 0.176,
     "hisse": 40,
     "gorus": 893,
     "kapsam": 1,
     "kaynak": "DAX üyeleri",
-    "hedefFiyat": 30545.49
+    "hedefFiyat": 30559.94
    }
   },
   "BTCUSD": {
-   "rsi": 33.8,
+   "rsi": 34.2,
    "teknik": -0.445,
-   "fiyat": 73872.01
+   "fiyat": 74043.19
   },
   "XRPUSD": {
-   "rsi": 25.7,
+   "rsi": 25.9,
    "teknik": -0.558,
-   "fiyat": 1.08311
+   "fiyat": 1.08584
   }
  }
 }
