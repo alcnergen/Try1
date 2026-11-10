@@ -1,5 +1,5 @@
 {
- "guncelleme": "2026-11-10T13:42:08.862Z",
+ "guncelleme": "2026-11-10T14:07:36.649Z",
  "seriler": {
   "TGT": {
    "ad": "GARANTİ PORTFÖY KISA VADELİ BORÇLANMA ARAÇLARI FONU",
@@ -45,11 +45,11 @@
    "ad": "Euro/TL",
    "tur": "kiyas",
    "pb": "TRY",
-   "kaynak": "tv:FX_IDC:EURTRY",
-   "ilk": "2010-01-27",
-   "son": "2026-11-10",
-   "deger": 56.2026,
-   "adet": 4380
+   "kaynak": "canlidoviz:50",
+   "ilk": "2026-10-01",
+   "son": "2026-11-09",
+   "deger": 56.3917,
+   "adet": 28
   },
   "JPYTRY": {
    "ad": "Yen/TL",
@@ -79,7 +79,7 @@
    "kaynak": "isyatirim:XU100",
    "ilk": "2014-11-13",
    "son": "2026-11-10",
-   "deger": 11719.9,
+   "deger": 11666.65,
    "adet": 3008
   },
   "SPX": {
@@ -220,8 +220,7 @@
    "ilk": "2026-03-31",
    "son": "2026-11-09",
    "deger": 21.11,
-   "adet": 155,
-   "hata": "tv:AMEX:NASA: zaman aşımı"
+   "adet": 155
   },
   "K_QQQM": {
    "ad": "Invesco NASDAQ 100 ETF (QQQM)",
@@ -272,9 +271,8 @@
    "kaynak": "tv:TVC:VIX",
    "ilk": "2009-07-06",
    "son": "2026-11-10",
-   "deger": 20.15,
-   "adet": 4388,
-   "hata": "tv:TVC:VIX: zaman aşımı"
+   "deger": 20.96,
+   "adet": 4388
   },
   "G_DXY": {
    "ad": "Dolar endeksi (DXY)",
@@ -283,9 +281,8 @@
    "kaynak": "tv:TVC:DXY",
    "ilk": "2009-07-20",
    "son": "2026-11-10",
-   "deger": 101.778,
-   "adet": 4388,
-   "hata": "tv:TVC:DXY: zaman aşımı"
+   "deger": 102.033,
+   "adet": 4388
   },
   "G_PETROL": {
    "ad": "Ham petrol (WTI)",
@@ -294,9 +291,8 @@
    "kaynak": "tv:TVC:USOIL",
    "ilk": "2009-06-08",
    "son": "2026-11-10",
-   "deger": 84.77,
-   "adet": 4388,
-   "hata": "tv:TVC:USOIL: zaman aşımı"
+   "deger": 84.45,
+   "adet": 4388
   },
   "G_US10Y": {
    "ad": "ABD 10 yıllık tahvil faizi",
@@ -305,9 +301,8 @@
    "kaynak": "tv:TVC:US10Y",
    "ilk": "2008-09-23",
    "son": "2026-11-10",
-   "deger": 4.897,
-   "adet": 4388,
-   "hata": "tv:TVC:US10Y: zaman aşımı"
+   "deger": 4.958,
+   "adet": 4388
   },
   "G_US02Y": {
    "ad": "ABD 2 yıllık tahvil faizi",
@@ -316,9 +311,8 @@
    "kaynak": "tv:TVC:US02Y",
    "ilk": "2009-05-15",
    "son": "2026-11-10",
-   "deger": 4.628,
-   "adet": 4241,
-   "hata": "tv:TVC:US02Y: zaman aşımı"
+   "deger": 4.696,
+   "adet": 4241
   },
   "G_FED": {
    "ad": "Fed politika faizi",
