@@ -1,5 +1,5 @@
 {
- "guncelleme": "2026-11-10T13:05:22.657Z",
+ "guncelleme": "2026-11-10T13:15:33.147Z",
  "seriler": {
   "TGT": {
    "ad": "GARANTİ PORTFÖY KISA VADELİ BORÇLANMA ARAÇLARI FONU",
@@ -29,38 +29,37 @@
    "ilk": "2022-07-04",
    "son": "2026-11-10",
    "deger": 4.774161,
-   "adet": 1094,
-   "hata": "tefas:YVD → fetch failed"
+   "adet": 1094
   },
   "USDTRY": {
    "ad": "Dolar/TL",
    "tur": "kiyas",
    "pb": "TRY",
-   "kaynak": "tv:FX_IDC:USDTRY",
-   "ilk": "2010-01-22",
-   "son": "2026-11-10",
-   "deger": 50.2212,
-   "adet": 4383
+   "kaynak": "canlidoviz:1",
+   "ilk": "2026-10-01",
+   "son": "2026-11-09",
+   "deger": 50.183,
+   "adet": 28
   },
   "EURTRY": {
    "ad": "Euro/TL",
    "tur": "kiyas",
    "pb": "TRY",
    "kaynak": "canlidoviz:50",
-   "ilk": "2026-10-01",
+   "ilk": "2014-11-13",
    "son": "2026-11-09",
    "deger": 56.3917,
-   "adet": 28
+   "adet": 3756
   },
   "JPYTRY": {
    "ad": "Yen/TL",
    "tur": "kiyas",
    "pb": "TRY",
    "kaynak": "canlidoviz:57",
-   "ilk": "2026-10-01",
+   "ilk": "2018-08-26",
    "son": "2026-11-09",
    "deger": 0.318706,
-   "adet": 34
+   "adet": 2870
   },
   "GOLD": {
    "ad": "Altın (ons, $)",
@@ -70,17 +69,18 @@
    "ilk": "2009-05-27",
    "son": "2026-11-10",
    "deger": 4077.557,
-   "adet": 4397
+   "adet": 4397,
+   "hata": "tv:TVC:GOLD: zaman aşımı"
   },
   "XU100": {
    "ad": "BIST 100",
    "tur": "kiyas",
    "pb": "TRY",
-   "kaynak": "tv:BIST:XU100",
-   "ilk": "2009-05-26",
+   "kaynak": "isyatirim:XU100",
+   "ilk": "2026-10-01",
    "son": "2026-11-10",
-   "deger": 11712.44,
-   "adet": 4383
+   "deger": 11722.5,
+   "adet": 28
   },
   "SPX": {
    "ad": "S&P 500",
@@ -90,7 +90,8 @@
    "ilk": "2016-07-01",
    "son": "2026-11-09",
    "deger": 7549.94,
-   "adet": 2604
+   "adet": 2604,
+   "hata": "tv:SP:SPX: zaman aşımı"
   },
   "NDX": {
    "ad": "Nasdaq 100",
@@ -100,7 +101,8 @@
    "ilk": "2009-05-20",
    "son": "2026-11-09",
    "deger": 27907.6251,
-   "adet": 4396
+   "adet": 4396,
+   "hata": "tv:NASDAQ:NDX: zaman aşımı"
   },
   "DAX": {
    "ad": "DAX",
@@ -110,7 +112,8 @@
    "ilk": "2009-07-21",
    "son": "2026-11-10",
    "deger": 26575.32,
-   "adet": 4397
+   "adet": 4397,
+   "hata": "tv:XETR:DAX: zaman aşımı"
   },
   "N225": {
    "ad": "Nikkei 225",
@@ -120,7 +123,8 @@
    "ilk": "2008-11-12",
    "son": "2026-11-10",
    "deger": 60459.36,
-   "adet": 4396
+   "adet": 4396,
+   "hata": "tv:TVC:NI225: zaman aşımı"
   },
   "MSCIW": {
    "ad": "MSCI Dünya (URTH)",
@@ -130,7 +134,8 @@
    "ilk": "2012-01-12",
    "son": "2026-11-09",
    "deger": 204.82,
-   "adet": 3531
+   "adet": 3531,
+   "hata": "tv:AMEX:URTH: zaman aşımı"
   },
   "BTCUSD": {
    "ad": "Bitcoin ($)",
@@ -140,7 +145,8 @@
    "ilk": "2014-10-22",
    "son": "2026-11-10",
    "deger": 74270.65,
-   "adet": 4400
+   "adet": 4400,
+   "hata": "tv:BITSTAMP:BTCUSD: zaman aşımı"
   },
   "XRPUSD": {
    "ad": "Ripple XRP ($)",
@@ -150,7 +156,8 @@
    "ilk": "2014-09-28",
    "son": "2026-11-10",
    "deger": 1.07968,
-   "adet": 4400
+   "adet": 4400,
+   "hata": "tv:BITSTAMP:XRPUSD: zaman aşımı"
   },
   "SILVER": {
    "ad": "Gümüş (ons, $)",
@@ -160,7 +167,8 @@
    "ilk": "2009-05-29",
    "son": "2026-11-10",
    "deger": 52.3132,
-   "adet": 4394
+   "adet": 4394,
+   "hata": "tv:TVC:SILVER: zaman aşımı"
   },
   "K_SMH": {
    "ad": "VanEck Semiconductor ETF (SMH)",
@@ -170,7 +178,8 @@
    "ilk": "2009-05-22",
    "son": "2026-11-09",
    "deger": 487.41,
-   "adet": 4394
+   "adet": 4394,
+   "hata": "tv:NASDAQ:SMH: zaman aşımı"
   },
   "K_NVDA": {
    "ad": "NVIDIA (NVDA)",
@@ -180,7 +189,8 @@
    "ilk": "2009-05-22",
    "son": "2026-11-09",
    "deger": 178.67,
-   "adet": 4394
+   "adet": 4394,
+   "hata": "tv:NASDAQ:NVDA: zaman aşımı"
   },
   "K_IGV": {
    "ad": "iShares Expanded Tech-Software ETF (IGV)",
@@ -190,7 +200,8 @@
    "ilk": "2009-05-22",
    "son": "2026-11-09",
    "deger": 101.46,
-   "adet": 4394
+   "adet": 4394,
+   "hata": "tv:AMEX:IGV: zaman aşımı"
   },
   "K_DRAM": {
    "ad": "Roundhill Memory ETF (DRAM)",
@@ -200,7 +211,8 @@
    "ilk": "2026-04-06",
    "son": "2026-11-09",
    "deger": 41.78,
-   "adet": 152
+   "adet": 152,
+   "hata": "tv:AMEX:DRAM: zaman aşımı"
   },
   "K_NASA": {
    "ad": "Tema Space Innovators ETF (NASA)",
@@ -210,7 +222,8 @@
    "ilk": "2026-03-31",
    "son": "2026-11-09",
    "deger": 21.11,
-   "adet": 155
+   "adet": 155,
+   "hata": "tv:AMEX:NASA: zaman aşımı"
   },
   "K_QQQM": {
    "ad": "Invesco NASDAQ 100 ETF (QQQM)",
@@ -220,7 +233,8 @@
    "ilk": "2020-10-13",
    "son": "2026-11-09",
    "deger": 279.52,
-   "adet": 1526
+   "adet": 1526,
+   "hata": "tv:NASDAQ:QQQM: zaman aşımı"
   },
   "K_CIBR": {
    "ad": "First Trust NASDAQ Cybersecurity ETF (CIBR)",
@@ -230,7 +244,8 @@
    "ilk": "2015-07-07",
    "son": "2026-11-09",
    "deger": 94.68,
-   "adet": 2854
+   "adet": 2854,
+   "hata": "tv:NASDAQ:CIBR: zaman aşımı"
   },
   "TUFE": {
    "ad": "TÜFE (aylık endeks)",
@@ -262,7 +277,8 @@
    "ilk": "2009-07-06",
    "son": "2026-11-10",
    "deger": 20.15,
-   "adet": 4388
+   "adet": 4388,
+   "hata": "tv:TVC:VIX: zaman aşımı"
   },
   "G_DXY": {
    "ad": "Dolar endeksi (DXY)",
@@ -272,7 +288,8 @@
    "ilk": "2009-07-20",
    "son": "2026-11-10",
    "deger": 101.778,
-   "adet": 4388
+   "adet": 4388,
+   "hata": "tv:TVC:DXY: zaman aşımı"
   },
   "G_PETROL": {
    "ad": "Ham petrol (WTI)",
@@ -282,7 +299,8 @@
    "ilk": "2009-06-08",
    "son": "2026-11-10",
    "deger": 84.77,
-   "adet": 4388
+   "adet": 4388,
+   "hata": "tv:TVC:USOIL: zaman aşımı"
   },
   "G_US10Y": {
    "ad": "ABD 10 yıllık tahvil faizi",
@@ -292,7 +310,8 @@
    "ilk": "2008-09-23",
    "son": "2026-11-10",
    "deger": 4.897,
-   "adet": 4388
+   "adet": 4388,
+   "hata": "tv:TVC:US10Y: zaman aşımı"
   },
   "G_US02Y": {
    "ad": "ABD 2 yıllık tahvil faizi",
@@ -302,7 +321,8 @@
    "ilk": "2009-05-15",
    "son": "2026-11-10",
    "deger": 4.628,
-   "adet": 4241
+   "adet": 4241,
+   "hata": "tv:TVC:US02Y: zaman aşımı"
   },
   "G_FED": {
    "ad": "Fed politika faizi",
@@ -312,7 +332,8 @@
    "ilk": "2013-10-01",
    "son": "2026-10-01",
    "deger": 4,
-   "adet": 156
+   "adet": 156,
+   "hata": "tv:ECONOMICS:USINTR: zaman aşımı"
   },
   "G_USTUFE": {
    "ad": "ABD yıllık enflasyon",
@@ -322,7 +343,8 @@
    "ilk": "2013-09-01",
    "son": "2026-09-01",
    "deger": 3.7,
-   "adet": 156
+   "adet": 156,
+   "hata": "tv:ECONOMICS:USIRYY: zaman aşımı"
   },
   "G_TCMB": {
    "ad": "TCMB politika faizi",
