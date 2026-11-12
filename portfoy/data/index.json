@@ -1,5 +1,5 @@
 {
- "guncelleme": "2026-11-12T07:35:18.468Z",
+ "guncelleme": "2026-11-12T07:45:25.898Z",
  "seriler": {
   "TGT": {
    "ad": "GARANTİ PORTFÖY KISA VADELİ BORÇLANMA ARAÇLARI FONU",
@@ -9,8 +9,7 @@
    "ilk": "2021-10-18",
    "son": "2026-11-12",
    "deger": 0.129678,
-   "adet": 1276,
-   "hata": "tefas:TGT → fetch failed"
+   "adet": 1276
   },
   "YFBL1": {
    "ad": "YAPI KREDİ PORTFÖY PARA PİYASASI FONU",
@@ -20,8 +19,7 @@
    "ilk": "2021-10-18",
    "son": "2026-11-12",
    "deger": 1.971568,
-   "adet": 1276,
-   "hata": "tefas:YLB → fetch failed"
+   "adet": 1276
   },
   "YFBL7": {
    "ad": "YAPI KREDİ PORTFÖY İKİNCİ PARA PİYASASI (TL) FONU",
@@ -40,7 +38,7 @@
    "kaynak": "tv:FX_IDC:USDTRY",
    "ilk": "2010-01-27",
    "son": "2026-11-12",
-   "deger": 50.254,
+   "deger": 50.25637,
    "adet": 4382
   },
   "EURTRY": {
@@ -50,7 +48,7 @@
    "kaynak": "tv:FX_IDC:EURTRY",
    "ilk": "2010-01-27",
    "son": "2026-11-12",
-   "deger": 55.79441,
+   "deger": 55.80959,
    "adet": 4382
   },
   "JPYTRY": {
@@ -60,7 +58,7 @@
    "kaynak": "tv:FX_IDC:JPYTRY",
    "ilk": "2010-01-25",
    "son": "2026-11-12",
-   "deger": 0.314284,
+   "deger": 0.314474,
    "adet": 4382
   },
   "GOLD": {
@@ -70,7 +68,7 @@
    "kaynak": "tv:TVC:GOLD",
    "ilk": "2009-05-27",
    "son": "2026-11-12",
-   "deger": 3958.27,
+   "deger": 3956.792,
    "adet": 4399
   },
   "XU100": {
@@ -80,7 +78,7 @@
    "kaynak": "tv:BIST:XU100",
    "ilk": "2009-05-29",
    "son": "2026-11-12",
-   "deger": 11789.69,
+   "deger": 11842.54,
    "adet": 4382
   },
   "SPX": {
@@ -140,7 +138,7 @@
    "kaynak": "tv:BITSTAMP:BTCUSD",
    "ilk": "2014-10-22",
    "son": "2026-11-12",
-   "deger": 73507.57,
+   "deger": 73474.69,
    "adet": 4402
   },
   "XRPUSD": {
@@ -150,7 +148,7 @@
    "kaynak": "tv:BITSTAMP:XRPUSD",
    "ilk": "2014-09-28",
    "son": "2026-11-12",
-   "deger": 1.04403,
+   "deger": 1.04181,
    "adet": 4402
   },
   "SILVER": {
@@ -160,7 +158,7 @@
    "kaynak": "tv:TVC:SILVER",
    "ilk": "2009-05-29",
    "son": "2026-11-12",
-   "deger": 51.222,
+   "deger": 51.2301,
    "adet": 4396
   },
   "K_SMH": {
@@ -270,7 +268,7 @@
    "kaynak": "tv:TVC:DXY",
    "ilk": "2009-07-20",
    "son": "2026-11-12",
-   "deger": 102.996,
+   "deger": 102.968,
    "adet": 4390
   },
   "G_PETROL": {
@@ -280,7 +278,7 @@
    "kaynak": "tv:TVC:USOIL",
    "ilk": "2009-06-08",
    "son": "2026-11-12",
-   "deger": 86.81,
+   "deger": 86.78,
    "adet": 4390
   },
   "G_US10Y": {
@@ -290,7 +288,7 @@
    "kaynak": "tv:TVC:US10Y",
    "ilk": "2008-09-23",
    "son": "2026-11-12",
-   "deger": 5.004,
+   "deger": 5,
    "adet": 4389
   },
   "G_US02Y": {
@@ -300,7 +298,7 @@
    "kaynak": "tv:TVC:US02Y",
    "ilk": "2009-05-15",
    "son": "2026-11-12",
-   "deger": 4.78,
+   "deger": 4.774,
    "adet": 4242
   },
   "G_FED": {
