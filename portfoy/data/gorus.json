@@ -1,20 +1,20 @@
 {
- "guncelleme": "2026-11-13T20:35:47.985Z",
+ "guncelleme": "2026-11-13T20:45:52.164Z",
  "varliklar": {
   "USDTRY": {
    "rsi": 81.1,
    "teknik": 0.51,
-   "fiyat": 50.3627
+   "fiyat": 50.3615
   },
   "EURTRY": {
-   "rsi": 44.8,
+   "rsi": 45.2,
    "teknik": -0.269,
-   "fiyat": 55.51619
+   "fiyat": 55.54121
   },
   "GOLD": {
-   "rsi": 37,
+   "rsi": 36.9,
    "teknik": -0.51,
-   "fiyat": 3876.329
+   "fiyat": 3874.23
   },
   "N225": {
    "rsi": 43,
@@ -33,9 +33,9 @@
    }
   },
   "SILVER": {
-   "rsi": 33,
+   "rsi": 32.9,
    "teknik": -0.464,
-   "fiyat": 48.864
+   "fiyat": 48.8045
   },
   "XU100": {
    "rsi": 52.2,
@@ -54,144 +54,144 @@
    }
   },
   "SPX": {
-   "rsi": 46.4,
+   "rsi": 46.2,
    "teknik": -0.312,
-   "fiyat": 7552.51,
+   "fiyat": 7548.42,
    "icerik": {
     "al": 0.707,
     "tut": 0.254,
     "sat": 0.039,
-    "hedef": 0.226,
+    "hedef": 0.227,
     "hisse": 502,
     "gorus": 12958,
     "kapsam": 1,
     "kaynak": "S&P 500 üyeleri",
-    "hedefFiyat": 9259.38
+    "hedefFiyat": 9261.91
    }
   },
   "NDX": {
-   "rsi": 42.5,
+   "rsi": 42.4,
    "teknik": -0.445,
-   "fiyat": 27917.5282,
+   "fiyat": 27907.9735,
    "icerik": {
     "al": 0.774,
     "tut": 0.196,
     "sat": 0.03,
-    "hedef": 0.324,
+    "hedef": 0.325,
     "hisse": 98,
     "gorus": 3448,
     "kapsam": 1,
     "kaynak": "Nasdaq 100 üyeleri",
-    "hedefFiyat": 36962.81
+    "hedefFiyat": 36978.06
    }
   },
   "MSCIW": {
-   "rsi": 47.2,
+   "rsi": 47,
    "teknik": -0.221,
-   "fiyat": 204.39
+   "fiyat": 204.3
   },
   "K_SMH": {
-   "rsi": 39.9,
+   "rsi": 39.8,
    "teknik": -0.512,
-   "fiyat": 485.88,
+   "fiyat": 485.49,
    "icerik": {
     "al": 0.822,
     "tut": 0.169,
     "sat": 0.009,
-    "hedef": 0.589,
+    "hedef": 0.59,
     "hisse": 27,
     "gorus": 869,
     "kapsam": 1,
     "kaynak": "SOX yarı iletken endeksi üyeleri (SMH'ye yakın)",
-    "hedefFiyat": 772.06
+    "hedefFiyat": 771.93
    }
   },
   "K_NVDA": {
-   "rsi": 24.8,
+   "rsi": 24.7,
    "teknik": -0.355,
-   "fiyat": 162.5801,
+   "fiyat": 162.3,
    "analist": {
     "al": 57,
     "tut": 15,
     "sat": 1,
     "toplam": 73,
-    "hedef": 0.77,
+    "hedef": 0.773,
     "hedefFiyat": 287.71351
    }
   },
   "K_IGV": {
-   "rsi": 42.3,
+   "rsi": 42.1,
    "teknik": -0.267,
-   "fiyat": 101.41,
+   "fiyat": 101.34,
    "icerik": {
     "al": 0.779,
-    "tut": 0.187,
+    "tut": 0.188,
     "sat": 0.033,
-    "hedef": 0.363,
+    "hedef": 0.364,
     "hisse": 39,
     "gorus": 1400,
     "kapsam": 0.919,
     "kaynak": "ABD'nin en büyük 40 yazılım şirketi (IGV'ye yakın)",
-    "hedefFiyat": 138.22
+    "hedefFiyat": 138.23
    }
   },
   "K_DRAM": {
-   "rsi": 41.3,
+   "rsi": 41.2,
    "teknik": -0.462,
-   "fiyat": 42.29,
+   "fiyat": 42.21,
    "icerik": {
     "al": 0.934,
     "tut": 0.066,
     "sat": 0,
-    "hedef": 1.263,
+    "hedef": 1.264,
     "hisse": 4,
     "gorus": 165,
     "kapsam": 1,
     "kaynak": "fonun ana hisseleri: Micron, Samsung, SK Hynix, Seagate (eşit ağırlık)",
-    "hedefFiyat": 95.7
+    "hedefFiyat": 95.56
    }
   },
   "K_NASA": {
-   "rsi": 48.1,
+   "rsi": 47.8,
    "teknik": -0.154,
-   "fiyat": 20.95,
+   "fiyat": 20.89,
    "icerik": {
     "al": 0.818,
     "tut": 0.158,
     "sat": 0.024,
-    "hedef": 0.69,
+    "hedef": 0.696,
     "hisse": 22,
     "gorus": 279,
     "kapsam": 0.577,
     "kaynak": "fonun günlük içerik listesi",
-    "hedefFiyat": 35.41
+    "hedefFiyat": 35.43
    }
   },
   "K_QQQM": {
-   "rsi": 42.5,
+   "rsi": 42.4,
    "teknik": -0.445,
-   "fiyat": 279.789,
+   "fiyat": 279.55,
    "icerik": {
     "al": 0.774,
     "tut": 0.196,
     "sat": 0.03,
-    "hedef": 0.324,
+    "hedef": 0.325,
     "hisse": 98,
     "gorus": 3448,
     "kapsam": 1,
     "kaynak": "Nasdaq 100 üyeleri",
-    "hedefFiyat": 370.44
+    "hedefFiyat": 370.4
    }
   },
   "K_CIBR": {
-   "rsi": 41.5,
-   "teknik": -0.312,
-   "fiyat": 95.2,
+   "rsi": 41.2,
+   "teknik": -0.379,
+   "fiyat": 95.04,
    "icerik": {
     "al": 0.648,
     "tut": 0.324,
     "sat": 0.027,
-    "hedef": 0.224,
+    "hedef": 0.226,
     "hisse": 8,
     "gorus": 373,
     "kapsam": 1,
@@ -218,12 +218,12 @@
   "BTCUSD": {
    "rsi": 25.6,
    "teknik": -0.558,
-   "fiyat": 68860.96
+   "fiyat": 68879.67
   },
   "XRPUSD": {
    "rsi": 21.8,
    "teknik": -0.4,
-   "fiyat": 1.02462
+   "fiyat": 1.0232
   }
  }
 }
