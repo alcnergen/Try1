@@ -1,5 +1,5 @@
 {
- "guncelleme": "2026-11-13T16:55:19.668Z",
+ "guncelleme": "2026-11-13T17:05:21.814Z",
  "seriler": {
   "TGT": {
    "ad": "GARANTİ PORTFÖY KISA VADELİ BORÇLANMA ARAÇLARI FONU",
@@ -44,7 +44,7 @@
    "kaynak": "tv:FX_IDC:USDTRY",
    "ilk": "2010-01-29",
    "son": "2026-11-13",
-   "deger": 50.3611,
+   "deger": 50.365,
    "adet": 4381
   },
   "EURTRY": {
@@ -54,7 +54,7 @@
    "kaynak": "tv:FX_IDC:EURTRY",
    "ilk": "2010-02-01",
    "son": "2026-11-13",
-   "deger": 55.58571,
+   "deger": 55.60768,
    "adet": 4380
   },
   "JPYTRY": {
@@ -64,7 +64,7 @@
    "kaynak": "tv:FX_IDC:JPYTRY",
    "ilk": "2010-01-27",
    "son": "2026-11-13",
-   "deger": 0.314809,
+   "deger": 0.314912,
    "adet": 4381
   },
   "GOLD": {
@@ -74,7 +74,7 @@
    "kaynak": "tv:TVC:GOLD",
    "ilk": "2009-05-27",
    "son": "2026-11-13",
-   "deger": 3878.54,
+   "deger": 3881.705,
    "adet": 4400
   },
   "XU100": {
@@ -94,7 +94,7 @@
    "kaynak": "tv:SP:SPX",
    "ilk": "2016-07-01",
    "son": "2026-11-13",
-   "deger": 7516.73,
+   "deger": 7518.96,
    "adet": 2608
   },
   "NDX": {
@@ -104,7 +104,7 @@
    "kaynak": "tv:NASDAQ:NDX",
    "ilk": "2009-05-20",
    "son": "2026-11-13",
-   "deger": 27715.2378,
+   "deger": 27700.5457,
    "adet": 4400
   },
   "DAX": {
@@ -134,7 +134,7 @@
    "kaynak": "tv:AMEX:URTH",
    "ilk": "2012-01-12",
    "son": "2026-11-13",
-   "deger": 203.41,
+   "deger": 203.59,
    "adet": 3535
   },
   "BTCUSD": {
@@ -144,7 +144,7 @@
    "kaynak": "tv:BITSTAMP:BTCUSD",
    "ilk": "2014-10-22",
    "son": "2026-11-13",
-   "deger": 68573.33,
+   "deger": 68702.98,
    "adet": 4403
   },
   "XRPUSD": {
@@ -154,7 +154,7 @@
    "kaynak": "tv:BITSTAMP:XRPUSD",
    "ilk": "2014-09-28",
    "son": "2026-11-13",
-   "deger": 1.01598,
+   "deger": 1.01808,
    "adet": 4403
   },
   "SILVER": {
@@ -164,7 +164,7 @@
    "kaynak": "tv:TVC:SILVER",
    "ilk": "2009-05-29",
    "son": "2026-11-13",
-   "deger": 48.9432,
+   "deger": 49.0762,
    "adet": 4397
   },
   "K_SMH": {
@@ -174,7 +174,7 @@
    "kaynak": "tv:NASDAQ:SMH",
    "ilk": "2009-05-22",
    "son": "2026-11-13",
-   "deger": 479.02,
+   "deger": 481.73,
    "adet": 4398
   },
   "K_NVDA": {
@@ -184,7 +184,7 @@
    "kaynak": "tv:NASDAQ:NVDA",
    "ilk": "2009-05-22",
    "son": "2026-11-13",
-   "deger": 159.97,
+   "deger": 160.91,
    "adet": 4398
   },
   "K_IGV": {
@@ -194,7 +194,7 @@
    "kaynak": "tv:AMEX:IGV",
    "ilk": "2009-05-22",
    "son": "2026-11-13",
-   "deger": 100.48,
+   "deger": 100.8,
    "adet": 4398
   },
   "K_DRAM": {
@@ -204,7 +204,7 @@
    "kaynak": "tv:AMEX:DRAM",
    "ilk": "2026-04-06",
    "son": "2026-11-13",
-   "deger": 41.4,
+   "deger": 41.64,
    "adet": 156
   },
   "K_NASA": {
@@ -214,7 +214,7 @@
    "kaynak": "tv:AMEX:NASA",
    "ilk": "2026-03-31",
    "son": "2026-11-13",
-   "deger": 20.57,
+   "deger": 20.64,
    "adet": 159
   },
   "K_QQQM": {
@@ -224,7 +224,7 @@
    "kaynak": "tv:NASDAQ:QQQM",
    "ilk": "2020-10-13",
    "son": "2026-11-13",
-   "deger": 277.86,
+   "deger": 278.73,
    "adet": 1530
   },
   "K_CIBR": {
@@ -234,7 +234,7 @@
    "kaynak": "tv:NASDAQ:CIBR",
    "ilk": "2015-07-07",
    "son": "2026-11-13",
-   "deger": 94.28,
+   "deger": 94.71,
    "adet": 2858
   },
   "TUFE": {
@@ -264,9 +264,8 @@
    "kaynak": "tv:TVC:VIX",
    "ilk": "2009-07-06",
    "son": "2026-11-13",
-   "deger": 20.38,
-   "adet": 4391,
-   "hata": "tv:TVC:VIX: veri yok"
+   "deger": 19.87,
+   "adet": 4391
   },
   "G_DXY": {
    "ad": "Dolar endeksi (DXY)",
@@ -275,9 +274,8 @@
    "kaynak": "tv:TVC:DXY",
    "ilk": "2009-07-20",
    "son": "2026-11-13",
-   "deger": 103.353,
-   "adet": 4391,
-   "hata": "tv:TVC:DXY: veri yok"
+   "deger": 103.348,
+   "adet": 4391
   },
   "G_PETROL": {
    "ad": "Ham petrol (WTI)",
@@ -286,9 +284,8 @@
    "kaynak": "tv:TVC:USOIL",
    "ilk": "2009-06-08",
    "son": "2026-11-13",
-   "deger": 88.65,
-   "adet": 4391,
-   "hata": "tv:TVC:USOIL: veri yok"
+   "deger": 88.52,
+   "adet": 4391
   },
   "G_US10Y": {
    "ad": "ABD 10 yıllık tahvil faizi",
@@ -297,9 +294,8 @@
    "kaynak": "tv:TVC:US10Y",
    "ilk": "2008-09-23",
    "son": "2026-11-13",
-   "deger": 5.131,
-   "adet": 4390,
-   "hata": "tv:TVC:US10Y: veri yok"
+   "deger": 5.137,
+   "adet": 4390
   },
   "G_US02Y": {
    "ad": "ABD 2 yıllık tahvil faizi",
@@ -308,9 +304,8 @@
    "kaynak": "tv:TVC:US02Y",
    "ilk": "2009-05-15",
    "son": "2026-11-13",
-   "deger": 4.848,
-   "adet": 4243,
-   "hata": "tv:TVC:US02Y: veri yok"
+   "deger": 4.855,
+   "adet": 4243
   },
   "G_FED": {
    "ad": "Fed politika faizi",
@@ -320,8 +315,7 @@
    "ilk": "2013-10-01",
    "son": "2026-10-01",
    "deger": 4,
-   "adet": 156,
-   "hata": "tv:ECONOMICS:USINTR: veri yok"
+   "adet": 156
   },
   "G_USTUFE": {
    "ad": "ABD yıllık enflasyon",
@@ -331,8 +325,7 @@
    "ilk": "2013-09-01",
    "son": "2026-09-01",
    "deger": 3.7,
-   "adet": 156,
-   "hata": "tv:ECONOMICS:USIRYY: veri yok"
+   "adet": 156
   },
   "G_TCMB": {
    "ad": "TCMB politika faizi",
@@ -342,8 +335,7 @@
    "ilk": "2013-09-01",
    "son": "2026-10-01",
    "deger": 36,
-   "adet": 156,
-   "hata": "tv:ECONOMICS:TRINTR: veri yok"
+   "adet": 156
   }
  }
 }
