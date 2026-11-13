@@ -1,5 +1,5 @@
 {
- "guncelleme": "2026-11-12T21:48:18.304Z",
+ "guncelleme": "2026-11-13T02:32:05.730Z",
  "seriler": {
   "TGT": {
    "ad": "GARANTİ PORTFÖY KISA VADELİ BORÇLANMA ARAÇLARI FONU",
@@ -46,9 +46,9 @@
    "pb": "TRY",
    "kaynak": "tv:FX_IDC:USDTRY",
    "ilk": "2010-01-29",
-   "son": "2026-11-12",
-   "deger": 50.2526,
-   "adet": 4380
+   "son": "2026-11-13",
+   "deger": 50.3561,
+   "adet": 4381
   },
   "EURTRY": {
    "ad": "Euro/TL",
@@ -56,9 +56,9 @@
    "pb": "TRY",
    "kaynak": "tv:FX_IDC:EURTRY",
    "ilk": "2010-01-29",
-   "son": "2026-11-12",
-   "deger": 55.61854,
-   "adet": 4380
+   "son": "2026-11-13",
+   "deger": 55.65485,
+   "adet": 4381
   },
   "JPYTRY": {
    "ad": "Yen/TL",
@@ -66,9 +66,9 @@
    "pb": "TRY",
    "kaynak": "tv:FX_IDC:JPYTRY",
    "ilk": "2010-01-27",
-   "son": "2026-11-12",
-   "deger": 0.314344,
-   "adet": 4380
+   "son": "2026-11-13",
+   "deger": 0.314907,
+   "adet": 4381
   },
   "GOLD": {
    "ad": "Altın (ons, $)",
@@ -76,9 +76,9 @@
    "pb": "TRY",
    "kaynak": "tv:TVC:GOLD",
    "ilk": "2009-05-27",
-   "son": "2026-11-12",
-   "deger": 3876.865,
-   "adet": 4399
+   "son": "2026-11-13",
+   "deger": 3910.26,
+   "adet": 4400
   },
   "XU100": {
    "ad": "BIST 100",
@@ -126,9 +126,9 @@
    "pb": "TRY",
    "kaynak": "tv:TVC:NI225",
    "ilk": "2008-11-12",
-   "son": "2026-11-12",
-   "deger": 60819.14,
-   "adet": 4398
+   "son": "2026-11-13",
+   "deger": 61816.67,
+   "adet": 4399
   },
   "MSCIW": {
    "ad": "MSCI Dünya (URTH)",
@@ -146,9 +146,9 @@
    "pb": "TRY",
    "kaynak": "tv:BITSTAMP:BTCUSD",
    "ilk": "2014-10-22",
-   "son": "2026-11-12",
-   "deger": 71493.94,
-   "adet": 4402
+   "son": "2026-11-13",
+   "deger": 70345.78,
+   "adet": 4403
   },
   "XRPUSD": {
    "ad": "Ripple XRP ($)",
@@ -156,9 +156,9 @@
    "pb": "TRY",
    "kaynak": "tv:BITSTAMP:XRPUSD",
    "ilk": "2014-09-28",
-   "son": "2026-11-12",
-   "deger": 1.03834,
-   "adet": 4402
+   "son": "2026-11-13",
+   "deger": 1.02307,
+   "adet": 4403
   },
   "SILVER": {
    "ad": "Gümüş (ons, $)",
@@ -166,9 +166,9 @@
    "pb": "TRY",
    "kaynak": "tv:TVC:SILVER",
    "ilk": "2009-05-29",
-   "son": "2026-11-12",
-   "deger": 50.006,
-   "adet": 4396
+   "son": "2026-11-13",
+   "deger": 50.5858,
+   "adet": 4397
   },
   "K_SMH": {
    "ad": "VanEck Semiconductor ETF (SMH)",
@@ -276,9 +276,9 @@
    "pb": "TRY",
    "kaynak": "tv:TVC:DXY",
    "ilk": "2009-07-20",
-   "son": "2026-11-12",
-   "deger": 103.183,
-   "adet": 4390
+   "son": "2026-11-13",
+   "deger": 103.168,
+   "adet": 4391
   },
   "G_PETROL": {
    "ad": "Ham petrol (WTI)",
@@ -286,9 +286,9 @@
    "pb": "TRY",
    "kaynak": "tv:TVC:USOIL",
    "ilk": "2009-06-08",
-   "son": "2026-11-12",
-   "deger": 88.73,
-   "adet": 4390
+   "son": "2026-11-13",
+   "deger": 88.51,
+   "adet": 4391
   },
   "G_US10Y": {
    "ad": "ABD 10 yıllık tahvil faizi",
@@ -296,9 +296,9 @@
    "pb": "TRY",
    "kaynak": "tv:TVC:US10Y",
    "ilk": "2008-09-23",
-   "son": "2026-11-12",
-   "deger": 5.133,
-   "adet": 4389
+   "son": "2026-11-13",
+   "deger": 5.129,
+   "adet": 4390
   },
   "G_US02Y": {
    "ad": "ABD 2 yıllık tahvil faizi",
@@ -306,9 +306,9 @@
    "pb": "TRY",
    "kaynak": "tv:TVC:US02Y",
    "ilk": "2009-05-15",
-   "son": "2026-11-12",
-   "deger": 4.886,
-   "adet": 4242
+   "son": "2026-11-13",
+   "deger": 4.867,
+   "adet": 4243
   },
   "G_FED": {
    "ad": "Fed politika faizi",
