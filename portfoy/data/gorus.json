@@ -1,20 +1,20 @@
 {
- "guncelleme": "2026-11-13T19:45:56.898Z",
+ "guncelleme": "2026-11-13T19:55:46.850Z",
  "varliklar": {
   "USDTRY": {
    "rsi": 81.1,
    "teknik": 0.51,
-   "fiyat": 50.3623
+   "fiyat": 50.3616
   },
   "EURTRY": {
-   "rsi": 45.2,
+   "rsi": 45,
    "teknik": -0.269,
-   "fiyat": 55.53863
+   "fiyat": 55.5262
   },
   "GOLD": {
-   "rsi": 36.9,
+   "rsi": 36.8,
    "teknik": -0.51,
-   "fiyat": 3874.86
+   "fiyat": 3873.19
   },
   "N225": {
    "rsi": 43,
@@ -33,9 +33,9 @@
    }
   },
   "SILVER": {
-   "rsi": 33.1,
+   "rsi": 32.9,
    "teknik": -0.464,
-   "fiyat": 48.904
+   "fiyat": 48.812
   },
   "XU100": {
    "rsi": 52.2,
@@ -54,9 +54,9 @@
    }
   },
   "SPX": {
-   "rsi": 46.3,
+   "rsi": 46.2,
    "teknik": -0.312,
-   "fiyat": 7551.12,
+   "fiyat": 7549.1,
    "icerik": {
     "al": 0.707,
     "tut": 0.254,
@@ -66,13 +66,13 @@
     "gorus": 12958,
     "kapsam": 1,
     "kaynak": "S&P 500 üyeleri",
-    "hedefFiyat": 9257.67
+    "hedefFiyat": 9255.2
    }
   },
   "NDX": {
    "rsi": 42.6,
    "teknik": -0.445,
-   "fiyat": 27936.0447,
+   "fiyat": 27929.8607,
    "icerik": {
     "al": 0.774,
     "tut": 0.196,
@@ -82,18 +82,18 @@
     "gorus": 3448,
     "kapsam": 1,
     "kaynak": "Nasdaq 100 üyeleri",
-    "hedefFiyat": 36987.32
+    "hedefFiyat": 36979.14
    }
   },
   "MSCIW": {
-   "rsi": 47.2,
+   "rsi": 47,
    "teknik": -0.221,
-   "fiyat": 204.39
+   "fiyat": 204.28
   },
   "K_SMH": {
-   "rsi": 40,
+   "rsi": 39.9,
    "teknik": -0.512,
-   "fiyat": 486.06,
+   "fiyat": 485.68,
    "icerik": {
     "al": 0.822,
     "tut": 0.169,
@@ -103,42 +103,42 @@
     "gorus": 869,
     "kapsam": 1,
     "kaynak": "SOX yarı iletken endeksi üyeleri (SMH'ye yakın)",
-    "hedefFiyat": 772.35
+    "hedefFiyat": 771.75
    }
   },
   "K_NVDA": {
    "rsi": 24.7,
    "teknik": -0.355,
-   "fiyat": 162.263,
+   "fiyat": 162.46,
    "analist": {
     "al": 57,
     "tut": 15,
     "sat": 1,
     "toplam": 73,
-    "hedef": 0.773,
+    "hedef": 0.771,
     "hedefFiyat": 287.71351
    }
   },
   "K_IGV": {
    "rsi": 42.3,
    "teknik": -0.267,
-   "fiyat": 101.405,
+   "fiyat": 101.44,
    "icerik": {
     "al": 0.779,
     "tut": 0.187,
     "sat": 0.033,
-    "hedef": 0.363,
+    "hedef": 0.362,
     "hisse": 39,
     "gorus": 1400,
     "kapsam": 0.919,
     "kaynak": "ABD'nin en büyük 40 yazılım şirketi (IGV'ye yakın)",
-    "hedefFiyat": 138.22
+    "hedefFiyat": 138.16
    }
   },
   "K_DRAM": {
    "rsi": 41.2,
    "teknik": -0.462,
-   "fiyat": 42.191,
+   "fiyat": 42.2238,
    "icerik": {
     "al": 0.934,
     "tut": 0.066,
@@ -148,29 +148,29 @@
     "gorus": 165,
     "kapsam": 1,
     "kaynak": "fonun ana hisseleri: Micron, Samsung, SK Hynix, Seagate (eşit ağırlık)",
-    "hedefFiyat": 95.52
+    "hedefFiyat": 95.59
    }
   },
   "K_NASA": {
-   "rsi": 47.7,
+   "rsi": 47.8,
    "teknik": -0.154,
-   "fiyat": 20.86,
+   "fiyat": 20.88,
    "icerik": {
     "al": 0.818,
     "tut": 0.158,
     "sat": 0.024,
-    "hedef": 0.7,
+    "hedef": 0.699,
     "hisse": 22,
     "gorus": 279,
     "kapsam": 0.577,
     "kaynak": "fonun günlük içerik listesi",
-    "hedefFiyat": 35.46
+    "hedefFiyat": 35.48
    }
   },
   "K_QQQM": {
-   "rsi": 42.6,
+   "rsi": 42.5,
    "teknik": -0.445,
-   "fiyat": 279.89,
+   "fiyat": 279.7851,
    "icerik": {
     "al": 0.774,
     "tut": 0.196,
@@ -180,7 +180,7 @@
     "gorus": 3448,
     "kapsam": 1,
     "kaynak": "Nasdaq 100 üyeleri",
-    "hedefFiyat": 370.57
+    "hedefFiyat": 370.44
    }
   },
   "K_CIBR": {
@@ -191,12 +191,12 @@
     "al": 0.648,
     "tut": 0.324,
     "sat": 0.027,
-    "hedef": 0.224,
+    "hedef": 0.223,
     "hisse": 8,
     "gorus": 373,
     "kapsam": 1,
     "kaynak": "ana siber güvenlik hisseleri (eşit ağırlık, yaklaşık)",
-    "hedefFiyat": 116.43
+    "hedefFiyat": 116.33
    }
   },
   "DAX": {
@@ -218,12 +218,12 @@
   "BTCUSD": {
    "rsi": 25.7,
    "teknik": -0.558,
-   "fiyat": 68957.97
+   "fiyat": 68946.96
   },
   "XRPUSD": {
    "rsi": 21.9,
    "teknik": -0.4,
-   "fiyat": 1.0261
+   "fiyat": 1.02571
   }
  }
 }
