@@ -1,5 +1,5 @@
 {
- "guncelleme": "2026-11-14T12:08:14.474Z",
+ "guncelleme": "2026-11-15T12:41:55.311Z",
  "varliklar": {
   "USDTRY": {
    "rsi": 80.6,
@@ -21,12 +21,12 @@
    "teknik": -0.412,
    "fiyat": 61142.13,
    "icerik": {
-    "al": 0.693,
-    "tut": 0.274,
+    "al": 0.694,
+    "tut": 0.273,
     "sat": 0.033,
     "hedef": 0.311,
     "hisse": 225,
-    "gorus": 2616,
+    "gorus": 2607,
     "kapsam": 1,
     "kaynak": "Nikkei 225 üyeleri (piyasa değeri ağırlıklı)",
     "hedefFiyat": 80157.33
@@ -45,12 +45,12 @@
     "al": 0.707,
     "tut": 0.276,
     "sat": 0.017,
-    "hedef": 0.448,
-    "hisse": 61,
-    "gorus": 280,
-    "kapsam": 0.914,
+    "hedef": 0.447,
+    "hisse": 60,
+    "gorus": 275,
+    "kapsam": 0.912,
     "kaynak": "BIST 100 üyeleri",
-    "hedefFiyat": 17148.4
+    "hedefFiyat": 17136.56
    }
   },
   "SPX": {
@@ -63,7 +63,7 @@
     "sat": 0.039,
     "hedef": 0.225,
     "hisse": 502,
-    "gorus": 12913,
+    "gorus": 12912,
     "kapsam": 1,
     "kaynak": "S&P 500 üyeleri",
     "hedefFiyat": 9263.05
@@ -216,14 +216,14 @@
    }
   },
   "BTCUSD": {
-   "rsi": 23.3,
-   "teknik": -0.558,
-   "fiyat": 67178.98
+   "rsi": 24.8,
+   "teknik": -0.218,
+   "fiyat": 65386.16
   },
   "XRPUSD": {
-   "rsi": 20,
-   "teknik": -0.445,
-   "fiyat": 0.99452
+   "rsi": 26.3,
+   "teknik": -0.218,
+   "fiyat": 0.96829
   }
  }
 }
