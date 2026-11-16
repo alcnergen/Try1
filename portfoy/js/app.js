@@ -9,14 +9,14 @@ import {
 import { lineChart, legend } from './chart.js';
 import { allocation, skorEtiket, baremEtiket, yuzdelik, faizSenaryo } from './olcer.js';
 
-export const APP_VERSION = '2026.10.29-c';
+export const APP_VERSION = '2026.11.16';
 
 // ---------- Durum ----------
 let S = store.load();
 let M = { raw: {}, names: {}, index: null, errors: [] };
 let C = null; // hesaplanmış değerler
 let tab = location.hash.match(/^#(ozet|fonlar|kiyas|senaryo|diger)$/)?.[1] || 'ozet';
-const ui = { ozetRange: 'ALL', fundRange: '1Y', cmpRange: '1Y', cmpCcy: null, histAll: false, otherDate: null, otherCcy: 'TRY' };
+const ui = { ozetRange: 'ALL', fundRange: '1Y', cmpRange: '1Y', cmpCcy: null, histAll: false, otherDate: null, otherCcy: 'TRY', senTab: 'dagilim', faizSen: 1 };
 const persist = () => { store.save(S); backup.schedule(() => S, (r) => { updateStatus(); if (r?.conflict) syncFromBackup(); }); };
 
 // ---------- Biçimlendirme ----------
@@ -683,9 +683,23 @@ function holdingShares() {
 }
 // Ölçer kalemleri: anahtar, ad, rakip (geçmiş sınamada neye karşı ölçüldü)
 const OLCER_K = [['abd', 'ABD borsası', 'TL mevduatı'], ['altin', 'Altın', 'TL mevduatı'], ['tl', 'TL fonları', 'dolar']];
+const rerender = () => { const y = scrollY; render(); scrollTo(0, y); };
+const lc = (s) => s.charAt(0).toLocaleLowerCase('tr') + s.slice(1);
+
+// Senaryo sekmesi üç bölümdür; her bölüm önce cevabı düz bir cümleyle verir, ayrıntılar katlanır.
+const SEN_TABS = [['dagilim', 'Dağılım'], ['faiz', 'Faiz'], ['birikim', 'Birikim']];
+function senaryo(root) {
+  if (!C.last) return root.append(h(emptyState()));
+  const t = SEN_TABS.some(([k]) => k === ui.senTab) ? ui.senTab : 'dagilim';
+  root.append(h(`<div class="seg full sen-tabs" role="tablist" aria-label="Senaryo bölümü">${SEN_TABS.map(([k, ad]) => `<button type="button" role="tab" data-st="${k}" aria-selected="${k === t}" class="${k === t ? 'on' : ''}">${ad}</button>`).join('')}</div>`));
+  root.querySelectorAll('[data-st]').forEach((b) => (b.onclick = () => { ui.senTab = b.dataset.st; render(); scrollTo(0, 0); }));
+  ({ dagilim: olcerCard, faiz: faizCard, birikim: birikimCard })[t](root);
+}
+
+// ---------- Dağılım: ölçere göre bugün ne kaydırılabilir ----------
 function olcerCard(root) {
   const O = M.olcer;
-  if (!O?.son) { root.append(h(`<section class="card"><h2>Dağılım ölçeri</h2><p class="muted small">Ölçer verisi henüz yok; bir sonraki veri çekiminde gelir.</p></section>`)); return; }
+  if (!O?.son) { root.append(h(`<section class="card"><h2>Dağılım</h2><p class="muted small">Ölçer verisi henüz yok; bir sonraki veri çekiminde gelir.</p></section>`)); return; }
   const o = O.son, hedef = S.settings.olcerHedef ?? 0.5, T = O.sinama;
   const fb = Object.fromEntries(OLCER_K.map(([k]) => [k, o[k].taban ?? o[k].skor]));
   // barem: bugünün fiyat bazlı puanının geçmiş dağılımındaki yeri (analist görüşü geçmişte olmadığı için hariç)
@@ -694,162 +708,205 @@ function olcerCard(root) {
   const p0 = (x) => `%${num(x * 100, 0)}`;
   const tone = (y) => (y == null ? 'flat' : y >= 0.6 ? 'up' : y <= 0.4 ? 'down' : 'flat');
   const toneS = (sk) => (sk >= 55 ? 'up' : sk <= 45 ? 'down' : 'flat');
-  const g = (k, ad, alt) => {
-    const sk = o[k].skor, dg = T?.dagilim[k], y = yer[k];
-    if (!dg) return `<div class="gauge-tile"><span class="label">${ad}</span><b class="${toneS(sk)}">${sk}</b><span class="g-bar"><i style="width:${sk}%"></i><em style="left:50%"></em></span><span class="small ${toneS(sk)}">${skorEtiket(sk)}</span>${alt ? `<span class="muted small">${alt}</span>` : ''}</div>`;
+  const etiket = (k) => (T ? baremEtiket(fb[k], T.dagilim[k]) : skorEtiket(o[k].skor));
+  const ton = (k) => (T ? tone(yer[k]) : toneS(o[k].skor));
+
+  // 1) Cevap: kaydırılabilecek tutarlar
+  const tol = Math.max(1000, cur.tot * 0.005);
+  const fark = { abd: (al.abd.simdi - cur.abd) * cur.tot, altin: (al.altin.simdi - cur.altin) * cur.tot };
+  const yon = { abd: "ABD ETF'lerine", altin: 'Altına' };
+  const tile = (k) => { const d = fark[k]; return `<div><span class="label">${yon[k]}</span><b class="${d > tol ? 'up' : d < -tol ? 'down' : ''}">${Math.abs(d) < tol ? '—' : signMoney(d, 'TRY', 0)}</b><span class="muted">öneri ${p0(al[k].simdi)} · sende ${p0(cur[k])}</span></div>`; };
+  const ekle = ['abd', 'altin'].filter((k) => fark[k] > tol), fazla = ['abd', 'altin'].filter((k) => fark[k] < -tol);
+  const cevap = ekle.length
+    ? `TL fonlarından ${ekle.map((k) => `<b>${money(fark[k], 'TRY', 0)}</b> ${k === 'abd' ? "ABD ETF'lerine" : 'altına'}`).join(', ')} kaydırılabilir.`
+    : fazla.length ? `${fazla.map((k) => (k === 'abd' ? 'ABD' : 'Altın')).join(' ve ')} payın bugünkü önerinin üstünde; yeni alım için ölçerin yükselmesini bekleyebilirsin.`
+      : 'Dağılımın bugünkü öneriyle uyumlu; değişiklik gerekmiyor.';
+  const neden = OLCER_K.map(([k, ad]) => `${ad} <b class="${ton(k)}">${lc(etiket(k))}</b>`).join(', ');
+  const hizi = T ? (Math.min(yer.abd, yer.altin) <= 0.2 ? 'Ölçerler düşük olduğu için hedefinin şimdilik bir kısmı öneriliyor; yükseldikçe öneri hedefe doğru artar.' : Math.max(yer.abd, yer.altin) >= 0.8 ? 'Ölçerler yüksek; öneri hedefinin tamamına yakın.' : 'Ölçerler yükseldikçe öneri hedefe doğru artar.') : '';
+
+  // 2) Ölçer satırları: puan, geçmişe göre etiket ve geçmiş aralıktaki yeri
+  const olcRow = ([k, ad]) => {
+    const sk = o[k].skor, dg = T?.dagilim[k];
     const at = (v) => `${Math.max(0, Math.min(100, ((v - dg.min) / (dg.max - dg.min || 1)) * 100))}%`;
-    return `<div class="gauge-tile"><span class="label">${ad}</span><b>${sk}</b>
-      <span class="g-range" title="Geçmiş aralık ${dg.min}–${dg.max}"><s style="left:${at(dg.p20)};right:calc(100% - ${at(dg.p80)})"></s><em style="left:${at(dg.p50)}"></em><i class="${tone(y)}" style="left:${at(fb[k])}"></i></span>
-      <span class="g-ends muted"><span>${dg.min}</span><span>${dg.max}</span></span>
-      <span class="small ${tone(y)}">${baremEtiket(fb[k], dg)}</span>
-      <span class="muted small">geçmişteki yeri: %${num(y * 100, 0)}${fb[k] !== sk ? ` · analist hariç ${fb[k]}` : ''}</span></div>`;
+    return `<div class="olc-row"><div class="row between"><span><b>${ad}</b> <span class="small ${ton(k)}">${etiket(k)}</span></span><b class="olc-n">${sk}</b></div>
+      ${dg ? `<span class="g-range"><s style="left:${at(dg.p20)};right:calc(100% - ${at(dg.p80)})"></s><em style="left:${at(dg.p50)}"></em><i class="${ton(k)}" style="left:${at(fb[k])}"></i></span>
+      <span class="g-ends muted"><span>en düşük ${dg.min}</span>${fb[k] !== sk ? `<span>analist hariç ${fb[k]}</span>` : ''}<span>en yüksek ${dg.max}</span></span>`
+        : `<span class="g-bar"><i style="width:${sk}%"></i><em style="left:50%"></em></span>`}</div>`;
   };
-  const row = (ad, k) => { const d = al[k].simdi - cur[k], tl = d * cur.tot; return `<tr><td>${ad}</td><td>${p0(al[k].hedef)}</td><td><b>${p0(al[k].simdi)}</b></td><td>${p0(cur[k])}</td><td class="${Math.abs(tl) < 1 ? '' : tl > 0 ? 'up' : 'down'}">${Math.abs(tl) < 1 ? '—' : (tl > 0 ? '+' : '−') + money(Math.abs(tl), 'TRY', 0)}</td></tr>`; };
-  const facts = (key, ad) => `<details class="fold"><summary><h3>${ad}: neden ${o[key].skor}?</h3></summary><div class="facts">${o[key].faktorler.map((f) => `<div class="fact"><div class="row between"><span>${esc(f.ad)}</span><span class="${f.puan == null ? 'muted' : f.puan > 0.1 ? 'up' : f.puan < -0.1 ? 'down' : 'flat'} small">${f.puan == null ? 'veri yok' : (f.puan > 0 ? '+' : '') + num(f.puan, 2)}</span></div><span class="f-bar"><i style="${f.puan == null ? 'width:0' : f.puan >= 0 ? `left:50%;width:${f.puan * 50}%` : `left:${50 + f.puan * 50}%;width:${-f.puan * 50}%`}" class="${f.puan >= 0 ? 'pos' : 'neg'}"></i></span><span class="muted small">${esc(f.deger)} · ağırlık %${num(f.agirlik * 100, 0)} — ${esc(f.aciklama)}</span></div>`).join('')}</div></details>`;
-  // geçmiş sınama tablosu: ölçerin üçte birlik dilimlerinde sonraki 3 ay
-  const sinama = () => {
-    if (!T) return '';
-    const blok = ([k, ad, rakip]) => {
-      const G = T.getiri[k], [t1, t2] = G.sinir, now = fb[k];
-      const cur = now <= t1 ? 'dusuk' : now < t2 ? 'orta' : 'yuksek';
-      const ad3 = { dusuk: `Alt (≤${num(t1, 0)})`, orta: 'Orta', yuksek: `Üst (≥${num(t2, 0)})` };
-      const own = k === 'tl' ? 'TL fonları' : k === 'abd' ? "ABD ETF'leri" : 'Altın';
-      const r = (b) => { const x = G[b][91]; return `<tr class="${b === cur ? 'now' : ''}"><td>${ad3[b]}${b === cur ? ' ◂' : ''}</td><td class="${cls(x.getiri)}">${pct(x.getiri, 1)}</td><td class="${cls(x.fark)}">${sgn(x.fark * 100)}</td><td>%${num(x.isabet * 100, 0)}</td></tr>`; };
-      const lo = G.dusuk[91], hi = G.yuksek[91];
-      const rk = rakip === 'dolar' ? 'doları' : 'mevduatı';
-      return `<h3>${ad}</h3><div class="tbl-wrap"><table class="tbl bt"><thead><tr><th>Ölçer</th><th>3 ay</th><th>${rakip === 'dolar' ? 'Dolara' : 'Mevduata'} fark</th><th>Geçti</th></tr></thead><tbody>${['dusuk', 'orta', 'yuksek'].map(r).join('')}</tbody></table></div>
-        <p class="small">${own}, ölçer üst dilimdeyken 3 ayda ${rk} <b>%${num(hi.isabet * 100, 0)}</b>, alt dilimdeyken <b>%${num(lo.isabet * 100, 0)}</b> oranında geçti.</p>`;
-    };
-    return `<details class="fold"><summary><h3>Geçmişte nasıl çalıştı?</h3></summary>
-      <p class="muted small">${dTR(T.baslangic)}–${dTR(T.bitis)} arasında her hafta ölçer yeniden hesaplandı (${T.adet} hafta) ve sonraki 3 ayın TL bazlı getirisi ölçüldü. ◂ bugünün dilimi. Getiriler TL bazlı; fark yüzde puan; "geçti" o dilimdeki haftaların kaçında rakibinden iyi gittiğidir.</p>
-      ${OLCER_K.map(blok).join('')}
-      <p class="muted small">Okuma: TL ölçeri en güçlü sinyal; yüksekken TL fonlarında kalmak dolara karşı çoğunlukla kazandırdı. ABD ve altında ölçer düşükken bile çoğu dönemde mevduatı geçti; bu yüzden ölçer "ne zaman" değil "ne hızda" sorusu için kullanılıyor. Analist görüşü geçmişte olmadığından sınamaya girmedi. ABD tarafı o tarihte en az 200 günlük geçmişi olan ETF'lerinden (SMH, IGV, CIBR, QQQM) hesaplandı. Son 10 yıl ABD teknolojisi için olağanüstüydü, geleceğin aynı olacağı garanti değil.</p></details>`;
+  const facts = (key, ad) => `<h3>${ad} · ${o[key].skor}</h3><div class="facts">${o[key].faktorler.map((f) => `<div class="fact"><div class="row between"><span>${esc(f.ad)}</span><span class="${f.puan == null ? 'muted' : f.puan > 0.1 ? 'up' : f.puan < -0.1 ? 'down' : 'flat'} small">${f.puan == null ? 'veri yok' : f.puan > 0.1 ? 'olumlu' : f.puan < -0.1 ? 'olumsuz' : 'nötr'}</span></div><span class="f-bar"><i style="${f.puan == null ? 'width:0' : f.puan >= 0 ? `left:50%;width:${f.puan * 50}%` : `left:${50 + f.puan * 50}%;width:${-f.puan * 50}%`}" class="${f.puan >= 0 ? 'pos' : 'neg'}"></i></span><span class="muted small">${esc(f.deger)} — ${esc(f.aciklama)}</span></div>`).join('')}</div>`;
+
+  // 4) Geçmiş sınama: her ölçer için tek cümle, tablo katlanır
+  const own = { abd: "ABD ETF'leri", altin: 'Altın', tl: 'TL fonları' }, rk = { abd: 'mevduatı', altin: 'mevduatı', tl: 'doları' };
+  const ozet = (k) => { const G = T.getiri[k], hi = G.yuksek[91].isabet, lo = G.dusuk[91].isabet; return `<li>${k === 'tl' ? 'TL ölçeri' : k === 'abd' ? 'ABD ölçeri' : 'Altın ölçeri'} yüksekken ${own[k]} 3 ayda ${rk[k]} <b>%${num(hi * 100, 0)}</b> oranında geçti; düşükken <b>%${num(lo * 100, 0)}</b>.</li>`; };
+  const blok = ([k, ad, rakip]) => {
+    const G = T.getiri[k], [t1, t2] = G.sinir, now = fb[k];
+    const c = now <= t1 ? 'dusuk' : now < t2 ? 'orta' : 'yuksek';
+    const ad3 = { dusuk: `Düşük (≤${num(t1, 0)})`, orta: 'Orta', yuksek: `Yüksek (≥${num(t2, 0)})` };
+    const r = (b) => { const x = G[b][91]; return `<tr class="${b === c ? 'now' : ''}"><td>${ad3[b]}${b === c ? ' ◂' : ''}</td><td class="${cls(x.getiri)}">${pct(x.getiri, 1)}</td><td class="${cls(x.fark)}">${sgn(x.fark * 100)}</td><td>%${num(x.isabet * 100, 0)}</td></tr>`; };
+    return `<h3>${ad}</h3><div class="tbl-wrap"><table class="tbl bt"><thead><tr><th>Ölçer</th><th>3 ay</th><th>${rakip === 'dolar' ? 'Dolara' : 'Mevduata'} fark</th><th>Geçti</th></tr></thead><tbody>${['dusuk', 'orta', 'yuksek'].map(r).join('')}</tbody></table></div>`;
   };
-  const upd = new Date(O.guncelleme);
   const hist = T?.gecmis?.length ? T.gecmis : O.gecmis;
-  const card = h(`<section class="card olcer">
-    <div class="row between"><h2>Dağılım ölçeri</h2><span class="muted small">${dTR(upd.toISOString().slice(0, 10))} ${hhmm(upd)}</span></div>
-    <p class="muted small">Trend, analist görüşü, ABD faizleri, petrol, dolar, korku endeksi ve TL'nin reel getirisinden çıkan 0–100 puan. ${T ? `Etiket ve çubuk, puanın ${T.baslangic.slice(0, 4)}'ten beri aldığı değerler içindeki yerini gösterir: gri bant geçmişin orta %60'ı, çizgi ortanca.` : '50 nötr.'}</p>
-    <div class="gauges">${g('abd', 'ABD borsası', 'ETF\'lerin')}${g('altin', 'Altın')}${g('tl', 'TL fonları', 'kalma cazibesi')}</div>
-    <h3>Önerilen dağılım</h3>
-    <form class="form inline-form" id="olh"><label>Orta vadeli hedefin (ABD + altın, portföyün %'si)<input name="h" inputmode="decimal" value="${num(hedef * 100, 0)}"></label></form>
-    <div class="tbl-wrap"><table class="tbl"><thead><tr><th></th><th>Hedef</th><th>Şimdi</th><th>Sende</th><th>Fark ₺</th></tr></thead><tbody>
-      ${row('ABD ETF\'leri', 'abd')}${row('Altın', 'altin')}${row('TL fonları', 'tl')}
-    </tbody></table></div>
-    <p class="muted small"><b>Hedef</b>: orta vadeli planın, iki ölçerin geçmişteki yerine göre ABD ve altın arasında bölünür. <b>Şimdi</b>: bugün için uygun pay. Ölçer geçmişinin alt %20'sindeyken hedefin dörtte biri, üst %20'sindeyken tamamı; arada kademeli. <b>Fark</b>: o paya ulaşmak için kaydırılabilecek tutar.</p>
-    <h3>ABD payının ETF'lere dağılımı</h3>
-    <div class="etf-list">${o.etfler.map((e, i) => { const pay = al.etf[i].pay * al.abd.simdi; return `<div class="etf-row"><b>${esc(e.kod)}</b><span class="muted small">${esc(e.ad)}</span><span class="chip-s ${e.skor == null ? '' : toneS(e.skor)}">${e.skor ?? '—'}</span><span class="r"><b>${p0(pay)}</b><span class="muted small">${money(pay * cur.tot, 'TRY', 0)}</span></span></div>`; }).join('')}</div>
-    <h3>Puanların geçmişi</h3><div id="olch" class="chart" style="min-height:150px"></div><div id="ollg"></div>
-    ${T ? `<p class="muted small">${T.baslangic.slice(0, 4)}'ten beri haftalık, fiyat ve faiz verileriyle (analist hariç) hesaplandı.</p>` : O.gecmis.length < 5 ? `<p class="muted small">Geçmiş ${dTR(O.gecmis[0][0])} tarihinden itibaren her gün kaydediliyor.</p>` : ''}
-    ${sinama()}
-    ${facts('abd', 'ABD borsası')}${facts('altin', 'Altın')}${facts('tl', 'TL fonları')}
-    <p class="muted small">Kural tabanlı bir özettir, tahmin ya da yatırım tavsiyesi değildir. Analist görüşleri ETF'lerin içindeki hisselerden gelir. Altın ve Fed için toplu bir uzman görüşü verisi olmadığından piyasa fiyatlamaları (tahvil faizleri, dolar endeksi, VIX) kullanılır. Kararını kademeli ve kendi risk sınırların içinde ver.</p>
-  </section>`);
-  root.append(card);
-  const el = root.querySelector('section.olcer'); // h() bir parça döndürür; eklendikten sonra kartı sayfada bul
-  const f = el.querySelector('#olh');
+  const upd = new Date(O.guncelleme);
+
+  root.append(h(`<section class="card olcer">
+    <h2>Bugün ne yapmalı?</h2>
+    <p class="lead">${cevap}</p>
+    <div class="kpis">${tile('abd')}${tile('altin')}</div>
+    <p class="small">${neden}.${hizi ? ` <span class="muted">${hizi}</span>` : ''}</p>
+    <p class="muted small">Ölçer: ${dTR(upd.toISOString().slice(0, 10))} ${hhmm(upd)}</p>
+  </section>
+  <section class="card">
+    <h2>Piyasa ölçerleri</h2>
+    <p class="muted small">0–100 puan. ${T ? `Çubuk, puanın ${T.baslangic.slice(0, 4)}'ten beri aldığı değerleri gösterir: nokta bugün, gri bant olağan aralık. Etiket bu geçmişe göredir.` : '50 nötr.'}</p>
+    ${OLCER_K.map(olcRow).join('')}
+    <details class="fold"><summary><h3>Puanlar neye dayanıyor?</h3></summary>
+      <p class="muted small">Trend, analist görüşü, ABD faizleri, petrol, dolar, korku endeksi (VIX) ve TL'nin enflasyon üstü getirisi.</p>
+      ${facts('abd', 'ABD borsası')}${facts('altin', 'Altın')}${facts('tl', 'TL fonları')}</details>
+  </section>
+  <section class="card">
+    <h2>Planın</h2>
+    <form class="form inline-form" id="olh"><label>ABD + altına ayırmak istediğin pay (%)<input name="h" inputmode="decimal" value="${num(hedef * 100, 0)}"></label></form>
+    <p class="small">Hedef %${num(hedef * 100, 0)}: ABD ETF'leri <b>${p0(al.abd.hedef)}</b>, altın <b>${p0(al.altin.hedef)}</b>, TL fonları ${p0(al.tl.hedef)}. Bugünkü öneri ABD ${p0(al.abd.simdi)}, altın ${p0(al.altin.simdi)}${T ? ' (ölçerler en düşükteyken hedefin dörtte biri, en yüksekteyken tamamı)' : ''}.</p>
+    <details class="fold"><summary><h3>ABD payı ETF'lere nasıl bölünür?</h3></summary>
+      <div class="etf-list">${o.etfler.map((e, i) => { const pay = al.etf[i].pay * al.abd.simdi; return `<div class="etf-row"><b>${esc(e.kod)}</b><span class="muted small">${esc(e.ad)}</span><span class="chip-s ${e.skor == null ? '' : toneS(e.skor)}">${e.skor ?? '—'}</span><span class="r"><b>${p0(pay)}</b><span class="muted small">${money(pay * cur.tot, 'TRY', 0)}</span></span></div>`; }).join('')}</div>
+      <p class="muted small">Puanı yüksek ETF'e daha çok pay düşer.</p></details>
+  </section>
+  ${T ? `<section class="card">
+    <h2>Ölçer geçmişte işe yaradı mı?</h2>
+    <p class="muted small">${T.baslangic.slice(0, 4)}'ten bu yana ${T.adet} haftada ölçer yeniden hesaplandı ve sonraki 3 ay ölçüldü.</p>
+    <ul class="plain">${OLCER_K.map(([k]) => ozet(k)).join('')}</ul>
+    <p class="small">En güvenilir sinyal TL ölçeri. ABD ve altın ölçer düşükken de çoğu dönemde mevduatı geçti; bu yüzden ölçer "ne zaman" değil "ne hızla" sorusuna cevap verir.</p>
+    <div id="olch" class="chart" style="min-height:150px"></div><div id="ollg"></div>
+    <details class="fold"><summary><h3>Ayrıntılı sonuçlar</h3></summary>
+      <p class="muted small">◂ bugünün dilimi. Getiriler TL bazlı, fark yüzde puan; "geçti" o dilimdeki haftaların kaçında rakibinden iyi gittiğidir. Analist görüşü geçmişte olmadığından sınamaya girmedi; ABD tarafı SMH, IGV, CIBR ve QQQM'den hesaplandı.</p>
+      ${OLCER_K.map(blok).join('')}</details>
+  </section>` : ''}
+  <p class="muted small foot">Kural tabanlı bir özettir, yatırım tavsiyesi değildir. Kararını kademeli ve kendi risk sınırların içinde ver.</p>`));
+  const f = root.querySelector('#olh');
   f.onsubmit = (e) => e.preventDefault();
-  f.h.onchange = () => { const v = parseNum(f.h.value); if (v >= 0 && v <= 100) { S.settings.olcerHedef = v / 100; persist(); const y = scrollY; render(); scrollTo(0, y); } };
-  const ser = [['ABD borsası', 1, 'var(--s1)'], ['Altın', 2, 'var(--s4)'], ['TL fonları', 3, 'var(--s11)']].map(([name, i, color]) => ({ name, color, points: hist.map((r) => [r[0], r[i]]) }));
-  requestAnimationFrame(() => lineChart(el.querySelector('#olch'), ser, { height: 150, baseline: 50, fmtY: (v) => num(v, 0), fmtTip: (v) => num(v, 0) }));
-  el.querySelector('#ollg').innerHTML = legend(ser);
+  f.h.onchange = () => { const v = parseNum(f.h.value); if (v >= 0 && v <= 100) { S.settings.olcerHedef = v / 100; persist(); rerender(); } };
+  if (T) {
+    const ser = [['ABD borsası', 1, 'var(--s1)'], ['Altın', 2, 'var(--s4)'], ['TL fonları', 3, 'var(--s11)']].map(([name, i, color]) => ({ name, color, points: hist.map((r) => [r[0], r[i]]) }));
+    requestAnimationFrame(() => lineChart(root.querySelector('#olch'), ser, { height: 150, fmtY: (v) => num(v, 0), fmtTip: (v) => num(v, 0) }));
+    root.querySelector('#ollg').innerHTML = legend(ser);
+  }
 }
 
-// Faiz senaryoları: TCMB ve Fed patikasına göre 12 ayda TL fonu/mevduat ile dolarda beklemenin karşılaştırması
+// ---------- Faiz: TCMB ve Fed patikasına göre 12 ayda TL fonu ile dolarda beklemenin karşılaştırması ----------
 const FAIZ_VARSAYILAN = [
-  { ad: 'Hızlı', tcmbSon: 26, enf: 0.22, kur: 0.15 },
+  { ad: 'Hızlı indirim', tcmbSon: 26, enf: 0.22, kur: 0.15 },
   { ad: 'Baz', tcmbSon: 30, enf: 0.25, kur: 0.2 },
-  { ad: 'Sıkı', tcmbSon: 40, enf: 0.33, kur: 0.32 },
+  { ad: 'Sıkı / şok', tcmbSon: 40, enf: 0.33, kur: 0.32 },
 ];
 function faizCard(root) {
   const tr = M.olcer?.tr || {};
   const tcmb = tr.tcmb ?? 36, mev = tr.mevduat ?? (tr.mevduatNet != null ? (tr.mevduatNet / 0.825) * 100 : tcmb), fed = tr.fed ?? 4;
   const fs = S.settings.faiz || {};
-  const sen = FAIZ_VARSAYILAN.map((d, i) => ({ ...d, ...(fs.s?.[i] || {}) }));
+  const sen = FAIZ_VARSAYILAN.map((d, i) => ({ ...d, ...(fs.s?.[i] || {}), ad: d.ad }));
   const fedSon = fs.fedSon ?? Math.max(0, fed - 0.5);
   const dg = M.olcer?.sinama?.dagilim?.tl;
   const cur = holdingShares(), tlTut = cur.tot * cur.tl;
   const res = sen.map((x) => ({ ...x, ...faizSenaryo({ tcmb, tcmbSon: x.tcmbSon, mevFark: mev - tcmb, vergi: S.settings.tax, enf: x.enf, kur: x.kur, fed, fedSon }) }));
-  const tdS = (f) => res.map((r) => `<td>${f(r)}</td>`).join('');
-  const inp = (i, k, v, d = 0) => `<input name="${k}${i}" inputmode="decimal" value="${num(v, d)}" aria-label="${k}">`;
+  const i = [0, 1, 2].includes(ui.faizSen) ? ui.faizSen : 1, r = res[i];
+  const tlKazanc = tlTut * r.tlNet, usdKazanc = tlTut * r.dolarTL;
+  const kazanan = r.fark >= 0;
+  const maxG = Math.max(r.tlNet, r.dolarTL, 0.01);
+  const bar = (ad, g, tut, c) => `<div class="cmp-row"><div class="row between"><span>${ad}</span><b class="${cls(g)}">${pct(g, 1)}${tlTut > 0 ? ` <span class="muted small">${signMoney(tut, 'TRY', 0)}</span>` : ''}</b></div><span class="cmp-bar"><i style="width:${Math.max(0, (g / maxG) * 100)}%;background:${c}"></i></span></div>`;
+  const tdS = (f) => res.map((x) => `<td>${f(x)}</td>`).join('');
+
   root.append(h(`<section class="card faiz">
-    <h2>Faiz senaryoları</h2>
-    <p class="muted small">TCMB politika faizi bugün <b>%${num(tcmb, 1)}</b>, mevduat <b>%${num(mev, 1)}</b>, Fed <b>%${num(fed, 2)}</b>. Üç senaryo: hızlı indirim, baz ve sıkı para politikası / kur şoku. Faizler 12 ay içinde girdiğin seviyeye doğrusal gider. TL tarafı mevduat/para piyasası fonu (stopaj sonrası), dolar tarafı dolarda faizde beklemektir (hisse getirisi hariç).</p>
-    <form id="fzf" class="form"><div class="tbl-wrap"><table class="tbl fz-in"><thead><tr><th></th>${res.map((r) => `<th>${esc(r.ad)}</th>`).join('')}</tr></thead><tbody>
-      <tr><td>TCMB 12 ay sonra (%)</td>${res.map((r, i) => `<td>${inp(i, 't', r.tcmbSon, 1)}</td>`).join('')}</tr>
-      <tr><td>Enflasyon (%)</td>${res.map((r, i) => `<td>${inp(i, 'e', r.enf * 100, 1)}</td>`).join('')}</tr>
-      <tr><td>Dolar/TL artışı (%)</td>${res.map((r, i) => `<td>${inp(i, 'k', r.kur * 100, 1)}</td>`).join('')}</tr>
-    </tbody></table></div>
-    <label>Fed 12 ay sonra (%)<input name="fed" inputmode="decimal" value="${num(fedSon, 2)}"></label>
-    <div class="row gap"><button class="btn" type="submit">Hesapla</button><button class="btn ghost" type="button" id="fzr">Varsayılana dön</button></div></form>
-    <div class="tbl-wrap"><table class="tbl fz-out"><thead><tr><th>12 ayda</th>${res.map((r) => `<th>${esc(r.ad)}</th>`).join('')}</tr></thead><tbody>
-      <tr><td>Ort. faiz</td>${tdS((r) => `%${num(r.ortFaiz, 1)}`)}</tr>
-      <tr><td>TL fonu (net)</td>${tdS((r) => `<b class="${cls(r.tlNet)}">${pct(r.tlNet, 1)}</b>`)}</tr>
-      <tr><td>Reel</td>${tdS((r) => `<span class="${cls(r.reel)}">${pct(r.reel, 1)}</span>`)}</tr>
-      <tr><td>Dolarda (TL)</td>${tdS((r) => `${pct(r.dolarTL, 1)}`)}</tr>
-      <tr><td>TL − dolar (puan)</td>${tdS((r) => `<b class="${cls(r.fark)}">${sgn(r.fark * 100)}</b>`)}</tr>
-      ${tlTut > 0 ? `<tr><td>Senin TL fonların</td>${tdS((r) => `<span class="${cls(r.tlNet)}">+₺${compact(tlTut * r.tlNet, 1e5)}</span>`)}</tr>
-      <tr><td>Dolarda olsa</td>${tdS((r) => `+₺${compact(tlTut * r.dolarTL, 1e5)}`)}</tr>` : ''}
-      <tr><td>TL ölçeri sonra</td>${tdS((r) => `<b>${r.tlOlcer}</b>${dg ? `<br><span class="muted small">yeri %${num(yuzdelik(r.tlOlcer, dg) * 100, 0)}</span>` : ''}`)}</tr>
-    </tbody></table></div>
-    <p class="muted small">${tlTut > 0 ? `TL fonların bugün ${money(tlTut, 'TRY', 0)}. ` : ''}TL ölçerinin yanındaki yüzde, geçmişteki yeri (üst %20 TL için çok cazip). Faiz indirimi TL fonlarının ileriki getirisini düşürür; kur enflasyonun altında kalırsa TL yine dolardan iyi gidebilir (TL'nin reel değer kazanması). Para piyasası ve kısa vadeli borçlanma araçları fonları faiz değişimini birkaç haftada yansıtır; uzun vadeli tahvil fonları indirimde değer kazanır. Hisse ve altın getirisi bu tabloya dahil değildir.</p>
+    <h2>Faizler değişirse?</h2>
+    <p class="muted small">Bugün TCMB %${num(tcmb, 1)}, mevduat %${num(mev, 1)}, Fed %${num(fed, 2)}. Bir senaryo seç; 12 ay sonra TL fonlarında kalmakla doları tutmayı karşılaştırır.</p>
+    <div class="seg full fz-seg" role="group" aria-label="Senaryo">${res.map((x, j) => `<button type="button" data-fz="${j}" class="${j === i ? 'on' : ''}">${esc(x.ad)}</button>`).join('')}</div>
+    <p class="chips-line muted small">TCMB %${num(tcmb, 0)} → <b>%${num(r.tcmbSon, 1)}</b> · enflasyon <b>%${num(r.enf * 100, 0)}</b> · dolar/TL <b>+%${num(r.kur * 100, 0)}</b></p>
+    <p class="lead">${kazanan ? 'TL fonlarında kalmak' : 'Doları tutmak'} <b class="${kazanan ? 'up' : 'down'}">${num(Math.abs(r.fark) * 100, 1)} puan</b> daha kazançlı.</p>
+    ${bar('TL fonu / mevduat', r.tlNet, tlKazanc, 'var(--s3)')}
+    ${bar('Dolarda bekleme', r.dolarTL, usdKazanc, 'var(--s1)')}
+    <p class="small">TL fonlarının enflasyona göre getirisi <b class="${cls(r.reel)}">${pct(r.reel, 1)}</b>.${dg ? ` 12 ay sonra TL ölçeri ${r.tlOlcer}: <b>${lc(baremEtiket(r.tlOlcer, dg))}</b>.` : ''}</p>
+    ${tlTut > 0 ? `<p class="muted small">Tutarlar bugünkü TL fonların (${money(tlTut, 'TRY', 0)}) için, stopaj sonrası.</p>` : ''}
+    <details class="fold"><summary><h3>Varsayımları değiştir</h3></summary>
+      <form id="fzf" class="form">
+        <label>${esc(r.ad)}: TCMB faizi 12 ay sonra (%)<input name="t" inputmode="decimal" value="${num(r.tcmbSon, 1)}"></label>
+        <label>Yıllık enflasyon (%)<input name="e" inputmode="decimal" value="${num(r.enf * 100, 1)}"></label>
+        <label>Dolar/TL artışı (%)<input name="k" inputmode="decimal" value="${num(r.kur * 100, 1)}"></label>
+        <label>Fed faizi 12 ay sonra (%, tüm senaryolar)<input name="fed" inputmode="decimal" value="${num(fedSon, 2)}"></label>
+        <div class="row gap"><button class="btn" type="submit">Hesapla</button><button class="btn ghost" type="button" id="fzr">Varsayılana dön</button></div>
+      </form></details>
+    <details class="fold"><summary><h3>Üç senaryo yan yana</h3></summary>
+      <div class="tbl-wrap"><table class="tbl fz-out"><thead><tr><th>12 ayda</th>${res.map((x) => `<th>${esc(x.ad.split(' ')[0])}</th>`).join('')}</tr></thead><tbody>
+        <tr><td>TCMB sonra</td>${tdS((x) => `%${num(x.tcmbSon, 1)}`)}</tr>
+        <tr><td>TL fonu (net)</td>${tdS((x) => `<b class="${cls(x.tlNet)}">${pct(x.tlNet, 1)}</b>`)}</tr>
+        <tr><td>Dolarda (TL)</td>${tdS((x) => pct(x.dolarTL, 1))}</tr>
+        <tr><td>TL − dolar (puan)</td>${tdS((x) => `<b class="${cls(x.fark)}">${sgn(x.fark * 100)}</b>`)}</tr>
+        <tr><td>Reel</td>${tdS((x) => `<span class="${cls(x.reel)}">${pct(x.reel, 1)}</span>`)}</tr>
+        <tr><td>TL ölçeri sonra</td>${tdS((x) => `<b>${x.tlOlcer}</b>`)}</tr>
+      </tbody></table></div></details>
+    <p class="muted small">Faizler bugünden seçtiğin seviyeye 12 ayda kademeli gider. Para piyasası fonları faiz değişimini birkaç haftada yansıtır; uzun vadeli tahvil fonları indirimde değer kazanır. Hisse ve altın getirisi dahil değildir.</p>
   </section>`));
+  root.querySelectorAll('[data-fz]').forEach((b) => (b.onclick = () => { ui.faizSen = +b.dataset.fz; rerender(); }));
   const form = root.querySelector('#fzf');
   form.onsubmit = (e) => {
     e.preventDefault();
     const fd = new FormData(form), v = (k, def) => { const x = parseNum(fd.get(k)); return Number.isFinite(x) ? x : def; };
-    S.settings.faiz = { fedSon: v('fed', fedSon), s: sen.map((x, i) => ({ tcmbSon: v('t' + i, x.tcmbSon), enf: v('e' + i, x.enf * 100) / 100, kur: v('k' + i, x.kur * 100) / 100 })) };
-    persist(); const y = scrollY; render(); scrollTo(0, y);
+    const s = sen.map(({ tcmbSon, enf, kur }) => ({ tcmbSon, enf, kur }));
+    s[i] = { tcmbSon: v('t', r.tcmbSon), enf: v('e', r.enf * 100) / 100, kur: v('k', r.kur * 100) / 100 };
+    S.settings.faiz = { fedSon: v('fed', fedSon), s };
+    persist(); rerender();
   };
-  root.querySelector('#fzr').onclick = () => { delete S.settings.faiz; persist(); const y = scrollY; render(); scrollTo(0, y); };
+  root.querySelector('#fzr').onclick = () => { delete S.settings.faiz; persist(); rerender(); };
 }
 
-function senaryo(root) {
-  if (!C.last) return root.append(h(emptyState()));
+// ---------- Birikim: portföy belli bir süre sonra ne olur ----------
+function birikimCard(root) {
   const sc = { ...scenarioDefaults(), ...(S.scenario || {}) };
   sc.perFund = { ...scenarioDefaults().perFund, ...(S.scenario?.perFund || {}) };
   const L = C.last;
   const tot = C.states.reduce((a, x) => a + x.s.value, 0) || 1;
   const base = C.states.reduce((a, x) => a + (x.s.value / tot) * (sc.perFund[x.f.code] ?? 0), 0);
-  const scen = [['Kötümser', base - sc.spread, 'var(--s2)'], ['Baz', base, 'var(--s1)'], ['İyimser', base + sc.spread, 'var(--s3)']];
+  const scen = [['Kötü', base - sc.spread, 'var(--s2)'], ['Beklenen', base, 'var(--s1)'], ['İyi', base + sc.spread, 'var(--s3)']];
   const usdNowVal = L.valueUsd;
   const res = scen.map(([n, a, c]) => ({ n, a, c, ...projectScenario({ start: L.value, annual: a, months: sc.months, monthly: sc.monthly, taxRate: S.settings.tax, costBase: L.cost }) }));
   const mt = sc.target ? monthsToTarget({ start: L.value, annual: base, monthly: sc.monthly, target: sc.target }) : null;
+  const B = res[1], defl = Math.pow(1 + sc.inflation, sc.months / 12), yatirilan = L.value + sc.monthly * sc.months;
+  const reel = (r) => (yatirilan ? r.value / defl / yatirilan - 1 : null);
+  const usdG = (r) => (usdNowVal ? (r.value - sc.monthly * sc.months) / sc.usdEnd / usdNowVal - 1 : null);
+  const sure = sc.months % 12 === 0 ? `${sc.months / 12} yıl` : `${sc.months} ay`;
 
-  olcerCard(root);
-  faizCard(root);
-  root.append(h(`
-  <section class="card">
-    <h2>Kâr senaryoları</h2>
-    <p class="muted small">Varsayılan yıllık getiriler fonların son 1 yıllık performansından (yoksa başlangıçtan bu yana yıllıklandırılmış getiriden) gelir. Değiştirebilirsin.</p>
-    <form id="scf" class="form">
-      <label>Süre (ay)<input name="months" inputmode="numeric" value="${sc.months}"></label>
-      <label>Aylık ek yatırım (₺)<input name="monthly" inputmode="decimal" value="${num(sc.monthly, 0)}"></label>
-      <label>Senaryo aralığı (± yıllık %)<input name="spread" inputmode="decimal" value="${num(sc.spread * 100, 1)}"></label>
-      <label>Dönem sonu USD/TL<input name="usdEnd" inputmode="decimal" value="${num(sc.usdEnd, 2)}"></label>
-      <label>Beklenen yıllık enflasyon (%)<input name="inflation" inputmode="decimal" value="${num(sc.inflation * 100, 1)}"></label>
-      <label>Hedef değer (₺, isteğe bağlı)<input name="target" inputmode="decimal" value="${sc.target ? num(sc.target, 0) : ''}"></label>
-      <fieldset><legend>Fon bazında beklenen yıllık getiri (%)</legend>
-        ${C.states.map(({ f }) => `<label>${esc(f.code)}<input name="f_${esc(f.code)}" inputmode="decimal" value="${num((sc.perFund[f.code] ?? 0) * 100, 1)}"></label>`).join('')}
-      </fieldset>
-      <div class="row gap"><button class="btn" type="submit">Hesapla</button><button class="btn ghost" type="button" id="screset">Varsayılana dön</button></div>
-    </form>
-  </section>
-  <section class="card">
-    <h2>${sc.months} ay sonra</h2>
-    <div class="tbl-wrap"><table class="tbl"><thead><tr><th></th>${res.map((r) => `<th><span class="sw" style="background:${r.c}"></span>${r.n}</th>`).join('')}</tr></thead><tbody>
-      <tr><td>Yıllık getiri</td>${res.map((r) => `<td>${pct(r.a, 1)}</td>`).join('')}</tr>
-      <tr><td>Değer ₺</td>${res.map((r) => `<td>${money(r.value, 'TRY', 0)}</td>`).join('')}</tr>
-      <tr><td>Brüt kâr</td>${res.map((r) => `<td class="${cls(r.gross)}">${signMoney(r.gross, 'TRY', 0)}</td>`).join('')}</tr>
-      <tr><td>Net kâr (stopaj)</td>${res.map((r) => `<td class="${cls(r.net)}">${signMoney(r.net, 'TRY', 0)}</td>`).join('')}</tr>
-      <tr><td>Değer $ (kur ${num(sc.usdEnd, 2)})</td>${res.map((r) => `<td>${money(r.value / sc.usdEnd, 'USD', 0)}</td>`).join('')}</tr>
-      <tr><td>Bugünün parasıyla değer</td>${res.map((r) => `<td>${money(r.value / Math.pow(1 + sc.inflation, sc.months / 12), 'TRY', 0)}</td>`).join('')}</tr>
-      <tr><td>Enflasyona göre getiri</td>${res.map((r) => { const g = (L.value + sc.monthly * sc.months) ? (r.value / Math.pow(1 + sc.inflation, sc.months / 12)) / (L.value + sc.monthly * sc.months) - 1 : null; return `<td class="${cls(g)}">${pct(g, 1)}</td>`; }).join('')}</tr>
-      <tr><td>Dolar bazında getiri</td>${res.map((r) => { const g = usdNowVal ? (r.value - sc.monthly * sc.months) / sc.usdEnd / usdNowVal - 1 : null; return `<td class="${cls(g)}">${pct(g, 1)}</td>`; }).join('')}</tr>
-    </tbody></table></div>
-    ${sc.target ? `<p>Baz senaryoda <b>${money(sc.target, 'TRY', 0)}</b> hedefine ${mt == null ? '50 yılda ulaşılamıyor' : mt === 0 ? 'zaten ulaşıldı' : `<b>${mt} ay</b> sonra (${dTR(addDays(C.today, Math.round(mt * 30.44)))}) ulaşılır`}.</p>` : ''}
+  root.append(h(`<section class="card">
+    <h2>${sure} sonra portföyün</h2>
+    <div class="big">${money(B.value, 'TRY', 0)}</div>
+    <div class="sub muted">kötü ${money(res[0].value, 'TRY', 0)} · iyi ${money(res[2].value, 'TRY', 0)}</div>
+    <div class="kpis">
+      <div><span class="label">Net kâr</span><b class="${cls(B.net)}">${signMoney(B.net, 'TRY', 0)}</b><span class="muted">stopaj sonrası</span></div>
+      <div><span class="label">Dolar karşılığı</span><b>${money(B.value / sc.usdEnd, 'USD', 0)}</b><span class="${cls(usdG(B))}">${pct(usdG(B), 1)} dolar bazında</span></div>
+      <div><span class="label">Bugünün parasıyla</span><b>${money(B.value / defl, 'TRY', 0)}</b><span class="${cls(reel(B))}">${pct(reel(B), 1)} enflasyona göre</span></div>
+      <div><span class="label">Yıllık getiri varsayımı</span><b>${pct(base, 1)}</b><span class="muted">±${num(sc.spread * 100, 0)} puan</span></div>
+    </div>
+    ${sc.target ? `<p>${money(sc.target, 'TRY', 0)} hedefine ${mt == null ? 'bu varsayımlarla 50 yılda ulaşılamıyor' : mt === 0 ? 'zaten ulaştın' : `<b>${mt} ay</b> sonra (${dTR(addDays(C.today, Math.round(mt * 30.44)))}) ulaşılır`}.</p>` : ''}
     <div id="ch4" class="chart"></div><div id="lg4"></div>
-    <p class="muted small">Dolar bazında getiri, ek yatırımlar düşülerek hesaplanır. Stopaj yalnızca kâra uygulanır (%${num(S.settings.tax * 100, 1)}).</p>
+    <details class="fold"><summary><h3>Varsayımları değiştir</h3></summary>
+      <p class="muted small">Fonların beklenen getirisi varsayılan olarak son 1 yıllık performanslarından gelir.</p>
+      <form id="scf" class="form">
+        <label>Süre (ay)<input name="months" inputmode="numeric" value="${sc.months}"></label>
+        <label>Aylık ek yatırım (₺)<input name="monthly" inputmode="decimal" value="${num(sc.monthly, 0)}"></label>
+        <label>Kötü/iyi senaryo farkı (± yıllık puan)<input name="spread" inputmode="decimal" value="${num(sc.spread * 100, 1)}"></label>
+        <label>Dönem sonu dolar/TL<input name="usdEnd" inputmode="decimal" value="${num(sc.usdEnd, 2)}"></label>
+        <label>Beklenen yıllık enflasyon (%)<input name="inflation" inputmode="decimal" value="${num(sc.inflation * 100, 1)}"></label>
+        <label>Hedef değer (₺, isteğe bağlı)<input name="target" inputmode="decimal" value="${sc.target ? num(sc.target, 0) : ''}"></label>
+        <fieldset><legend>Fonların beklenen yıllık getirisi (%)</legend>
+          ${C.states.map(({ f }) => `<label>${esc(f.code)}<input name="f_${esc(f.code)}" inputmode="decimal" value="${num((sc.perFund[f.code] ?? 0) * 100, 1)}"></label>`).join('')}
+        </fieldset>
+        <div class="row gap"><button class="btn" type="submit">Hesapla</button><button class="btn ghost" type="button" id="screset">Varsayılana dön</button></div>
+      </form></details>
+    <details class="fold"><summary><h3>Üç senaryo yan yana</h3></summary>
+      <div class="tbl-wrap"><table class="tbl fz-out"><thead><tr><th></th>${res.map((r) => `<th>${r.n}</th>`).join('')}</tr></thead><tbody>
+        <tr><td>Yıllık getiri</td>${res.map((r) => `<td>${pct(r.a, 1)}</td>`).join('')}</tr>
+        <tr><td>Değer (₺)</td>${res.map((r) => `<td>${compact(r.value, 1e4)}</td>`).join('')}</tr>
+        <tr><td>Net kâr (₺)</td>${res.map((r) => `<td class="${cls(r.net)}">${r.net < 0 ? '−' : '+'}${compact(Math.abs(r.net), 1e4)}</td>`).join('')}</tr>
+        <tr><td>Dolar bazlı</td>${res.map((r) => `<td class="${cls(usdG(r))}">${pct(usdG(r), 1)}</td>`).join('')}</tr>
+        <tr><td>Reel</td>${res.map((r) => `<td class="${cls(reel(r))}">${pct(reel(r), 1)}</td>`).join('')}</tr>
+      </tbody></table></div>
+      <p class="muted small">Dolar bazında getiri ek yatırımlar düşülerek hesaplanır. Stopaj yalnızca kâra uygulanır (%${num(S.settings.tax * 100, 1)}).</p></details>
   </section>`));
 
   const form = root.querySelector('#scf');
@@ -868,9 +925,9 @@ function senaryo(root) {
       target: Number.isFinite(t) && t > 0 ? t : null,
       perFund,
     };
-    persist(); render();
+    persist(); rerender();
   };
-  root.querySelector('#screset').onclick = () => { S.scenario = null; persist(); render(); };
+  root.querySelector('#screset').onclick = () => { S.scenario = null; persist(); rerender(); };
   const toDate = (i) => addDays(C.today, Math.round(i * 30.44));
   const ser = res.map((r) => ({ name: r.n, color: r.c, points: r.path.map(([i, v]) => [toDate(i), v]) }));
   requestAnimationFrame(() => lineChart(root.querySelector('#ch4'), ser, { fmtY: compact, fmtTip: (v) => money(v, 'TRY', 0) }));

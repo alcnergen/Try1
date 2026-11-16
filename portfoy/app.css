@@ -288,12 +288,8 @@ h2 { font-size: 17px; font-weight: 650; letter-spacing: -0.01em; }
 .tbl th { border-bottom-color: var(--line); }
 
 /* Dağılım ölçeri */
-.gauges { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 10px 0 4px; }
-.gauge-tile { background: var(--tint); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-.gauge-tile b { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; }
 .g-bar { position: relative; height: 5px; border-radius: 3px; background: color-mix(in srgb, var(--line) 80%, transparent); margin: 2px 0; }
 .g-bar i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 3px; background: currentColor; opacity: .55; }
-.gauge-tile .g-bar { color: var(--accent); }
 .g-bar em { position: absolute; top: -2px; bottom: -2px; width: 1px; background: var(--muted); }
 .g-range { position: relative; height: 6px; border-radius: 3px; background: color-mix(in srgb, var(--line) 70%, transparent); margin: 4px 0 0; }
 .g-range s { position: absolute; top: 0; bottom: 0; border-radius: 3px; background: color-mix(in srgb, var(--muted) 35%, transparent); }
@@ -302,13 +298,10 @@ h2 { font-size: 17px; font-weight: 650; letter-spacing: -0.01em; }
 .g-range i.flat { color: var(--text); }
 .g-ends { display: flex; justify-content: space-between; font-size: 10px; font-variant-numeric: tabular-nums; }
 .tbl.bt tr.now td { font-weight: 600; background: var(--tint); }
-.fz-in input { width: 62px; padding: 6px 8px; text-align: right; }
-.fz-in td:not(:first-child) { text-align: right; }
 .fz-out { font-size: 14px; }
-.fz-out td, .fz-out th, .fz-in td, .fz-in th { padding-left: 6px; padding-right: 6px; }
-@media (max-width: 360px) { .fz-out, .tbl.bt { font-size: 12.5px; } .tbl.bt td, .tbl.bt th { padding-left: 4px; padding-right: 4px; } .fz-in input { width: 56px; } }
+.fz-out td, .fz-out th { padding-left: 6px; padding-right: 6px; }
+@media (max-width: 360px) { .fz-out, .tbl.bt { font-size: 12.5px; } .tbl.bt td, .tbl.bt th { padding-left: 4px; padding-right: 4px; } }
 .fz-out td:first-child, .tbl.bt td:first-child { white-space: normal; }
-.fz-in td:first-child { white-space: normal; }
 .inline-form label { font-size: 13px; }
 .inline-form input { max-width: 120px; }
 .etf-list { display: grid; }
@@ -322,3 +315,23 @@ h2 { font-size: 17px; font-weight: 650; letter-spacing: -0.01em; }
 .f-bar i { position: absolute; top: 0; bottom: 0; border-radius: 3px; opacity: .6; }
 .f-bar i.pos { background: var(--up); } .f-bar i.neg { background: var(--down); }
 .f-bar::after { content: ''; position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: var(--muted); }
+
+/* Senaryo sekmesi: bölüm seçici, düz cümleli cevaplar, ölçer satırları, karşılaştırma çubukları */
+.sen-tabs { margin: 0 0 12px; }
+.sen-tabs button, .fz-seg button { flex: 1; padding: 7px 6px; }
+.fz-seg { margin: 10px 0 6px; }
+.fz-seg button { font-size: 14px; }
+.lead { font-size: 17px; line-height: 1.4; margin: 8px 0 4px; }
+.olc-row { padding: 10px 0; border-top: 1px solid var(--line); }
+.olc-row:first-of-type { border-top: 0; }
+.olc-n { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.olc-row .g-range { display: block; margin-top: 8px; }
+.olc-row .g-bar { display: block; margin-top: 8px; }
+.olc-row .g-ends { margin-top: 4px; gap: 8px; }
+.cmp-row { margin: 10px 0; }
+.cmp-bar { display: block; height: 8px; border-radius: 4px; background: var(--tint); margin-top: 5px; overflow: hidden; }
+.cmp-bar i { display: block; height: 100%; border-radius: 4px; }
+ul.plain { margin: 8px 0; padding-left: 18px; }
+ul.plain li { margin: 4px 0; font-size: 14.5px; line-height: 1.4; }
+.foot { margin: 4px 4px 12px; }
+.chips-line { margin: 4px 0; }
