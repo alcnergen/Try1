@@ -9,7 +9,7 @@ import {
 import { lineChart, legend } from './chart.js';
 import { allocation, skorEtiket, baremEtiket, yuzdelik, faizSenaryo } from './olcer.js';
 
-export const APP_VERSION = '2026.11.17';
+export const APP_VERSION = '2026.11.18';
 
 // ---------- Durum ----------
 let S = store.load();
@@ -221,6 +221,8 @@ const RANGES = [['1A', '1A'], ['3A', '3A'], ['6A', '6A'], ['YB', 'YB'], ['1Y', '
 const clip = (pts, key) => { if (key === 'ALL') return pts; const s = periodStart(key, C.today); return pts.filter((p) => p[0] >= s); };
 
 // ---------- ÖZET ----------
+// Büyük tutarlarda kuruş gösterilmez (okunaklılık)
+const kd = (v) => (Math.abs(v || 0) >= 1e5 ? 0 : 2);
 function ozet(root) {
   if (!C.last) return root.append(h(emptyState()));
   const ccy = S.settings.ccy;
@@ -255,10 +257,10 @@ function ozet(root) {
     <div class="muted small">Stopaj sonrası: ${ccy === 'USD' ? money((L.cost + L.net) / (L.usd || 1), 'USD') : money(L.cost + L.net)}</div>
     ${P ? `<div class="chg"><span class="pill ${cls(dayChg)}">${arrow(dayChg)} ${signMoney(dayChg, 'TRY')} · ${pct(dayPct)}</span><span class="muted small">son fiyat gününe göre</span></div>` : ''}
     <div class="kpis">
-      <div><span class="label">Net kâr (stopaj sonrası)</span><b class="${cls(L.net)}">${signMoney(L.net, 'TRY')}</b><span class="${cls(netPct)}">${pct(netPct)}</span></div>
-      <div><span class="label">Brüt kâr</span><b class="${cls(L.gross)}">${signMoney(L.gross, 'TRY')}</b><span class="${cls(grossPct)}">${pct(grossPct)}</span></div>
-      <div><span class="label">Dolar bazında</span><b>${money(L.valueUsd, 'USD')}</b><span class="${cls(usdPct)}">${pct(usdPct)}</span></div>
-      <div><span class="label">Maliyet</span><b>${money(L.cost, 'TRY')}</b><span class="muted">${days} gün</span></div>
+      <div><span class="label">Net kâr</span><b class="${cls(L.net)}">${signMoney(L.net, 'TRY', kd(L.net))}</b><span class="${cls(netPct)}">${pct(netPct)}</span></div>
+      <div><span class="label">Brüt kâr</span><b class="${cls(L.gross)}">${signMoney(L.gross, 'TRY', kd(L.gross))}</b><span class="${cls(grossPct)}">${pct(grossPct)}</span></div>
+      <div><span class="label">Dolar bazında</span><b>${money(L.valueUsd, 'USD', kd(L.valueUsd))}</b><span class="${cls(usdPct)}">${pct(usdPct)}</span></div>
+      <div><span class="label">Maliyet</span><b>${money(L.cost, 'TRY', kd(L.cost))}</b><span class="muted">${days} gün</span></div>
       <div><span class="label">Günlük ort. (net)</span><b class="${cls(netPct)}">${pct(dailyRate(netPct, days), 4)}</b><span class="muted">USD: ${pct(dailyRate(usdPct, days), 4)}</span></div>
       <div><span class="label">Yıllık karşılığı (net)</span><b class="${cls(netPct)}">${pct(annualize(netPct, days), 1)}</b><span class="muted">USD kuru ${num(C.usdNow ?? L.usd, 4)}</span></div>
       ${(() => {
@@ -315,7 +317,7 @@ function ozet(root) {
 
   // Günlük kayıt tablosu
   const rows = C.hist.slice().reverse();
-  const shown = ui.histAll ? rows : rows.slice(0, 30);
+  const shown = ui.histAll ? rows : rows.slice(0, 10);
   const tbl = `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Tarih</th><th>Değer ₺</th><th>Fark ₺</th><th>Gün %</th><th>Net kâr</th><th>Kâr %</th><th>USD kuru</th><th>Değer $</th><th>$ getiri</th></tr></thead><tbody>
     ${shown.map((r, i) => {
       const pr = rows[rows.indexOf(r) + 1];
@@ -324,7 +326,7 @@ function ozet(root) {
       const up = r.costUsd > 0 && r.valueUsd ? r.valueUsd / r.costUsd - 1 : null;
       return `<tr><td>${dTR(r.date)}</td><td>${num(r.value)}</td><td class="${cls(diff)}">${diff == null ? '—' : num(diff)}</td><td class="${cls(dp)}">${pct(dp)}</td><td class="${cls(r.net)}">${num(r.net)}</td><td class="${cls(r.net)}">${pct(r.cost ? r.net / r.cost : null)}</td><td>${num(r.usd, 4)}</td><td>${num(r.valueUsd)}</td><td class="${cls(up)}">${pct(up)}</td></tr>`;
     }).join('')}</tbody></table></div>
-    ${rows.length > 30 && !ui.histAll ? `<button class="btn ghost full" id="more">Tümünü göster (${rows.length} gün)</button>` : ''}`;
+    ${rows.length > 10 && !ui.histAll ? `<button class="btn ghost full" id="more">Tümünü göster (${rows.length} gün)</button>` : ''}`;
   root.querySelector('#hist').innerHTML = tbl;
   const more = root.querySelector('#more');
   if (more) more.onclick = () => { ui.histAll = true; render(); };
@@ -490,7 +492,7 @@ function returnsTable(rows, ccy) {
   return `<div class="tbl-wrap"><table class="tbl ret"><thead><tr><th>Varlık</th>${keys.map(([, l]) => `<th>${l}</th>`).join('')}</tr></thead><tbody>
     ${rows.map(([name, pts0]) => {
       const pts = conv(pts0 || []);
-      return `<tr><td>${esc(name)}</td>${keys.map(([k]) => {
+      return `<tr><td>${esc(name.replace(/ \(.*\)$/, ''))}</td>${keys.map(([k]) => {
         const r = k === 'ALL' ? (pts.length > 1 ? pts[pts.length - 1][1] / pts[0][1] - 1 : null) : periodReturn(pts, periodStart(k, C.today), C.today);
         return `<td class="${cls(r)}">${pct(r, 1)}</td>`;
       }).join('')}</tr>`;
@@ -498,6 +500,7 @@ function returnsTable(rows, ccy) {
 }
 
 // ---------- KIYAS ----------
+const KIY_TABS = [['karne', 'Karne'], ['grafik', 'Grafik'], ['donem', 'Dönemler']];
 function kiyas(root) {
   if (!C.last) return root.append(h(emptyState()));
   const ccy = ui.cmpCcy || S.settings.ccy;
@@ -564,13 +567,15 @@ function kiyas(root) {
   };
   const gorusTarih = M.gorus?.guncelleme ? new Date(M.gorus.guncelleme) : null;
 
+  const t = KIY_TABS.some(([k]) => k === ui.kiyTab) ? ui.kiyTab : 'karne';
   root.append(h(`
-    <section class="card">
-      <div class="row between wrap"><h2>${dTR(start)} – ${dTR(C.asOf)}</h2>
-        <div class="row gap">
-          <div class="seg" role="group" aria-label="Kâr türü"><button data-n="1" class="${net ? 'on' : ''}">Net</button><button data-n="0" class="${net ? '' : 'on'}">Brüt</button></div>
-          <div class="seg" role="group" aria-label="Para birimi"><button data-c="TRY" class="${ccy === 'TRY' ? 'on' : ''}">₺</button><button data-c="USD" class="${ccy === 'USD' ? 'on' : ''}">$</button></div>
-        </div></div>
+    <div class="seg full sen-tabs" role="tablist" aria-label="Kıyas bölümü">${KIY_TABS.map(([k, ad]) => `<button type="button" role="tab" data-kt="${k}" aria-selected="${k === t}" class="${k === t ? 'on' : ''}">${ad}</button>`).join('')}</div>
+    <div class="row between wrap kiy-bar"><span class="muted small">${t === 'donem' ? 'Takvim dönemleri' : `${dTR(start)} – ${dTR(C.asOf)}`}</span>
+      <div class="row gap">
+        ${t === 'donem' ? '' : `<div class="seg" role="group" aria-label="Kâr türü"><button data-n="1" class="${net ? 'on' : ''}">Net</button><button data-n="0" class="${net ? '' : 'on'}">Brüt</button></div>`}
+        <div class="seg" role="group" aria-label="Para birimi"><button data-c="TRY" class="${ccy === 'TRY' ? 'on' : ''}">₺</button><button data-c="USD" class="${ccy === 'USD' ? 'on' : ''}">$</button></div>
+      </div></div>
+    ${t !== 'karne' ? '' : `<section class="card">
       <div class="verdict">
         <div><span class="label">Portföyün (${net ? 'stopaj sonrası' : 'brüt'}, ${ccy === 'USD' ? 'dolar' : 'TL'} bazında)</span>
           <div class="big ${cls(portRet)}">${pct(portRet)}</div>
@@ -592,13 +597,15 @@ function kiyas(root) {
           </div>`;
         }).join('')}
       </div>
-      <p class="muted small">Her alışın tutarı aynı gün o piyasaya yatırılmış gibi hesaplanır. Sağdaki tutar, paranı o piyasaya yatırsaydın bugün olacak değere göre portföyünün kaç TL fazla ya da eksik olduğudur (fiyat değil). Çubuktaki mavi çizgi senin getirin, ince gri çizgi sıfır; ucu soluk çubuklar ölçeğe sığmayacak kadar uçta. Yabancı borsalar TL'ye çevrilmiş haliyle (kur etkisi dahil) karşılaştırılır.${C.cpiEst && C.cpiEst < C.today ? ` Enflasyonun ${dTR(C.cpiEst).slice(3)} sonrası, son 3 ayın ortalamasıyla tahmin edilir.` : ''}${net ? ' Portföyün stopaj sonrası, kıyaslar vergisiz alınmıştır.' : ''}</p>
-      ${gorusTarih ? `<p class="muted small">Görüş satırları: NVIDIA'da analistlerin kendisi için verdiği al/tut/sat sayıları; endeks ve ETF'lerde içindeki hisselerin analist dağılımlarının ağırlıklı ortalaması (S&P 500, Nasdaq 100, DAX, Nikkei, BIST 100: üyeler, piyasa değeri ağırlıklı; SMH: SOX yarı iletken endeksi; IGV: ABD'nin en büyük 40 yazılım şirketi; DRAM: Micron, Samsung, SK Hynix, Seagate eşit ağırlık; NASA: fonun günlük içerik listesindeki ABD hisseleri). Hedef: analistlerin 12 aylık ortalama hedef fiyatı; endeks ve ETF'lerde (≈) içindeki hisselerin hedeflerinden çıkan ağırlıklı farkın bugünkü fiyata uygulanmasıyla bulunur (endekslerde puan). Yüzde farkı görmek için hedefe dokunun. Analistler genelde "al"a yatkındır; asıl bilgi zaman içindeki değişimdedir. ${(() => { const low = rows.map((r) => [r, M.gorus?.varliklar?.[BENCHES.find((b) => b.id === r.id)?.need?.[0]]?.icerik]).filter(([, c]) => c && c.kapsam < 0.9); return low.length ? ` * Analist görüşü olan hisseler fonun yalnızca bir kısmını oluşturuyor: ${low.map(([r, c]) => `${esc(r.name)} %${num(c.kapsam * 100, 0)}`).join(', ')}.` : ''; })()} Döviz, emtia ve kriptoda analist dağılımı yoktur; teknik özet TradingView'in günlük gösterge özetidir (hareketli ortalamalar ve osilatörler, uzman görüşü değildir). RSI 14 günlüktür: 70 üstü aşırı alım, 30 altı aşırı satım bölgesi sayılır. Göstergeler varlığın kendi piyasasındaki fiyata göredir (ör. altında ons $). Kısa vadeli sinyallerdir, yatırım tavsiyesi değildir. Güncelleme: ${dTR(gorusTarih.toISOString().slice(0, 10))} ${hhmm(gorusTarih)}. <button type="button" class="link" id="gyenile">↻ Görüşleri yenile</button></p>` : ''}` : '<p>Kıyas verisi henüz yok. Veriler her gün otomatik çekilir; ilk çekimden sonra burada görünür.</p>'}
+      <details class="fold"><summary><h3>Nasıl hesaplanıyor?</h3></summary><p class="muted small">Her alışın tutarı aynı gün o piyasaya yatırılmış gibi hesaplanır. Sağdaki tutar, paranı o piyasaya yatırsaydın bugün olacak değere göre portföyünün kaç TL fazla ya da eksik olduğudur (fiyat değil). Çubuktaki mavi çizgi senin getirin, ince gri çizgi sıfır; ucu soluk çubuklar ölçeğe sığmayacak kadar uçta. Yabancı borsalar TL'ye çevrilmiş haliyle (kur etkisi dahil) karşılaştırılır.${C.cpiEst && C.cpiEst < C.today ? ` Enflasyonun ${dTR(C.cpiEst).slice(3)} sonrası, son 3 ayın ortalamasıyla tahmin edilir.` : ''}${net ? ' Portföyün stopaj sonrası, kıyaslar vergisiz alınmıştır.' : ''}</p></details>
+      ${gorusTarih ? `<details class="fold"><summary><h3>Analist satırları ne anlatıyor?</h3></summary><p class="muted small">Görüş satırları: NVIDIA'da analistlerin kendisi için verdiği al/tut/sat sayıları; endeks ve ETF'lerde içindeki hisselerin analist dağılımlarının ağırlıklı ortalaması (S&P 500, Nasdaq 100, DAX, Nikkei, BIST 100: üyeler, piyasa değeri ağırlıklı; SMH: SOX yarı iletken endeksi; IGV: ABD'nin en büyük 40 yazılım şirketi; DRAM: Micron, Samsung, SK Hynix, Seagate eşit ağırlık; NASA: fonun günlük içerik listesindeki ABD hisseleri). Hedef: analistlerin 12 aylık ortalama hedef fiyatı; endeks ve ETF'lerde (≈) içindeki hisselerin hedeflerinden çıkan ağırlıklı farkın bugünkü fiyata uygulanmasıyla bulunur (endekslerde puan). Yüzde farkı görmek için hedefe dokunun. Analistler genelde "al"a yatkındır; asıl bilgi zaman içindeki değişimdedir. ${(() => { const low = rows.map((r) => [r, M.gorus?.varliklar?.[BENCHES.find((b) => b.id === r.id)?.need?.[0]]?.icerik]).filter(([, c]) => c && c.kapsam < 0.9); return low.length ? ` * Analist görüşü olan hisseler fonun yalnızca bir kısmını oluşturuyor: ${low.map(([r, c]) => `${esc(r.name)} %${num(c.kapsam * 100, 0)}`).join(', ')}.` : ''; })()} Döviz, emtia ve kriptoda analist dağılımı yoktur; teknik özet TradingView'in günlük gösterge özetidir (hareketli ortalamalar ve osilatörler, uzman görüşü değildir). RSI 14 günlüktür: 70 üstü aşırı alım, 30 altı aşırı satım bölgesi sayılır. Göstergeler varlığın kendi piyasasındaki fiyata göredir (ör. altında ons $). Kısa vadeli sinyallerdir, yatırım tavsiyesi değildir.</p></details><p class="muted small foot">Görüşler: ${dTR(gorusTarih.toISOString().slice(0, 10))} ${hhmm(gorusTarih)} · <button type="button" class="link" id="gyenile">↻ Yenile</button></p>` : ''}` : '<p>Kıyas verisi henüz yok. Veriler her gün otomatik çekilir; ilk çekimden sonra burada görünür.</p>'}
       ${missing.length ? `<p class="muted small">Verisi olmayan: ${missing.map((r) => esc(r.name)).join(', ')}</p>` : ''}
-    </section>
-    <section class="card"><h2>Zaman içinde karşılaştırma</h2><p class="muted small">Grafikte en çok 3 kıyas gösterilir</p><div id="pick"></div><div id="ch2" class="chart"></div><div id="lg2"></div></section>
-    <section class="card"><div class="row between"><h2>Tüm zamanlar: dönemsel getiriler</h2></div><div id="per"></div></section>
-    <section class="card"><h2>Uzun vadeli seyir (100'e endeksli)</h2><div id="rng3"></div><div id="ch3" class="chart"></div><div id="lg3"></div></section>`));
+    </section>`}
+    ${t !== 'grafik' ? '' : `<section class="card"><h2>Zaman içinde karşılaştırma</h2><p class="muted small">Grafikte en çok 3 kıyas gösterilir</p><div id="pick"></div><div id="ch2" class="chart"></div><div id="lg2"></div></section>
+    <section class="card"><h2>Uzun vadeli seyir (100'e endeksli)</h2><div id="rng3"></div><div id="ch3" class="chart"></div><div id="lg3"></div></section>`}
+    ${t !== 'donem' ? '' : '<section class="card"><h2>Dönemsel getiriler</h2><div id="per"></div></section>'}`));
+  root.querySelectorAll('[data-kt]').forEach((b) => (b.onclick = () => { ui.kiyTab = b.dataset.kt; render(); scrollTo(0, 0); }));
+
 
   root.querySelectorAll('[data-n]').forEach((b) => (b.onclick = () => { ui.cmpNet = b.dataset.n === '1'; render(); }));
   root.querySelectorAll('[data-c]').forEach((b) => (b.onclick = () => { ui.cmpCcy = b.dataset.c; render(); }));
@@ -609,6 +616,7 @@ function kiyas(root) {
   if (gy) gy.onclick = () => refreshViews(gy);
   // 30 dakikadan eskiyse Kıyas açılınca kendiliğinden yenilenir
   if (gorusTarih && Date.now() - gorusTarih > 30 * 60e3 && !ui.viewsTried) { ui.viewsTried = true; refreshViews(gy, true); }
+  if (t === 'grafik') {
   const sel = S.settings.compare;
   const wrap = document.createElement('div'); wrap.className = 'chips';
   for (const b of BENCHES) {
@@ -631,11 +639,15 @@ function kiyas(root) {
   ser.push({ name: 'Yatırılan', color: COLORS.COST, dashed: true, points: C.hist.map((r) => [r.date, ccy === 'USD' ? r.costUsd : r.cost]) });
   requestAnimationFrame(() => lineChart(root.querySelector('#ch2'), ser, { fmtY: compact, fmtTip: (v) => money(v, ccy) }));
   root.querySelector('#lg2').innerHTML = legend(ser);
+  }
 
   // Dönemsel getiriler
+  if (t === 'donem') {
   const per = root.querySelector('#per');
   const rowsR = [...S.funds.map((f) => [f.code, C.pmap[f.code]]), ...BENCHES.map((b) => [benchName(b.id), C.benches[b.id]])];
-  per.innerHTML = `<p class="muted small">${ccy === 'USD' ? 'Dolar bazında' : 'TL bazında'} getiri. Para birimini yukarıdan değiştirebilirsin.</p>` + returnsTable(rowsR, ccy);
+  per.innerHTML = `<p class="muted small">${ccy === 'USD' ? 'Dolar bazında' : 'TL bazında'} getiri.</p>` + returnsTable(rowsR, ccy);
+  }
+  if (t !== 'grafik') return;
 
   const rng = root.querySelector('#rng3');
   rng.append(chips('Dönem', RANGES.slice(3), ui.cmpRange, (k) => { ui.cmpRange = k; render(); }));
@@ -1484,7 +1496,7 @@ async function refreshViews(btn, quiet = false) {
     if (tab === 'kiyas') { const y = main().scrollTop; render(); main().scrollTop = y; }
     if (!quiet) toast('Analist, teknik ve RSI verileri güncellendi ✓');
   } catch (e) {
-    if (btn) { btn.disabled = false; btn.textContent = '↻ Görüşleri yenile'; }
+    if (btn) { btn.disabled = false; btn.textContent = '↻ Yenile'; }
     if (!quiet) toast(`Görüşler alınamadı (${e.message}); bağlantıyı kontrol et.`, 5000);
   }
 }
