@@ -24,6 +24,7 @@ export const BENCHES = [
   { id: 'NASA', ad: 'NASA (uzay ETF)', renk: 20, need: ['K_NASA', 'USDTRY'], tl: (s) => combine(s.K_NASA, s.USDTRY, (a, b) => a * b) },
   { id: 'QQQM', ad: 'QQQM (Nasdaq 100 ETF)', renk: 21, need: ['K_QQQM', 'USDTRY'], tl: (s) => combine(s.K_QQQM, s.USDTRY, (a, b) => a * b) },
   { id: 'CIBR', ad: 'CIBR (siber güvenlik ETF)', renk: 22, need: ['K_CIBR', 'USDTRY'], tl: (s) => combine(s.K_CIBR, s.USDTRY, (a, b) => a * b) },
+  { id: 'IBB', ad: 'IBB (biyoteknoloji ETF)', renk: 23, need: ['K_IBB', 'USDTRY'], tl: (s) => combine(s.K_IBB, s.USDTRY, (a, b) => a * b) },
   { id: 'TUFE', ad: 'Enflasyon (TÜFE)', renk: 12, need: ['TUFE'], tl: (s) => cpiDaily(s.TUFE).points },
   { id: 'MEVDUAT', ad: 'Mevduat', renk: 11, need: [], tl: null },
 ];
