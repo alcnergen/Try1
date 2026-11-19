@@ -1,5 +1,5 @@
 {
- "guncelleme": "2026-11-19T20:35:21.462Z",
+ "guncelleme": "2026-11-19T20:45:28.222Z",
  "seriler": {
   "TGT": {
    "ad": "GARANTİ PORTFÖY KISA VADELİ BORÇLANMA ARAÇLARI FONU",
@@ -44,7 +44,7 @@
    "kaynak": "tv:FX_IDC:USDTRY",
    "ilk": "2010-01-29",
    "son": "2026-11-19",
-   "deger": 50.4578,
+   "deger": 50.4574,
    "adet": 4385
   },
   "EURTRY": {
@@ -54,7 +54,7 @@
    "kaynak": "tv:FX_IDC:EURTRY",
    "ilk": "2010-02-01",
    "son": "2026-11-19",
-   "deger": 55.50447,
+   "deger": 55.5,
    "adet": 4384
   },
   "JPYTRY": {
@@ -64,7 +64,7 @@
    "kaynak": "tv:FX_IDC:JPYTRY",
    "ilk": "2010-01-27",
    "son": "2026-11-19",
-   "deger": 0.315971,
+   "deger": 0.315934,
    "adet": 4385
   },
   "GOLD": {
@@ -74,7 +74,7 @@
    "kaynak": "tv:TVC:GOLD",
    "ilk": "2009-05-27",
    "son": "2026-11-19",
-   "deger": 3668.2,
+   "deger": 3665.47,
    "adet": 4404
   },
   "XU100": {
@@ -94,7 +94,7 @@
    "kaynak": "tv:SP:SPX",
    "ilk": "2016-07-01",
    "son": "2026-11-19",
-   "deger": 7195.28,
+   "deger": 7185.35,
    "adet": 2612
   },
   "NDX": {
@@ -104,7 +104,7 @@
    "kaynak": "tv:NASDAQ:NDX",
    "ilk": "2009-05-20",
    "son": "2026-11-19",
-   "deger": 26566.8295,
+   "deger": 26519.4246,
    "adet": 4404
   },
   "DAX": {
@@ -134,7 +134,7 @@
    "kaynak": "tv:AMEX:URTH",
    "ilk": "2012-01-12",
    "son": "2026-11-19",
-   "deger": 193.98,
+   "deger": 194.16,
    "adet": 3539
   },
   "BTCUSD": {
@@ -144,7 +144,7 @@
    "kaynak": "tv:BITSTAMP:BTCUSD",
    "ilk": "2014-10-22",
    "son": "2026-11-19",
-   "deger": 61861.69,
+   "deger": 62077.81,
    "adet": 4409
   },
   "XRPUSD": {
@@ -154,7 +154,7 @@
    "kaynak": "tv:BITSTAMP:XRPUSD",
    "ilk": "2014-09-28",
    "son": "2026-11-19",
-   "deger": 0.95997,
+   "deger": 0.96306,
    "adet": 4409
   },
   "SILVER": {
@@ -164,7 +164,7 @@
    "kaynak": "tv:TVC:SILVER",
    "ilk": "2009-05-29",
    "son": "2026-11-19",
-   "deger": 44.037,
+   "deger": 44.039,
    "adet": 4401
   },
   "K_SMH": {
@@ -174,7 +174,7 @@
    "kaynak": "tv:NASDAQ:SMH",
    "ilk": "2009-05-22",
    "son": "2026-11-19",
-   "deger": 448.86,
+   "deger": 450.55,
    "adet": 4402
   },
   "K_NVDA": {
@@ -184,7 +184,7 @@
    "kaynak": "tv:NASDAQ:NVDA",
    "ilk": "2009-05-22",
    "son": "2026-11-19",
-   "deger": 147.11,
+   "deger": 147.5,
    "adet": 4402
   },
   "K_IGV": {
@@ -194,7 +194,7 @@
    "kaynak": "tv:AMEX:IGV",
    "ilk": "2009-05-22",
    "son": "2026-11-19",
-   "deger": 95.96,
+   "deger": 96.11,
    "adet": 4402
   },
   "K_DRAM": {
@@ -204,7 +204,7 @@
    "kaynak": "tv:AMEX:DRAM",
    "ilk": "2026-04-06",
    "son": "2026-11-19",
-   "deger": 38.6,
+   "deger": 38.765,
    "adet": 160
   },
   "K_NASA": {
@@ -214,7 +214,7 @@
    "kaynak": "tv:AMEX:NASA",
    "ilk": "2026-03-31",
    "son": "2026-11-19",
-   "deger": 18.745,
+   "deger": 18.84,
    "adet": 163
   },
   "K_QQQM": {
@@ -224,7 +224,7 @@
    "kaynak": "tv:NASDAQ:QQQM",
    "ilk": "2020-10-13",
    "son": "2026-11-19",
-   "deger": 265.89,
+   "deger": 266.43,
    "adet": 1534
   },
   "K_CIBR": {
@@ -234,7 +234,7 @@
    "kaynak": "tv:NASDAQ:CIBR",
    "ilk": "2015-07-07",
    "son": "2026-11-19",
-   "deger": 96.17,
+   "deger": 96.35,
    "adet": 2862
   },
   "K_IBB": {
@@ -244,7 +244,7 @@
    "kaynak": "tv:NASDAQ:IBB",
    "ilk": "2009-06-19",
    "son": "2026-11-19",
-   "deger": 203.83,
+   "deger": 204.36,
    "adet": 4383
   },
   "TUFE": {
@@ -274,7 +274,7 @@
    "kaynak": "tv:TVC:VIX",
    "ilk": "2009-07-06",
    "son": "2026-11-19",
-   "deger": 28.41,
+   "deger": 28.18,
    "adet": 4395
   },
   "G_DXY": {
@@ -294,7 +294,7 @@
    "kaynak": "tv:TVC:USOIL",
    "ilk": "2009-06-08",
    "son": "2026-11-19",
-   "deger": 82.9,
+   "deger": 83.14,
    "adet": 4395
   },
   "G_US10Y": {
@@ -304,7 +304,7 @@
    "kaynak": "tv:TVC:US10Y",
    "ilk": "2008-09-23",
    "son": "2026-11-19",
-   "deger": 5.048,
+   "deger": 5.052,
    "adet": 4394
   },
   "G_US02Y": {
@@ -314,7 +314,7 @@
    "kaynak": "tv:TVC:US02Y",
    "ilk": "2009-05-15",
    "son": "2026-11-19",
-   "deger": 4.77,
+   "deger": 4.772,
    "adet": 4247
   },
   "G_FED": {
