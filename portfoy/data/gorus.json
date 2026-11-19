@@ -1,20 +1,20 @@
 {
- "guncelleme": "2026-11-19T07:46:09.780Z",
+ "guncelleme": "2026-11-19T07:55:42.905Z",
  "varliklar": {
   "USDTRY": {
-   "rsi": 82.7,
+   "rsi": 83.1,
    "teknik": 0.438,
-   "fiyat": 50.4386
+   "fiyat": 50.46
   },
   "EURTRY": {
-   "rsi": 45.8,
+   "rsi": 46.7,
    "teknik": -0.016,
-   "fiyat": 55.5075
+   "fiyat": 55.54508
   },
   "GOLD": {
-   "rsi": 30.5,
+   "rsi": 30.8,
    "teknik": -0.484,
-   "fiyat": 3730.97
+   "fiyat": 3734.056
   },
   "N225": {
    "rsi": 39.2,
@@ -33,24 +33,24 @@
    }
   },
   "SILVER": {
-   "rsi": 28.2,
+   "rsi": 28.4,
    "teknik": -0.302,
-   "fiyat": 45.306
+   "fiyat": 45.3637
   },
   "XU100": {
-   "rsi": 45.9,
+   "rsi": 45.1,
    "teknik": -0.242,
-   "fiyat": 11564.57,
+   "fiyat": 11536.64,
    "icerik": {
     "al": 0.703,
     "tut": 0.284,
     "sat": 0.013,
-    "hedef": 0.48,
+    "hedef": 0.483,
     "hisse": 60,
     "gorus": 267,
     "kapsam": 0.912,
     "kaynak": "BIST 100 üyeleri",
-    "hedefFiyat": 17115.56
+    "hedefFiyat": 17108.84
    }
   },
   "SPX": {
@@ -143,12 +143,12 @@
     "al": 0.934,
     "tut": 0.066,
     "sat": 0,
-    "hedef": 1.345,
+    "hedef": 1.34,
     "hisse": 4,
     "gorus": 167,
     "kapsam": 1,
     "kaynak": "fonun ana hisseleri: Micron, Samsung, SK Hynix, Seagate (eşit ağırlık)",
-    "hedefFiyat": 91.81
+    "hedefFiyat": 91.61
    }
   },
   "K_NASA": {
@@ -232,14 +232,14 @@
    }
   },
   "BTCUSD": {
-   "rsi": 24.2,
+   "rsi": 24.6,
    "teknik": -0.264,
-   "fiyat": 63547.27
+   "fiyat": 63663.71
   },
   "XRPUSD": {
-   "rsi": 31.6,
+   "rsi": 32.1,
    "teknik": -0.445,
-   "fiyat": 0.97858
+   "fiyat": 0.98164
   }
  }
 }
