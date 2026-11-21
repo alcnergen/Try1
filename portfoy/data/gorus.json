@@ -1,5 +1,5 @@
 {
- "guncelleme": "2026-11-20T22:13:37.038Z",
+ "guncelleme": "2026-11-21T03:14:40.467Z",
  "varliklar": {
   "USDTRY": {
    "rsi": 84.2,
@@ -21,12 +21,12 @@
    "teknik": -0.555,
    "fiyat": 56436.65,
    "icerik": {
-    "al": 0.691,
-    "tut": 0.277,
+    "al": 0.693,
+    "tut": 0.274,
     "sat": 0.033,
     "hedef": 0.418,
     "hisse": 225,
-    "gorus": 2616,
+    "gorus": 2620,
     "kapsam": 1,
     "kaynak": "Nikkei 225 üyeleri (piyasa değeri ağırlıklı)",
     "hedefFiyat": 80027.17
@@ -58,12 +58,12 @@
    "teknik": -0.603,
    "fiyat": 6910.39,
    "icerik": {
-    "al": 0.697,
+    "al": 0.696,
     "tut": 0.263,
     "sat": 0.04,
     "hedef": 0.323,
     "hisse": 501,
-    "gorus": 13242,
+    "gorus": 13244,
     "kapsam": 1,
     "kaynak": "S&P 500 üyeleri",
     "hedefFiyat": 9142.45
@@ -75,11 +75,11 @@
    "fiyat": 25028.9821,
    "icerik": {
     "al": 0.767,
-    "tut": 0.2,
+    "tut": 0.201,
     "sat": 0.033,
     "hedef": 0.44,
     "hisse": 98,
-    "gorus": 3501,
+    "gorus": 3503,
     "kapsam": 1,
     "kaynak": "Nasdaq 100 üyeleri",
     "hedefFiyat": 36041.73
@@ -95,8 +95,8 @@
    "teknik": -0.558,
    "fiyat": 400.06,
    "icerik": {
-    "al": 0.802,
-    "tut": 0.185,
+    "al": 0.803,
+    "tut": 0.184,
     "sat": 0.013,
     "hedef": 0.865,
     "hisse": 27,
@@ -156,15 +156,15 @@
    "teknik": -0.643,
    "fiyat": 17.05,
    "icerik": {
-    "al": 0.83,
+    "al": 0.831,
     "tut": 0.146,
-    "sat": 0.024,
-    "hedef": 1.151,
+    "sat": 0.023,
+    "hedef": 1.145,
     "hisse": 21,
-    "gorus": 276,
-    "kapsam": 0.548,
+    "gorus": 269,
+    "kapsam": 0.542,
     "kaynak": "fonun günlük içerik listesi",
-    "hedefFiyat": 36.67
+    "hedefFiyat": 36.57
    }
   },
   "K_QQQM": {
@@ -173,11 +173,11 @@
    "fiyat": 251.23,
    "icerik": {
     "al": 0.767,
-    "tut": 0.2,
+    "tut": 0.201,
     "sat": 0.033,
     "hedef": 0.44,
     "hisse": 98,
-    "gorus": 3501,
+    "gorus": 3503,
     "kapsam": 1,
     "kaynak": "Nasdaq 100 üyeleri",
     "hedefFiyat": 361.77
@@ -232,14 +232,14 @@
    }
   },
   "BTCUSD": {
-   "rsi": 17.6,
+   "rsi": 17,
    "teknik": -0.558,
-   "fiyat": 58989.45
+   "fiyat": 58353.44
   },
   "XRPUSD": {
-   "rsi": 25.6,
-   "teknik": -0.603,
-   "fiyat": 0.90929
+   "rsi": 24.8,
+   "teknik": -0.648,
+   "fiyat": 0.89684
   }
  }
 }
