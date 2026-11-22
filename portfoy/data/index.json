@@ -1,5 +1,5 @@
 {
- "guncelleme": "2026-11-21T13:25:36.153Z",
+ "guncelleme": "2026-11-22T13:17:08.239Z",
  "seriler": {
   "TGT": {
    "ad": "GARANTİ PORTFÖY KISA VADELİ BORÇLANMA ARAÇLARI FONU",
@@ -146,9 +146,9 @@
    "pb": "TRY",
    "kaynak": "tv:BITSTAMP:BTCUSD",
    "ilk": "2014-10-22",
-   "son": "2026-11-21",
-   "deger": 59403.75,
-   "adet": 4411
+   "son": "2026-11-22",
+   "deger": 60710.03,
+   "adet": 4412
   },
   "XRPUSD": {
    "ad": "Ripple XRP ($)",
@@ -156,9 +156,9 @@
    "pb": "TRY",
    "kaynak": "tv:BITSTAMP:XRPUSD",
    "ilk": "2014-09-28",
-   "son": "2026-11-21",
-   "deger": 0.91072,
-   "adet": 4411
+   "son": "2026-11-22",
+   "deger": 0.92089,
+   "adet": 4412
   },
   "SILVER": {
    "ad": "Gümüş (ons, $)",
