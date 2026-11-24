@@ -1,5 +1,5 @@
 {
- "guncelleme": "2026-11-24T07:45:32.610Z",
+ "guncelleme": "2026-11-24T07:55:28.294Z",
  "seriler": {
   "TGT": {
    "ad": "GARANTİ PORTFÖY KISA VADELİ BORÇLANMA ARAÇLARI FONU",
@@ -38,7 +38,7 @@
    "kaynak": "tv:FX_IDC:USDTRY",
    "ilk": "2010-01-29",
    "son": "2026-11-24",
-   "deger": 50.62692,
+   "deger": 50.6115,
    "adet": 4388
   },
   "EURTRY": {
@@ -48,7 +48,7 @@
    "kaynak": "tv:FX_IDC:EURTRY",
    "ilk": "2010-02-01",
    "son": "2026-11-24",
-   "deger": 55.2885,
+   "deger": 55.29407,
    "adet": 4387
   },
   "JPYTRY": {
@@ -58,7 +58,7 @@
    "kaynak": "tv:FX_IDC:JPYTRY",
    "ilk": "2010-01-27",
    "son": "2026-11-24",
-   "deger": 0.317686,
+   "deger": 0.317602,
    "adet": 4388
   },
   "GOLD": {
@@ -68,7 +68,7 @@
    "kaynak": "tv:TVC:GOLD",
    "ilk": "2009-05-27",
    "son": "2026-11-24",
-   "deger": 3623.261,
+   "deger": 3621.781,
    "adet": 4407
   },
   "XU100": {
@@ -78,7 +78,7 @@
    "kaynak": "tv:BIST:XU100",
    "ilk": "2009-06-02",
    "son": "2026-11-24",
-   "deger": 11080.64,
+   "deger": 11076.86,
    "adet": 4388
   },
   "SPX": {
@@ -138,7 +138,7 @@
    "kaynak": "tv:BITSTAMP:BTCUSD",
    "ilk": "2014-10-22",
    "son": "2026-11-24",
-   "deger": 60402.25,
+   "deger": 60361.97,
    "adet": 4414
   },
   "XRPUSD": {
@@ -148,7 +148,7 @@
    "kaynak": "tv:BITSTAMP:XRPUSD",
    "ilk": "2014-09-28",
    "son": "2026-11-24",
-   "deger": 0.94335,
+   "deger": 0.94406,
    "adet": 4414
   },
   "SILVER": {
@@ -158,7 +158,7 @@
    "kaynak": "tv:TVC:SILVER",
    "ilk": "2009-05-29",
    "son": "2026-11-24",
-   "deger": 42.5044,
+   "deger": 42.4197,
    "adet": 4404
   },
   "K_SMH": {
@@ -278,7 +278,7 @@
    "kaynak": "tv:TVC:DXY",
    "ilk": "2009-07-20",
    "son": "2026-11-24",
-   "deger": 104.349,
+   "deger": 104.344,
    "adet": 4398
   },
   "G_PETROL": {
@@ -288,7 +288,7 @@
    "kaynak": "tv:TVC:USOIL",
    "ilk": "2009-06-08",
    "son": "2026-11-24",
-   "deger": 80.24,
+   "deger": 80.14,
    "adet": 4398
   },
   "G_US10Y": {
@@ -298,7 +298,7 @@
    "kaynak": "tv:TVC:US10Y",
    "ilk": "2008-09-23",
    "son": "2026-11-24",
-   "deger": 4.94,
+   "deger": 4.938,
    "adet": 4397
   },
   "G_US02Y": {
