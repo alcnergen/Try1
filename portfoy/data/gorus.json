@@ -1,20 +1,20 @@
 {
- "guncelleme": "2026-11-25T07:05:49.128Z",
+ "guncelleme": "2026-11-25T07:16:09.464Z",
  "varliklar": {
   "USDTRY": {
    "rsi": 87.1,
    "teknik": 0.692,
-   "fiyat": 50.67632
+   "fiyat": 50.67679
   },
   "EURTRY": {
-   "rsi": 46,
+   "rsi": 46.1,
    "teknik": -0.153,
-   "fiyat": 55.42216
+   "fiyat": 55.42295
   },
   "GOLD": {
    "rsi": 27.8,
    "teknik": -0.393,
-   "fiyat": 3519.438
+   "fiyat": 3520.05
   },
   "N225": {
    "rsi": 36.7,
@@ -33,24 +33,24 @@
    }
   },
   "SILVER": {
-   "rsi": 25.6,
-   "teknik": -0.438,
-   "fiyat": 40.416
+   "rsi": 25.5,
+   "teknik": -0.484,
+   "fiyat": 40.3623
   },
   "XU100": {
-   "rsi": 33.6,
+   "rsi": 33,
    "teknik": -0.536,
-   "fiyat": 10965.93,
+   "fiyat": 10930.28,
    "icerik": {
     "al": 0.705,
     "tut": 0.287,
     "sat": 0.007,
-    "hedef": 0.561,
+    "hedef": 0.567,
     "hisse": 60,
     "gorus": 258,
     "kapsam": 0.912,
     "kaynak": "BIST 100 üyeleri",
-    "hedefFiyat": 17117.82
+    "hedefFiyat": 17127.75
    }
   },
   "SPX": {
@@ -232,14 +232,14 @@
    }
   },
   "BTCUSD": {
-   "rsi": 24.1,
+   "rsi": 24,
    "teknik": -0.603,
-   "fiyat": 59244.44
+   "fiyat": 59175.99
   },
   "XRPUSD": {
-   "rsi": 29.9,
+   "rsi": 29.8,
    "teknik": -0.467,
-   "fiyat": 0.921
+   "fiyat": 0.92001
   }
  }
 }
