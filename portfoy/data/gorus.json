@@ -1,5 +1,5 @@
 {
- "guncelleme": "2026-11-26T20:15:54.214Z",
+ "guncelleme": "2026-11-26T20:25:49.775Z",
  "varliklar": {
   "USDTRY": {
    "rsi": 87.1,
@@ -9,7 +9,7 @@
   "EURTRY": {
    "rsi": 51.7,
    "teknik": 0.367,
-   "fiyat": 55.71155
+   "fiyat": 55.71403
   },
   "GOLD": {
    "rsi": 30.9,
@@ -232,14 +232,14 @@
    }
   },
   "BTCUSD": {
-   "rsi": 28.6,
+   "rsi": 28.5,
    "teknik": -0.355,
-   "fiyat": 60656.27
+   "fiyat": 60614
   },
   "XRPUSD": {
-   "rsi": 35.5,
+   "rsi": 35.6,
    "teknik": -0.242,
-   "fiyat": 0.95083
+   "fiyat": 0.95155
   }
  }
 }
