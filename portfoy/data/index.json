@@ -1,5 +1,5 @@
 {
- "guncelleme": "2026-11-27T20:35:24.495Z",
+ "guncelleme": "2026-11-27T20:45:29.936Z",
  "seriler": {
   "TGT": {
    "ad": "GARANTİ PORTFÖY KISA VADELİ BORÇLANMA ARAÇLARI FONU",
@@ -44,7 +44,7 @@
    "kaynak": "tv:FX_IDC:USDTRY",
    "ilk": "2010-01-29",
    "son": "2026-11-27",
-   "deger": 50.7524,
+   "deger": 50.74681,
    "adet": 4391
   },
   "EURTRY": {
@@ -54,7 +54,7 @@
    "kaynak": "tv:FX_IDC:EURTRY",
    "ilk": "2010-02-01",
    "son": "2026-11-27",
-   "deger": 55.53743,
+   "deger": 55.53151,
    "adet": 4390
   },
   "JPYTRY": {
@@ -64,7 +64,7 @@
    "kaynak": "tv:FX_IDC:JPYTRY",
    "ilk": "2010-01-27",
    "son": "2026-11-27",
-   "deger": 0.318086,
+   "deger": 0.318194,
    "adet": 4391
   },
   "GOLD": {
@@ -144,7 +144,7 @@
    "kaynak": "tv:BITSTAMP:BTCUSD",
    "ilk": "2014-10-22",
    "son": "2026-11-27",
-   "deger": 59718.77,
+   "deger": 59779.25,
    "adet": 4417
   },
   "XRPUSD": {
@@ -154,7 +154,7 @@
    "kaynak": "tv:BITSTAMP:XRPUSD",
    "ilk": "2014-09-28",
    "son": "2026-11-27",
-   "deger": 0.94923,
+   "deger": 0.94945,
    "adet": 4417
   },
   "SILVER": {
@@ -174,7 +174,7 @@
    "kaynak": "tv:NASDAQ:SMH",
    "ilk": "2009-05-22",
    "son": "2026-11-27",
-   "deger": 440.06,
+   "deger": 437.69,
    "adet": 4407
   },
   "K_NVDA": {
@@ -184,7 +184,7 @@
    "kaynak": "tv:NASDAQ:NVDA",
    "ilk": "2009-05-22",
    "son": "2026-11-27",
-   "deger": 149.96,
+   "deger": 150.13,
    "adet": 4407
   },
   "K_IGV": {
@@ -194,7 +194,7 @@
    "kaynak": "tv:AMEX:IGV",
    "ilk": "2009-05-22",
    "son": "2026-11-27",
-   "deger": 97.53,
+   "deger": 97.45,
    "adet": 4407
   },
   "K_DRAM": {
@@ -204,7 +204,7 @@
    "kaynak": "tv:AMEX:DRAM",
    "ilk": "2026-04-06",
    "son": "2026-11-27",
-   "deger": 37.52,
+   "deger": 37.5,
    "adet": 165
   },
   "K_NASA": {
@@ -214,7 +214,7 @@
    "kaynak": "tv:AMEX:NASA",
    "ilk": "2026-03-31",
    "son": "2026-11-27",
-   "deger": 18.95,
+   "deger": 18.91,
    "adet": 168
   },
   "K_QQQM": {
@@ -224,7 +224,7 @@
    "kaynak": "tv:NASDAQ:QQQM",
    "ilk": "2020-10-13",
    "son": "2026-11-27",
-   "deger": 267.94,
+   "deger": 267.9,
    "adet": 1539
   },
   "K_CIBR": {
@@ -234,7 +234,7 @@
    "kaynak": "tv:NASDAQ:CIBR",
    "ilk": "2015-07-07",
    "son": "2026-11-27",
-   "deger": 97.44,
+   "deger": 97.69,
    "adet": 2867
   },
   "K_IBB": {
