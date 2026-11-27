@@ -1,15 +1,15 @@
 {
- "guncelleme": "2026-11-27T20:55:57.399Z",
+ "guncelleme": "2026-11-27T23:22:28.715Z",
  "varliklar": {
   "USDTRY": {
-   "rsi": 88.6,
-   "teknik": 0.51,
-   "fiyat": 50.7689
+   "rsi": 88.2,
+   "teknik": 0.393,
+   "fiyat": 50.7464
   },
   "EURTRY": {
-   "rsi": 47.9,
+   "rsi": 47,
    "teknik": -0.107,
-   "fiyat": 55.53785
+   "fiyat": 55.49166
   },
   "GOLD": {
    "rsi": 37,
@@ -26,7 +26,7 @@
     "sat": 0.033,
     "hedef": 0.328,
     "hisse": 225,
-    "gorus": 2584,
+    "gorus": 2583,
     "kapsam": 1,
     "kaynak": "Nikkei 225 üyeleri (piyasa değeri ağırlıklı)",
     "hedefFiyat": 77968.06
@@ -63,7 +63,7 @@
     "sat": 0.042,
     "hedef": 0.254,
     "hisse": 502,
-    "gorus": 13331,
+    "gorus": 13332,
     "kapsam": 1,
     "kaynak": "S&P 500 üyeleri",
     "hedefFiyat": 9151.05
@@ -79,7 +79,7 @@
     "sat": 0.036,
     "hedef": 0.355,
     "hisse": 98,
-    "gorus": 3507,
+    "gorus": 3508,
     "kapsam": 1,
     "kaynak": "Nasdaq 100 üyeleri",
     "hedefFiyat": 36214.26
@@ -100,7 +100,7 @@
     "sat": 0.014,
     "hedef": 0.706,
     "hisse": 27,
-    "gorus": 874,
+    "gorus": 875,
     "kapsam": 1,
     "kaynak": "SOX yarı iletken endeksi üyeleri (SMH'ye yakın)",
     "hedefFiyat": 750.74
@@ -124,12 +124,12 @@
    "teknik": -0.245,
    "fiyat": 97.53,
    "icerik": {
-    "al": 0.789,
-    "tut": 0.183,
+    "al": 0.79,
+    "tut": 0.182,
     "sat": 0.028,
     "hedef": 0.429,
     "hisse": 39,
-    "gorus": 1423,
+    "gorus": 1424,
     "kapsam": 0.936,
     "kaynak": "ABD'nin en büyük 40 yazılım şirketi (IGV'ye yakın)",
     "hedefFiyat": 139.37
@@ -177,7 +177,7 @@
     "sat": 0.036,
     "hedef": 0.355,
     "hisse": 98,
-    "gorus": 3507,
+    "gorus": 3508,
     "kapsam": 1,
     "kaynak": "Nasdaq 100 üyeleri",
     "hedefFiyat": 363.21
@@ -220,8 +220,8 @@
    "teknik": -0.133,
    "fiyat": 25441.24,
    "icerik": {
-    "al": 0.594,
-    "tut": 0.303,
+    "al": 0.593,
+    "tut": 0.304,
     "sat": 0.102,
     "hedef": 0.197,
     "hisse": 40,
@@ -234,12 +234,12 @@
   "BTCUSD": {
    "rsi": 26.7,
    "teknik": -0.512,
-   "fiyat": 59738
+   "fiyat": 59771.73
   },
   "XRPUSD": {
-   "rsi": 35.2,
+   "rsi": 34.5,
    "teknik": -0.333,
-   "fiyat": 0.94858
+   "fiyat": 0.94553
   }
  }
 }
